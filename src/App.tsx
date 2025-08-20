@@ -501,6 +501,72 @@ function App() {
                         )}
                       </div>
                     )}
+                      <h2 className="text-2xl font-bold text-white">Equipment Quote Form</h2>
+                      <button
+                        onClick={() => setShowContactSearch(!showContactSearch)}
+                        className="flex items-center px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 hover:text-white transition-colors"
+                      >
+                        <Search className="w-4 h-4 mr-2" />
+                        Search Contacts
+                      </button>
+                    </div>
+
+                    {showContactSearch && (
+                      <div className="mb-6 p-4 bg-gray-900 border border-accent rounded-lg">
+                        <div className="flex items-center space-x-4 mb-4">
+                          <div className="flex-1">
+                            <input
+                              type="text"
+                              value={contactSearchTerm}
+                              onChange={(e) => {
+                                setContactSearchTerm(e.target.value)
+                                searchHubSpotContacts(e.target.value)
+                              }}
+                              placeholder="Search contacts by name..."
+                              className="w-full px-4 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white placeholder-white"
+                            />
+                          </div>
+                          <button
+                            onClick={() => setShowContactSearch(false)}
+                            className="p-2 text-white hover:text-white"
+                          >
+                            <X className="w-5 h-5" />
+                          </button>
+                        </div>
+
+                        {searchingContacts && (
+                          <div className="text-center py-4">
+                            <div className="inline-flex items-center text-white">
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                              Searching contacts...
+                            </div>
+                          </div>
+                        )}
+
+                        {hubspotContacts.length > 0 && (
+                          <div className="space-y-2 max-h-60 overflow-y-auto">
+                            {hubspotContacts.map((contact) => (
+                              <div
+                                key={contact.id}
+                                onClick={() => selectContact(contact)}
+                                className="p-3 bg-black border border-accent rounded-lg cursor-pointer hover:bg-gray-800 transition-colors"
+                              >
+                                <div className="font-medium text-white">
+                                  {contact.firstName} {contact.lastName}
+                                </div>
+                                <div className="text-sm text-white">
+                                  {contact.companyName && <span>{contact.companyName} • </span>}
+                                  {contact.email}
+                                </div>
+                                {contact.contactAddress && (
+                                  <div className="text-sm text-white">{contact.contactAddress}</div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
