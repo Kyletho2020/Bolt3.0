@@ -1666,13 +1666,7 @@ When job is complete clean up debris and return to ${shopLocation}.`
                 <RotateCcw className="w-4 h-4 mr-2" />
                 Reset Saved Data
               </button>
-              <button
-                onClick={() => setShowTemplates(true)}
-                className="flex items-center px-4 py-2 bg-white text-black font-medium rounded-lg hover:bg-white transition-colors"
-              >
-                <FileText className="w-4 h-4 mr-2" />
-                Preview Templa
-              </button>
+        
             </div>
           </div>
         </div>
