@@ -17,6 +17,7 @@ import {
 import { useSessionId } from './hooks/useSessionId'
 import AIExtractorModal from './components/AIExtractorModal'
 import PreviewTemplates from './components/PreviewTemplates'
+import QuoteSaveManager from './components/QuoteSaveManager'
 import ApiKeySetup from './components/ApiKeySetup'
 import { HubSpotService, HubSpotContact } from './services/hubspotService'
 import { QuoteService } from './services/quoteService'
@@ -141,6 +142,7 @@ const getInitialSection = (section: string): Partial<FormData> => {
 const App: React.FC = () => {
   const [showAIExtractor, setShowAIExtractor] = useState(false)
   const [showTemplates, setShowTemplates] = useState(false)
+  const [showSaveManager, setShowSaveManager] = useState(false)
   const [showApiKeySetup, setShowApiKeySetup] = useState(false)
   const sessionId = useSessionId()
 
@@ -637,21 +639,7 @@ const App: React.FC = () => {
         <h3 className="text-lg font-semibold text-white">Project Details</h3>
         <div className="flex items-center gap-2">
           <button
-            onClick={async () => {
-              if (!sessionId) return
-              const quoteNumber = `${new Date().toISOString().slice(0,10)}-${Math.random().toString(36).slice(2,6).toUpperCase()}`
-              try {
-                setSavingQuote(true)
-                await QuoteService.saveQuote(sessionId, quoteNumber, formData as unknown as Record<string, unknown>)
-                const items = await QuoteService.listQuotes(sessionId)
-                setQuoteList(items)
-                setQuoteHistoryOpen(true)
-              } catch (e) {
-                console.error('Save quote failed', e)
-              } finally {
-                setSavingQuote(false)
-              }
-            }}
+            onClick={() => setShowSaveManager(true)}
             className="flex items-center px-3 py-1.5 text-sm bg-white text-black rounded-lg border border-white hover:bg-white disabled:opacity-50"
             disabled={savingQuote}
           >
@@ -1712,6 +1700,18 @@ When job is complete clean up debris and return to ${shopLocation}.`
         onClose={() => setShowTemplates(false)}
       />
 
+      <QuoteSaveManager
+        equipmentData={formData}
+        logisticsData={formData}
+        emailTemplate={generateCustomerEmailTemplate()}
+        scopeTemplate={generateScopeTemplate()}
+        onLoadQuote={(equipment, logistics) => {
+          setFormData({ ...equipment, ...logistics })
+        }}
+        isOpen={showSaveManager}
+        onClose={() => setShowSaveManager(false)}
+      />
+
       {showApiKeySetup && (
         <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
           <div className="bg-black rounded-2xl shadow-2xl w-full max-w-md">
@@ -1737,4 +1737,3 @@ When job is complete clean up debris and return to ${shopLocation}.`
 }
 
 export default App
-
