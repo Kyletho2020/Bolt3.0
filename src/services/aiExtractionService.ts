@@ -9,11 +9,16 @@ interface ExtractionResult {
 }
 
 export class AIExtractionService {
-  private static readonly SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL
-  private static readonly SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY
+  private static readonly SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || ''
+  private static readonly SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || ''
 
   static async extractProjectInfo(text: string, sessionId: string): Promise<ExtractionResult> {
     try {
+      // Check if environment variables are available
+      if (!this.SUPABASE_URL || !this.SUPABASE_ANON_KEY) {
+        throw new Error('Supabase configuration missing. Please check environment variables.')
+      }
+
       // Validate inputs
       if (!text?.trim()) {
         throw new Error('Text is required')

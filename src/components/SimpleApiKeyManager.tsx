@@ -31,10 +31,17 @@ const SimpleApiKeyManager: React.FC<SimpleApiKeyManagerProps> = ({ onApiKeySet }
 
     setLoading(true);
     try {
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/store-api-key-simple`, {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+      const manualKey = import.meta.env.VITE_SUPABASE_MANUAL_KEY
+      
+      if (!supabaseUrl || !manualKey) {
+        throw new Error('Supabase configuration missing')
+      }
+
+      const response = await fetch(`${supabaseUrl}/functions/v1/store-api-key-simple`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_MANUAL_KEY}`,
+          'Authorization': `Bearer ${manualKey}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ 

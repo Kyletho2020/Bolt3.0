@@ -18,10 +18,14 @@ export interface HubSpotContact {
 }
 
 export class HubSpotService {
-  private static readonly SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL
-  private static readonly SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY
+  private static readonly SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || ''
+  private static readonly SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || ''
 
   static async searchContactsByName(name: string, partial = false): Promise<HubSpotContact[]> {
+    if (!this.SUPABASE_URL || !this.SUPABASE_ANON_KEY) {
+      throw new Error('Supabase configuration missing')
+    }
+
     const response = await fetch(`${this.SUPABASE_URL}/functions/v1/hubspot-search`, {
       method: 'POST',
       headers: {
