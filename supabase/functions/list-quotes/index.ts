@@ -29,7 +29,7 @@ Deno.serve(async (req) => {
 
     const { data, error } = await supabase
       .from('quotes')
-      .select('id, quote_number, customer_name, company_name, created_at')
+      .select('id, quote_number, contact_name, company_name, created_at')
       .order('created_at', { ascending: false })
 
     if (error) {

@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase'
 export interface QuoteListItem {
   id: string
   quote_number: string
-  customer_name: string | null
+  contact_name: string | null
   company_name: string | null
   created_at: string
 }
