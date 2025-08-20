@@ -676,22 +676,7 @@ const App: React.FC = () => {
           >
             {savingQuote ? 'Saving…' : 'Save Quote'}
           </button>
-          <button
-            onClick={async () => {
-              if (!sessionId) return
-              try {
-                const items = await QuoteService.listQuotes(sessionId)
-                setQuoteList(items)
-                setQuoteHistoryOpen(true)
-              } catch (e) {
-                console.error('Load quote list failed', e)
-              }
-            }}
-            className="flex items-center px-3 py-1.5 text-sm text-white hover:bg-black rounded-lg transition-colors"
-          >
-            <History className="w-4 h-4 mr-1" />
-            Histor
-          </button>
+   
           <button
             onClick={() => clearSection('project')}
             className="flex items-center px-3 py-1.5 text-sm text-white hover:bg-black rounded-lg transition-colors"
