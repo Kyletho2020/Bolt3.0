@@ -1671,7 +1671,7 @@ When job is complete clean up debris and return to ${shopLocation}.`
                 className="flex items-center px-4 py-2 bg-white text-black font-medium rounded-lg hover:bg-white transition-colors"
               >
                 <FileText className="w-4 h-4 mr-2" />
-                Preview Templates
+                Preview Templa
               </button>
             </div>
           </div>
