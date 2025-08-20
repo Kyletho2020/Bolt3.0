@@ -130,7 +130,7 @@ ${equipmentData.specialInstructions}
         <div className="flex items-center justify-between p-6 border-b-2 border-accent">
           <div className="flex items-center">
             <Eye className="w-6 h-6 text-white mr-2" />
-            <h3 className="text-xl font-bold text-white">Preview Temp</h3>
+            <h3 className="text-xl font-bold text-white">Preview Te</h3>
           </div>
           <button
             onClick={onClose}
