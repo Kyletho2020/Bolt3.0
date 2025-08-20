@@ -37,59 +37,26 @@ Deno.serve(async (req) => {
     const companyName = String(formData['companyName'] || '')
     const email = String(formData['email'] || '')
     const phone = String(formData['phone'] || '')
-    const siteAddress = String(formData['projectAddress'] || '')
+    const siteAddress = String(formData['siteAddress'] || '')
     const pickupAddress = String(formData['pickupAddress'] || '')
     const pickupCity = String(formData['pickupCity'] || '')
     const pickupState = String(formData['pickupState'] || '')
     const pickupZip = String(formData['pickupZip'] || '')
 
-    // Check if quote already exists (for updates)
-    const { data: existingQuote } = await supabase
-      .from('quotes')
-      .select('id')
-      .eq('quote_number', quoteNumber)
-      .single()
-
-    let error
-    if (existingQuote) {
-      // Update existing quote
-      const result = await supabase
-        .from('quotes')
-        .update({
-          session_id: sessionId,
-          customer_name: customerName,
-          company_name: companyName,
-          email,
-          phone,
-          site_address: siteAddress,
-          pickup_address: pickupAddress,
-          pickup_city: pickupCity,
-          pickup_state: pickupState,
-          pickup_zip: pickupZip,
-          form_snapshot: formData,
-        })
-        .eq('quote_number', quoteNumber)
-      error = result.error
-    } else {
-      // Insert new quote
-      const result = await supabase
-        .from('quotes')
-        .insert({
-          session_id: sessionId,
-          quote_number: quoteNumber,
-          customer_name: customerName,
-          company_name: companyName,
-          email,
-          phone,
-          site_address: siteAddress,
-          pickup_address: pickupAddress,
-          pickup_city: pickupCity,
-          pickup_state: pickupState,
-          pickup_zip: pickupZip,
-          form_snapshot: formData,
-        })
-      error = result.error
-    }
+    const { error } = await supabase.from('quotes').insert({
+      session_id: sessionId,
+      quote_number: quoteNumber,
+      customer_name: customerName,
+      company_name: companyName,
+      email,
+      phone,
+      site_address: siteAddress,
+      pickup_address: pickupAddress,
+      pickup_city: pickupCity,
+      pickup_state: pickupState,
+      pickup_zip: pickupZip,
+      form_snapshot: formData,
+    })
 
     if (error) {
       return new Response(JSON.stringify({ error: error.message }), {
@@ -98,10 +65,7 @@ Deno.serve(async (req) => {
       })
     }
 
-    return new Response(JSON.stringify({ 
-      success: true, 
-      action: existingQuote ? 'updated' : 'created' 
-    }), {
+    return new Response(JSON.stringify({ success: true }), {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
