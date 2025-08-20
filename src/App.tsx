@@ -690,7 +690,7 @@ const App: React.FC = () => {
             className="flex items-center px-3 py-1.5 text-sm text-white hover:bg-black rounded-lg transition-colors"
           >
             <History className="w-4 h-4 mr-1" />
-            History
+            Histor
           </button>
           <button
             onClick={() => clearSection('project')}
