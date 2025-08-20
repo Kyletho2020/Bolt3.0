@@ -676,7 +676,6 @@ const App: React.FC = () => {
           >
             {savingQuote ? 'Saving…' : 'Save Quote'}
           </button>
-   
           <button
             onClick={() => clearSection('project')}
             className="flex items-center px-3 py-1.5 text-sm text-white hover:bg-black rounded-lg transition-colors"
