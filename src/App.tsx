@@ -13,11 +13,13 @@ import {
   CheckCircle,
   Search,
   Mail,
-  History
+  History,
+  Archive
 } from 'lucide-react'
 import { useSessionId } from './hooks/useSessionId'
 import AIExtractorModal from './components/AIExtractorModal'
 import PreviewTemplates from './components/PreviewTemplates'
+import QuoteHistoryModal from './components/QuoteHistoryModal'
 import ApiKeySetup from './components/ApiKeySetup'
 import { HubSpotService, HubSpotContact } from './services/hubspotService'
 import { QuoteService } from './services/quoteService'
@@ -143,6 +145,7 @@ const App: React.FC = () => {
   const [showAIExtractor, setShowAIExtractor] = useState(false)
   const [showTemplates, setShowTemplates] = useState(false)
   const [showApiKeySetup, setShowApiKeySetup] = useState(false)
+  const [showQuoteHistory, setShowQuoteHistory] = useState(false)
   const sessionId = useSessionId()
 
   const [formData, setFormData] = useState<FormData>(initialFormData)
@@ -625,6 +628,35 @@ const App: React.FC = () => {
     }
   }
 
+  const handleSaveQuote = async () => {
+    try {
+      const quoteNumber = QuoteService.generateQuoteNumber(
+        formData.projectName,
+        formData.companyName
+      )
+      
+      const result = await QuoteService.saveQuote(
+        quoteNumber,
+        formData,
+        formData
+      )
+      
+      if (result.success) {
+        alert('Quote saved successfully!')
+      } else {
+        alert(`Failed to save quote: ${result.error}`)
+      }
+    } catch (error) {
+      alert('Error saving quote')
+      console.error('Save quote error:', error)
+    }
+  }
+
+  const handleLoadQuote = (loadedEquipmentData: any, loadedLogisticsData: any) => {
+    setFormData({ ...loadedEquipmentData, ...loadedLogisticsData })
+    setShowQuoteHistory(false)
+  }
+
   const navigation = [
     { id: 'project', name: 'Project Details', icon: Building2 },
     { id: 'equipment', name: 'Equipment Required', icon: Truck },
@@ -638,21 +670,7 @@ const App: React.FC = () => {
         <h3 className="text-lg font-semibold text-white">Project Details</h3>
         <div className="flex items-center gap-2">
           <button
-            onClick={async () => {
-              if (!sessionId) return
-              const quoteNumber = `${new Date().toISOString().slice(0,10)}-${Math.random().toString(36).slice(2,6).toUpperCase()}`
-              try {
-                setSavingQuote(true)
-                await QuoteService.saveQuote(sessionId, quoteNumber, formData as unknown as Record<string, unknown>)
-                const items = await QuoteService.listQuotes(sessionId)
-                setQuoteList(items)
-                setQuoteHistoryOpen(true)
-              } catch (e) {
-                console.error('Save quote failed', e)
-              } finally {
-                setSavingQuote(false)
-              }
-            }}
+            onClick={handleSaveQuote}
             className="flex items-center px-3 py-1.5 text-sm bg-white text-black rounded-lg border border-white hover:bg-white disabled:opacity-50"
             disabled={savingQuote}
           >
@@ -1622,6 +1640,13 @@ When job is complete clean up debris and return to ${shopLocation}.`
             AI Extractor
           </button>
           <button
+            onClick={() => setShowQuoteHistory(true)}
+            className="w-full flex items-center px-4 py-3 text-left text-white hover:bg-gray-800 transition-colors rounded-lg"
+          >
+            <Archive className="w-4 h-4 mr-2" />
+            Quote History
+          </button>
+          <button
             onClick={() => setShowApiKeySetup(true)}
             className="w-full flex items-center px-4 py-3 text-left text-white hover:bg-gray-800 hover:text-white rounded-lg transition-colors"
           >
@@ -1712,6 +1737,14 @@ When job is complete clean up debris and return to ${shopLocation}.`
         logisticsData={formData}
         isOpen={showTemplates}
         onClose={() => setShowTemplates(false)}
+      />
+
+      <QuoteHistoryModal
+        isOpen={showQuoteHistory}
+        onClose={() => setShowQuoteHistory(false)}
+        onLoadQuote={handleLoadQuote}
+        currentEquipmentData={formData}
+        currentLogisticsData={formData}
       />
 
       {showApiKeySetup && (
