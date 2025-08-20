@@ -28,9 +28,6 @@ export interface SavedQuote {
 }
 
 export class QuoteService {
-  private static readonly SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL
-  private static readonly SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY
-
   // Generate a readable quote number
   static generateQuoteNumber(projectName?: string, companyName?: string): string {
     const date = new Date()

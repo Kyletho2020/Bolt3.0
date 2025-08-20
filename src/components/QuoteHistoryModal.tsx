@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from 'react'
-import { Archive, Search, Trash2, Download, Save, X, Calendar, Building, User, FileText, Loader, CheckCircle, AlertCircle } from 'lucide-react'
+import { Archive, Search, Trash2, Download, Save, X, Calendar, Building, User, FileText, Loader, CheckCircle, AlertCircle, Plus } from 'lucide-react'
 import { QuoteService, QuoteListItem, SavedQuote } from '../services/quoteService'
 
 interface QuoteHistoryModalProps {
@@ -152,6 +152,7 @@ const QuoteHistoryModal: React.FC<QuoteHistoryModalProps> = ({
         
         onLoadQuote(loadedEquipmentData, quote.logistics_data || {})
         setMessage({ type: 'success', text: 'Quote loaded successfully!' })
+        setTimeout(() => onClose(), 1500) // Close modal after success message
       }
     } catch (error) {
       setMessage({ type: 'error', text: 'Failed to load quote' })
@@ -248,13 +249,22 @@ const QuoteHistoryModal: React.FC<QuoteHistoryModalProps> = ({
                 <label className="block text-sm font-medium text-white mb-2">
                   Quote Number
                 </label>
-                <input
-                  type="text"
-                  value={quoteNumber}
-                  onChange={(e) => setQuoteNumber(e.target.value)}
-                  className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                  placeholder="Enter quote number"
-                />
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={quoteNumber}
+                    onChange={(e) => setQuoteNumber(e.target.value)}
+                    className="flex-1 px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
+                    placeholder="Enter quote number"
+                  />
+                  <button
+                    onClick={generateNewQuoteNumber}
+                    className="px-3 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                    title="Generate new number"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
 
               <div className="bg-black rounded-lg p-4 border border-accent">
