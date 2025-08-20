@@ -8,6 +8,7 @@ import { useSessionId } from './hooks/useSessionId'
 import { supabase } from './lib/supabase'
 import { QuoteService, QuoteListItem } from './services/quoteService'
 import { HubSpotService, HubSpotContact } from './services/hubspotService'
+import { HubSpotService, HubSpotContact } from './services/hubspotService'
 
 interface FormData {
   // Equipment form fields
@@ -81,6 +82,10 @@ function App() {
   const [saveMessage, setSaveMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
   const [savingQuote, setSavingQuote] = useState(false)
   const [editingQuote, setEditingQuote] = useState<string | null>(null)
+  const [hubspotContacts, setHubspotContacts] = useState<HubSpotContact[]>([])
+  const [showContactSearch, setShowContactSearch] = useState(false)
+  const [contactSearchTerm, setContactSearchTerm] = useState('')
+  const [searchingContacts, setSearchingContacts] = useState(false)
   const [hubspotContacts, setHubspotContacts] = useState<HubSpotContact[]>([])
   const [showContactSearch, setShowContactSearch] = useState(false)
   const [contactSearchTerm, setContactSearchTerm] = useState('')
