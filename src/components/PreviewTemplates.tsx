@@ -19,7 +19,7 @@ const PreviewTemplates: React.FC<PreviewTemplatesProps> = ({
   const [copiedTemplate, setCopiedTemplate] = useState<string | null>(null)
 
   const generateEmailTemplate = () => {
-    const projectName = equipmentData.projectName || '[Project Name]'
+    const projectName = equipmentData.projectName || '[project name]'
     const companyName = equipmentData.companyName || '[Company Name]'
     const contactName = equipmentData.contactName || '[Contact Name]'
     const projectAddress = equipmentData.projectAddress || '[Project Address]'
