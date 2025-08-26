@@ -1466,10 +1466,11 @@ When job is complete clean up debris and return to ${shopLocation}.`
   }
 
   const generateCustomerEmailTemplate = () => {
-    const contactName = formData.contactName || '[site contact]'
+    const fullContactName = formData.contactName?.trim()
+    const firstName = fullContactName ? fullContactName.split(' ')[0] : '[site contact]'
     const projectName = formData.projectName || '[project name]'
 
-    return `${contactName} - Omega Morgan - ${projectName} - Quote\n\nHello ${contactName},\n\nThank you for considering Omega Morgan for the opportunity to provide your company with ${projectName}.\n\nShould you have any questions or require further clarification, please don't hesitate to reach out.\n\nIf you are ready to proceed, kindly sign and return the documents via email.\n\nWe appreciate your time and consideration.\n\nThank you,\n`
+    return `${firstName} - Omega Morgan - ${projectName} - Quote\n\nHello ${firstName},\n\nThank you for considering Omega Morgan for the opportunity to provide your company with ${projectName}.\n\nShould you have any questions or require further clarification, please don't hesitate to reach out.\n\nIf you are ready to proceed, kindly sign and return the documents via email.\n\nWe appreciate your time and consideration.\n\nThank you,\n`
   }
 
   const renderTemplates = () => (
