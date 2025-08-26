@@ -51,6 +51,7 @@ CREATE TABLE IF NOT EXISTS quotes (
 ALTER TABLE quotes ENABLE ROW LEVEL SECURITY;
 
 -- Create policy for public access
+DROP POLICY IF EXISTS "Allow public access to quotes" ON quotes;
 CREATE POLICY "Allow public access to quotes"
   ON quotes
   FOR ALL
