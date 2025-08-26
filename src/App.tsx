@@ -7,6 +7,7 @@ import {
   FileText,
   Bot,
   Trash2,
+  Edit2,
   RotateCcw,
   Plus,
   Minus,
@@ -667,7 +668,7 @@ const App: React.FC = () => {
     { id: 'clarifications', name: 'Clarifications', icon: Archive },
   ]
 
-  const clarificationSections = [
+  const [clarificationSections, setClarificationSections] = useState([
     {
       title: 'Machinery Moving',
       lines: [
@@ -689,7 +690,67 @@ const App: React.FC = () => {
         'Mandatory missed meal charge at 10 hours from start of shift.',
       ],
     },
-  ]
+    {
+      title: 'Custom Clarifications',
+      lines: [],
+    },
+  ])
+
+  const [copiedClarifications, setCopiedClarifications] = useState<string[]>([])
+
+  const addClarification = (sectionIndex: number) => {
+    const text = prompt('Enter clarification')
+    if (text) {
+      setClarificationSections((prev) =>
+        prev.map((section, idx) =>
+          idx === sectionIndex
+            ? { ...section, lines: [...section.lines, text] }
+            : section
+        )
+      )
+    }
+  }
+
+  const editClarification = (sectionIndex: number, lineIndex: number) => {
+    const current = clarificationSections[sectionIndex].lines[lineIndex]
+    const id = `clarification-${sectionIndex}-${lineIndex}`
+    const text = prompt('Edit clarification', current)
+    if (text !== null) {
+      setClarificationSections((prev) =>
+        prev.map((section, idx) =>
+          idx === sectionIndex
+            ? {
+                ...section,
+                lines: section.lines.map((l, i) => (i === lineIndex ? text : l)),
+              }
+            : section
+        )
+      )
+      setCopiedClarifications((prev) => prev.filter((c) => c !== id))
+    }
+  }
+
+  const deleteClarification = (sectionIndex: number, lineIndex: number) => {
+    const id = `clarification-${sectionIndex}-${lineIndex}`
+    setClarificationSections((prev) =>
+      prev.map((section, idx) =>
+        idx === sectionIndex
+          ? {
+              ...section,
+              lines: section.lines.filter((_, i) => i !== lineIndex),
+            }
+          : section
+      )
+    )
+    setCopiedClarifications((prev) => prev.filter((c) => c !== id))
+  }
+
+  const copyClarification = (line: string, id: string) => {
+    copyToClipboard(line, id)
+    setCopiedClarifications((prev) =>
+      prev.includes(id) ? prev : [...prev, id]
+    )
+  }
 
   const renderProjectDetails = () => (
     <div className="bg-gray-900 rounded-xl border-2 border-accent">
@@ -1622,26 +1683,56 @@ When job is complete clean up debris and return to ${shopLocation}.`
                     key={id}
                     className="flex items-start justify-between bg-black border border-white rounded-lg p-3"
                   >
-                    <span className="text-white text-sm pr-4">{line}</span>
-                    <button
-                      onClick={() => copyToClipboard(line, id)}
-                      className="flex items-center px-2 py-1 text-sm bg-white text-black rounded hover:bg-white transition-colors"
-                    >
-                      {copiedTemplate === id ? (
-                        <>
-                          <CheckCircle className="w-4 h-4 mr-1" />
-                          Copied!
-                        </>
-                      ) : (
-                        <>
-                          <FileText className="w-4 h-4 mr-1" />
-                          Copy
-                        </>
+                    <span className="text-white text-sm pr-4 flex items-center">
+                      {line}
+                      {copiedClarifications.includes(id) && (
+                        <CheckCircle className="w-4 h-4 ml-2 text-green-400" />
                       )}
-                    </button>
+                    </span>
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => copyClarification(line, id)}
+                        className="flex items-center px-2 py-1 text-sm bg-white text-black rounded hover:bg-white transition-colors"
+                      >
+                        {copiedTemplate === id ? (
+                          <>
+                            <CheckCircle className="w-4 h-4 mr-1" />
+                            Copied!
+                          </>
+                        ) : (
+                          <>
+                            <FileText className="w-4 h-4 mr-1" />
+                            Copy
+                          </>
+                        )}
+                      </button>
+                      <button
+                        onClick={() => editClarification(sectionIndex, lineIndex)}
+                        className="p-1 text-white hover:text-accent"
+                      >
+                        <Edit2 className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => deleteClarification(sectionIndex, lineIndex)}
+                        className="p-1 text-white hover:text-accent"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </li>
                 )
               })}
+              {sectionIndex === clarificationSections.length - 1 && (
+                <li>
+                  <button
+                    onClick={() => addClarification(sectionIndex)}
+                    className="flex items-center text-sm text-white hover:text-accent"
+                  >
+                    <Plus className="w-4 h-4 mr-1" />
+                    Add Clarification
+                  </button>
+                </li>
+              )}
             </ul>
           </div>
         ))}
