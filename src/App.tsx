@@ -13,7 +13,6 @@ import {
   CheckCircle,
   Search,
   Mail,
-  History,
   Archive
 } from 'lucide-react'
 import { useSessionId } from './hooks/useSessionId'
@@ -160,7 +159,7 @@ const App: React.FC = () => {
   const suppressNextTypeaheadRef = useRef<boolean>(false)
   const [savingQuote, setSavingQuote] = useState(false)
   const [quoteHistoryOpen, setQuoteHistoryOpen] = useState(false)
-  const [quoteList, setQuoteList] = useState<Array<{ id: string; quote_number: string; customer_name: string | null; company_name: string | null; created_at: string }>>([])
+  const [quoteList] = useState<Array<{ id: string; quote_number: string; customer_name: string | null; company_name: string | null; created_at: string }>>([])
 
   useEffect(() => {
     const stored = localStorage.getItem('quote-form')
@@ -630,17 +629,18 @@ const App: React.FC = () => {
 
   const handleSaveQuote = async () => {
     try {
+      setSavingQuote(true)
       const quoteNumber = QuoteService.generateQuoteNumber(
         formData.projectName,
         formData.companyName
       )
-      
+
       const result = await QuoteService.saveQuote(
         quoteNumber,
         formData,
         formData
       )
-      
+
       if (result.success) {
         alert('Quote saved successfully!')
       } else {
@@ -649,6 +649,8 @@ const App: React.FC = () => {
     } catch (error) {
       alert('Error saving quote')
       console.error('Save quote error:', error)
+    } finally {
+      setSavingQuote(false)
     }
   }
 
@@ -662,6 +664,31 @@ const App: React.FC = () => {
     { id: 'equipment', name: 'Equipment Required', icon: Truck },
     { id: 'storage', name: 'Storage & Logistics', icon: Package },
     { id: 'templates', name: 'Templates', icon: FileText },
+    { id: 'clarifications', name: 'Clarifications', icon: Archive },
+  ]
+
+  const clarificationSections = [
+    {
+      title: 'Machinery Moving',
+      lines: [
+        'Any change to the job will require approval in writing prior to completion of work.',
+        'Customer is to supply clear pathway for all items to be loaded onto trailers',
+        'Quote is based on no site visit and is not responsible for cracks in pavement or other unforeseen causes to not be able to perform work',
+      ],
+    },
+    {
+      title: 'Crane',
+      lines: [
+        'Crew to take half hour meal break between 4 - 5 hour start of shift in yard.',
+        'Customer may work crew through first meal break and pay missed meal charge of $175 per crew member.',
+        '60 ton boom truck quoted and 6 and 8 hour minimums. 8 hour quoted for budget.',
+        'Quoted straight time and portal to portal.',
+        'Overtime overtime to be charged $65/hour.',
+        'Straight time is the first 8 hours worked between 5am - 6pm Monday through Friday including travel and dismantle.',
+        'Customer may work crew through meal with signature on work ticket and pay missed meal charge of $175 per crew member per missed meal.',
+        'Mandatory missed meal charge at 10 hours from start of shift.',
+      ],
+    },
   ]
 
   const renderProjectDetails = () => (
@@ -1578,6 +1605,50 @@ When job is complete clean up debris and return to ${shopLocation}.`
     </div>
   )
 
+  const renderClarifications = () => (
+    <div className="bg-gray-900 rounded-xl border-2 border-accent">
+      <div className="p-6 border-b-2 border-accent">
+        <h3 className="text-lg font-semibold text-white">Clarifications</h3>
+      </div>
+      <div className="p-6 space-y-6">
+        {clarificationSections.map((section, sectionIndex) => (
+          <div key={section.title}>
+            <h4 className="text-md font-semibold text-white mb-2">{section.title}</h4>
+            <ul className="space-y-2">
+              {section.lines.map((line, lineIndex) => {
+                const id = `clarification-${sectionIndex}-${lineIndex}`
+                return (
+                  <li
+                    key={id}
+                    className="flex items-start justify-between bg-black border border-white rounded-lg p-3"
+                  >
+                    <span className="text-white text-sm pr-4">{line}</span>
+                    <button
+                      onClick={() => copyToClipboard(line, id)}
+                      className="flex items-center px-2 py-1 text-sm bg-white text-black rounded hover:bg-white transition-colors"
+                    >
+                      {copiedTemplate === id ? (
+                        <>
+                          <CheckCircle className="w-4 h-4 mr-1" />
+                          Copied!
+                        </>
+                      ) : (
+                        <>
+                          <FileText className="w-4 h-4 mr-1" />
+                          Copy
+                        </>
+                      )}
+                    </button>
+                  </li>
+                )
+              })}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+
   const renderContent = () => {
     return (
       <div className="space-y-8">
@@ -1585,6 +1656,7 @@ When job is complete clean up debris and return to ${shopLocation}.`
         <div id="equipment">{renderEquipmentRequired()}</div>
         <div id="storage">{renderStorageLogistics()}</div>
         <div id="templates">{renderTemplates()}</div>
+        <div id="clarifications">{renderClarifications()}</div>
       </div>
     )
   }
