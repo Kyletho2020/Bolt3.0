@@ -1524,7 +1524,7 @@ When job is complete clean up debris and return to ${shopLocation}.`
       ? `<strong>Storage Required:</strong> ${storageLine.replace(/^Storage Required:\s*/, '')}<br><br>`
       : ''
 
-    const body =
+    const bodyHtml =
       `Hello Team,<br><br>` +
       `I'm reaching out to request a logistics quote for an upcoming project. Please see the load and transport details below:<br><br>` +
       `<strong>Number of Pieces:</strong> ${pieceCount}<br><br>` +
@@ -1539,17 +1539,19 @@ When job is complete clean up debris and return to ${shopLocation}.`
       `Looking forward to your response.<br><br>` +
       `Thanks,`
 
-    return { subject, body }
+    const bodyText = bodyHtml.replace(/<br>/g, '\n').replace(/<[^>]+>/g, '')
+
+    return { subject, bodyHtml, bodyText }
   }
 
   const generateLogisticsTemplate = () => {
-    const { subject, body } = generateLogisticsEmail()
-    return `<strong>Subject:</strong> ${subject}<br><br>${body}`
+    const { subject, bodyHtml } = generateLogisticsEmail()
+    return `<strong>Subject:</strong> ${subject}<br><br>${bodyHtml}`
   }
 
   const sendLogisticsEmail = () => {
-    const { subject, body } = generateLogisticsEmail()
-    const mailto = `mailto:Logistics@omegamorgan.com;MachineryLogistics@omegamorgan.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+    const { subject, bodyText } = generateLogisticsEmail()
+    const mailto = `mailto:Logistics@omegamorgan.com;MachineryLogistics@omegamorgan.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyText)}`
     window.location.href = mailto
   }
 
