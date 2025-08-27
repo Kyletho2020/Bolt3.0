@@ -1618,7 +1618,7 @@ When job is complete clean up debris and return to ${shopLocation}.`
           </button>
         </div>
         <div className="p-6">
-          <div className="bg-black rounded-lg p-4 border border-white h-64 overflow-y-auto">
+          <div className="bg-black rounded-lg p-4 border border-white h-96 overflow-y-auto">
             <pre className="whitespace-pre-wrap text-sm text-white font-mono leading-relaxed">
               {generateCustomerEmailTemplate()}
             </pre>
