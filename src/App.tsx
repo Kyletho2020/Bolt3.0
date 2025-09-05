@@ -24,6 +24,7 @@ import AIExtractorModal from './components/AIExtractorModal'
 import PreviewTemplates from './components/PreviewTemplates'
 import QuoteHistoryModal from './components/QuoteHistoryModal'
 import ApiKeySetup from './components/ApiKeySetup'
+import HubSpotContactSearch from './components/HubSpotContactSearch'
 import { HubSpotService, HubSpotContact } from './services/hubspotService'
 
 const App: React.FC = () => {
@@ -63,11 +64,6 @@ const App: React.FC = () => {
   const [showHistory, setShowHistory] = useState(false)
   const [showApiKeySetup, setShowApiKeySetup] = useState(false)
 
-  // HubSpot search
-  const [hubspotSearchTerm, setHubspotSearchTerm] = useState('')
-  const [hubspotResults, setHubspotResults] = useState<HubSpotContact[]>([])
-  const [hubspotLoading, setHubspotLoading] = useState(false)
-  const [hubspotError, setHubspotError] = useState<string | null>(null)
 
   // Hooks
   const sessionId = useSessionId()
@@ -86,34 +82,7 @@ const App: React.FC = () => {
     }
   }, [equipmentData.projectAddress, equipmentData.city, equipmentData.state, equipmentData.zipCode])
 
-  // HubSpot search functionality
-  const searchHubSpot = async (searchTerm: string) => {
-    if (!searchTerm.trim()) {
-      setHubspotResults([])
-      return
-    }
-
-    setHubspotLoading(true)
-    setHubspotError(null)
-
-    try {
-      const results = await HubSpotService.searchContactsByName(searchTerm, true)
-      setHubspotResults(results)
-    } catch (error) {
-      console.error('HubSpot search error:', error)
-      setHubspotError(error instanceof Error ? error.message : 'Search failed')
-      setHubspotResults([])
-    } finally {
-      setHubspotLoading(false)
-    }
-  }
-
-  const handleHubSpotSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-    searchHubSpot(hubspotSearchTerm)
-  }
-
-  const selectHubSpotContact = (contact: HubSpotContact) => {
+  const handleSelectHubSpotContact = (contact: HubSpotContact) => {
     setEquipmentData(prev => ({
       ...prev,
       contactName: `${contact.firstName} ${contact.lastName}`.trim(),
@@ -125,8 +94,6 @@ const App: React.FC = () => {
       state: contact.contactState || contact.companyState || prev.state,
       zipCode: contact.contactZip || contact.companyZip || prev.zipCode
     }))
-    setHubspotResults([])
-    setHubspotSearchTerm('')
   }
 
   const handleEquipmentChange = (field: string, value: string) => {
@@ -233,63 +200,7 @@ const App: React.FC = () => {
               <h2 className="text-2xl font-bold text-white">Equipment Quote</h2>
             </div>
 
-            {/* HubSpot Contact Search */}
-            <div className="mb-6 p-4 bg-black rounded-lg border border-accent">
-              <h3 className="text-lg font-semibold text-white mb-3">HubSpot Contact Search</h3>
-              <form onSubmit={handleHubSpotSearch} className="space-y-3">
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={hubspotSearchTerm}
-                    onChange={(e) => setHubspotSearchTerm(e.target.value)}
-                    placeholder="Search contacts by name..."
-                    className="flex-1 px-3 py-2 bg-gray-900 border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white placeholder-white"
-                  />
-                  <button
-                    type="submit"
-                    disabled={hubspotLoading}
-                    className="px-4 py-2 bg-accent text-black rounded-lg hover:bg-green-400 disabled:opacity-50 transition-colors"
-                  >
-                    <Search className="w-4 h-4" />
-                  </button>
-                </div>
-                
-                {hubspotError && (
-                  <p className="text-red-400 text-sm">{hubspotError}</p>
-                )}
-                
-                {hubspotResults.length > 0 && (
-                  <div className="max-h-48 overflow-y-auto space-y-2">
-                    {hubspotResults.map((contact) => (
-                      <div
-                        key={contact.id}
-                        onClick={() => selectHubSpotContact(contact)}
-                        className="p-3 bg-gray-900 rounded-lg border border-gray-600 hover:border-accent cursor-pointer transition-colors"
-                      >
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="font-medium text-white">
-                              {contact.firstName} {contact.lastName}
-                            </p>
-                            {contact.companyName && (
-                              <p className="text-sm text-gray-300">{contact.companyName}</p>
-                            )}
-                            {contact.email && (
-                              <p className="text-sm text-gray-400">{contact.email}</p>
-                            )}
-                          </div>
-                          <div className="text-right">
-                            {contact.phone && (
-                              <p className="text-sm text-gray-400">{contact.phone}</p>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </form>
-            </div>
+            <HubSpotContactSearch onSelectContact={handleSelectHubSpotContact} />
 
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -480,7 +391,7 @@ const App: React.FC = () => {
                           type="number"
                           value={piece.quantity}
                           onChange={(e) => handlePieceChange(index, 'quantity', parseInt(e.target.value) || 1)}
-                          className="w-12 px-2 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white text-sm text-center"
+                         className="w-16 px-2 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white text-sm text-center"
                           placeholder="Qty"
                           min="1"
                           max="99"
