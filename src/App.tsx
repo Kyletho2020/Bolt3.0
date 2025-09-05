@@ -40,6 +40,7 @@ const App: React.FC = () => {
     state: '',
     zipCode: '',
     projectDescription: '',
+    additionalDetails: '',
     specialInstructions: ''
   })
 
@@ -294,24 +295,55 @@ const App: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-white mb-2">City</label>
-                  <input
-                    type="text"
+                  <select
                     value={equipmentData.city}
                     onChange={(e) => handleEquipmentChange('city', e.target.value)}
                     className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                    placeholder="Enter city"
-                  />
+                  >
+                    <option value="">Select city</option>
+                    <option value="Portland">Portland</option>
+                    <option value="Seattle">Seattle</option>
+                    <option value="Spokane">Spokane</option>
+                    <option value="Tacoma">Tacoma</option>
+                    <option value="Vancouver">Vancouver</option>
+                    <option value="Bellevue">Bellevue</option>
+                    <option value="Everett">Everett</option>
+                    <option value="Kent">Kent</option>
+                    <option value="Renton">Renton</option>
+                    <option value="Yakima">Yakima</option>
+                    <option value="Bellingham">Bellingham</option>
+                    <option value="Olympia">Olympia</option>
+                    <option value="Beaverton">Beaverton</option>
+                    <option value="Gresham">Gresham</option>
+                    <option value="Hillsboro">Hillsboro</option>
+                    <option value="Bend">Bend</option>
+                    <option value="Medford">Medford</option>
+                    <option value="Springfield">Springfield</option>
+                    <option value="Corvallis">Corvallis</option>
+                    <option value="Albany">Albany</option>
+                  </select>
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-white mb-2">State</label>
-                  <input
-                    type="text"
+                  <select
                     value={equipmentData.state}
                     onChange={(e) => handleEquipmentChange('state', e.target.value)}
                     className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                    placeholder="Enter state"
-                  />
+                  >
+                    <option value="">Select state</option>
+                    <option value="WA">Washington</option>
+                    <option value="OR">Oregon</option>
+                    <option value="CA">California</option>
+                    <option value="ID">Idaho</option>
+                    <option value="MT">Montana</option>
+                    <option value="NV">Nevada</option>
+                    <option value="UT">Utah</option>
+                    <option value="AZ">Arizona</option>
+                    <option value="CO">Colorado</option>
+                    <option value="WY">Wyoming</option>
+                    <option value="AK">Alaska</option>
+                  </select>
                 </div>
                 
                 <div>
@@ -328,12 +360,38 @@ const App: React.FC = () => {
 
               <div>
                 <label className="block text-sm font-medium text-white mb-2">Project Description</label>
-                <textarea
+                <select
                   value={equipmentData.projectDescription}
                   onChange={(e) => handleEquipmentChange('projectDescription', e.target.value)}
-                  rows={4}
                   className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent resize-none text-white"
-                  placeholder="Describe the project and work to be performed"
+                >
+                  <option value="">Select project type</option>
+                  <option value="Heavy Equipment Transport">Heavy Equipment Transport</option>
+                  <option value="Machinery Rigging & Installation">Machinery Rigging & Installation</option>
+                  <option value="Industrial Plant Relocation">Industrial Plant Relocation</option>
+                  <option value="Construction Equipment Moving">Construction Equipment Moving</option>
+                  <option value="Manufacturing Equipment Setup">Manufacturing Equipment Setup</option>
+                  <option value="Warehouse Equipment Installation">Warehouse Equipment Installation</option>
+                  <option value="Medical Equipment Transport">Medical Equipment Transport</option>
+                  <option value="Server Room Equipment Moving">Server Room Equipment Moving</option>
+                  <option value="Laboratory Equipment Relocation">Laboratory Equipment Relocation</option>
+                  <option value="HVAC System Installation">HVAC System Installation</option>
+                  <option value="Generator Installation">Generator Installation</option>
+                  <option value="Transformer Installation">Transformer Installation</option>
+                  <option value="Crane Services">Crane Services</option>
+                  <option value="Millwright Services">Millwright Services</option>
+                  <option value="Custom Project">Custom Project</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-white mb-2">Additional Project Details</label>
+                <textarea
+                  value={equipmentData.additionalDetails || ''}
+                  onChange={(e) => handleEquipmentChange('additionalDetails', e.target.value)}
+                  rows={3}
+                  className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent resize-none text-white"
+                  placeholder="Additional details about the project and work to be performed"
                 />
               </div>
 
