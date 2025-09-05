@@ -56,10 +56,10 @@ LOGISTICS REQUIREMENTS:
 • Service Type: ${logisticsData.serviceType || 'Standard Delivery'}
 ${logisticsData.specialHandling ? `• Special Handling: ${logisticsData.specialHandling}` : ''}
 
-${logisticsData.pieces && logisticsData.pieces.length > 0 ? `ITEMS TO TRANSPORT:
-${logisticsData.pieces.map((piece: any) => 
-  `${index + 1}. ${piece.description || '[Description]'} - ${piece.length || '[L]'}"L x ${piece.width || '[W]'}"W x ${piece.height || '[H]'}"H, ${piece.weight || '[Weight]'} lbs`
-).join('\n')}` : ''}
+    ${logisticsData.pieces && logisticsData.pieces.length > 0 ? `ITEMS TO TRANSPORT:
+    ${logisticsData.pieces.map((piece: any, index: number) =>
+      `${index + 1}. (Qty: ${piece.quantity || 1}) ${piece.description || '[Description]'} - ${piece.length || '[L]'}"L x ${piece.width || '[W]'}"W x ${piece.height || '[H]'}"H, ${piece.weight || '[Weight]'} lbs`
+    ).join('\n')}` : ''}
 
 Please provide a detailed quote including all equipment, labor, and transportation costs. We would appreciate receiving this quote at your earliest convenience.
 
@@ -95,8 +95,8 @@ ${equipmentData.projectDescription ? `PROJECT DESCRIPTION:
 ${equipmentData.projectDescription}
 
 ` : ''}${logisticsData.pieces && logisticsData.pieces.length > 0 ? `ITEMS TO HANDLE:
-${logisticsData.pieces.map((piece: any) => 
-  `• ${piece.description || '[Item Description]'} - ${piece.length || '[L]'}"L x ${piece.width || '[W]'}"W x ${piece.height || '[H]'}"H, ${piece.weight || '[Weight]'} lbs`
+${logisticsData.pieces.map((piece: any) =>
+  `• (Qty: ${piece.quantity || 1}) ${piece.description || '[Item Description]'} - ${piece.length || '[L]'}"L x ${piece.width || '[W]'}"W x ${piece.height || '[H]'}"H, ${piece.weight || '[Weight]'} lbs`
 ).join('\n')}
 
 ` : ''}${logisticsData.specialHandling ? `SPECIAL HANDLING REQUIREMENTS:
