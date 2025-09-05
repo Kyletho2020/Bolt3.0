@@ -1,693 +1,218 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState, useEffect } from 'react'
-import { 
-  FileText, 
-  Mail, 
-  Copy, 
-  CheckCircle, 
-  Eye, 
-  X, 
-  Bot, 
-  Archive, 
-  Save, 
-  Plus, 
-  Minus, 
-  Search, 
-  Building, 
-  User, 
-  Phone, 
-  MapPin, 
-  Package, 
-  Truck, 
-  Key 
-} from 'lucide-react'
-import { useSessionId } from './hooks/useSessionId'
-import { useApiKey } from './hooks/useApiKey'
-import AIExtractorModal from './components/AIExtractorModal'
-import PreviewTemplates from './components/PreviewTemplates'
-import QuoteHistoryModal from './components/QuoteHistoryModal'
-import ApiKeySetup from './components/ApiKeySetup'
-import { HubSpotService, HubSpotContact } from './services/hubspotService'
+import React, { useState } from 'react'
+import { FileText, Mail, Copy, CheckCircle, Eye, X } from 'lucide-react'
 
-const App: React.FC = () => {
-  // State for equipment form
-  const [equipmentData, setEquipmentData] = useState({
-    projectName: '',
-    companyName: '',
-    contactName: '',
-    email: '',
-    phone: '',
-    projectAddress: '',
-    city: '',
-    state: '',
-    zipCode: '',
-    projectDescription: '',
-    specialInstructions: ''
-  })
+interface PreviewTemplatesProps {
+  equipmentData: any
+  logisticsData: any
+  isOpen: boolean
+  onClose: () => void
+}
 
-  // State for logistics form
-  const [logisticsData, setLogisticsData] = useState({
-    pieces: [{ description: '', quantity: 1, length: '', width: '', height: '', weight: '' }],
-    pickupAddress: '',
-    pickupCity: '',
-    pickupState: '',
-    pickupZip: '',
-    deliveryAddress: '',
-    deliveryCity: '',
-    deliveryState: '',
-    deliveryZip: '',
-    serviceType: 'Standard Delivery',
-    specialHandling: ''
-  })
+const PreviewTemplates: React.FC<PreviewTemplatesProps> = ({ 
+  equipmentData, 
+  logisticsData, 
+  isOpen, 
+  onClose 
+}) => {
+  const [activeTemplate, setActiveTemplate] = useState<'email' | 'scope'>('email')
+  const [copiedTemplate, setCopiedTemplate] = useState<string | null>(null)
 
-  // Modal states
-  const [showAIExtractor, setShowAIExtractor] = useState(false)
-  const [showPreview, setShowPreview] = useState(false)
-  const [showHistory, setShowHistory] = useState(false)
-  const [showApiKeySetup, setShowApiKeySetup] = useState(false)
+  const generateEmailTemplate = () => {
+    const projectName = equipmentData.projectName || '[project name]'
+    const companyName = equipmentData.companyName || '[Company Name]'
+    const contactName = equipmentData.contactName || '[Contact Name]'
+    const projectAddress = equipmentData.projectAddress || '[Project Address]'
+    const city = equipmentData.city || '[City]'
+    const state = equipmentData.state || '[State]'
+    const projectDescription = equipmentData.projectDescription || '[Project Description]'
+    
+    const pickupAddress = logisticsData.pickupAddress || projectAddress
+    const pickupCity = logisticsData.pickupCity || city
+    const pickupState = logisticsData.pickupState || state
+    
+    const deliveryAddress = logisticsData.deliveryAddress || '[Delivery Address]'
+    const deliveryCity = logisticsData.deliveryCity || '[Delivery City]'
+    const deliveryState = logisticsData.deliveryState || '[Delivery State]'
 
-  // HubSpot search
-  const [hubspotSearchTerm, setHubspotSearchTerm] = useState('')
-  const [hubspotResults, setHubspotResults] = useState<HubSpotContact[]>([])
-  const [hubspotLoading, setHubspotLoading] = useState(false)
-  const [hubspotError, setHubspotError] = useState<string | null>(null)
+    return `Subject: Quote Request - ${projectName}
 
-  // Hooks
-  const sessionId = useSessionId()
-  const { hasApiKey, refetch: refetchApiKey } = useApiKey()
+Dear Omega Morgan Team,
 
-  // Auto-populate pickup address from project address
-  useEffect(() => {
-    if (equipmentData.projectAddress && !logisticsData.pickupAddress) {
-      setLogisticsData(prev => ({
-        ...prev,
-        pickupAddress: equipmentData.projectAddress,
-        pickupCity: equipmentData.city,
-        pickupState: equipmentData.state,
-        pickupZip: equipmentData.zipCode
-      }))
-    }
-  }, [equipmentData.projectAddress, equipmentData.city, equipmentData.state, equipmentData.zipCode])
+I hope this email finds you well. I am writing to request a quote for an upcoming project that requires your specialized equipment and logistics services.
 
-  // HubSpot search functionality
-  const searchHubSpot = async (searchTerm: string) => {
-    if (!searchTerm.trim()) {
-      setHubspotResults([])
-      return
-    }
+PROJECT DETAILS:
+• Project Name: ${projectName}
+• Company: ${companyName}
+• Contact: ${contactName}
+• Project Location: ${projectAddress}, ${city}, ${state}
 
-    setHubspotLoading(true)
-    setHubspotError(null)
+PROJECT DESCRIPTION:
+${projectDescription}
 
+LOGISTICS REQUIREMENTS:
+• Pickup Location: ${pickupAddress}, ${pickupCity}, ${pickupState}
+• Delivery Location: ${deliveryAddress}, ${deliveryCity}, ${deliveryState}
+• Service Type: ${logisticsData.serviceType || 'Standard Delivery'}
+${logisticsData.specialHandling ? `• Special Handling: ${logisticsData.specialHandling}` : ''}
+
+    ${logisticsData.pieces && logisticsData.pieces.length > 0 ? `ITEMS TO TRANSPORT:
+    ${logisticsData.pieces.map((piece: any, index: number) =>
+      `${index + 1}. (Qty: ${piece.quantity || 1}) ${piece.description || '[Description]'} - ${piece.length || '[L]'}"L x ${piece.width || '[W]'}"W x ${piece.height || '[H]'}"H, ${piece.weight || '[Weight]'} lbs`
+    ).join('\n')}` : ''}
+
+Please provide a detailed quote including all equipment, labor, and transportation costs. We would appreciate receiving this quote at your earliest convenience.
+
+${equipmentData.specialInstructions ? `SPECIAL INSTRUCTIONS:
+${equipmentData.specialInstructions}` : ''}
+
+Thank you for your time and consideration. I look forward to hearing from you soon.
+
+Best regards,
+${contactName}
+${companyName}
+${equipmentData.email || '[Email]'}
+${equipmentData.phone || '[Phone]'}`
+  }
+
+  const generateScopeTemplate = () => {
+    const projectAddress = equipmentData.projectAddress || '[Project Address]'
+    const city = equipmentData.city || '[City]'
+    const state = equipmentData.state || '[State]'
+    const contactName = equipmentData.contactName || '[Site Contact]'
+    const phone = equipmentData.phone || '[Site Contact Phone Number]'
+    
+    return `SCOPE OF WORK
+
+Mobilize crew and Omega Morgan equipment to site: ${projectAddress}, ${city}, ${state}
+
+${contactName}
+${phone}
+
+Omega Morgan to supply 3-man crew, Gear Truck and Trailer.
+
+${equipmentData.projectDescription ? `PROJECT DESCRIPTION:
+${equipmentData.projectDescription}
+
+` : ''}${logisticsData.pieces && logisticsData.pieces.length > 0 ? `ITEMS TO HANDLE:
+${logisticsData.pieces.map((piece: any) =>
+  `• (Qty: ${piece.quantity || 1}) ${piece.description || '[Item Description]'} - ${piece.length || '[L]'}"L x ${piece.width || '[W]'}"W x ${piece.height || '[H]'}"H, ${piece.weight || '[Weight]'} lbs`
+).join('\n')}
+
+` : ''}${logisticsData.specialHandling ? `SPECIAL HANDLING REQUIREMENTS:
+${logisticsData.specialHandling}
+
+` : ''}${equipmentData.specialInstructions ? `SPECIAL INSTRUCTIONS:
+${equipmentData.specialInstructions}
+
+` : ''}When job is complete clean up debris and return to [Shop].`
+  }
+
+  const copyToClipboard = async (text: string, templateType: string) => {
     try {
-      const results = await HubSpotService.searchContactsByName(searchTerm, true)
-      setHubspotResults(results)
-    } catch (error) {
-      console.error('HubSpot search error:', error)
-      setHubspotError(error instanceof Error ? error.message : 'Search failed')
-      setHubspotResults([])
-    } finally {
-      setHubspotLoading(false)
+      await navigator.clipboard.writeText(text)
+      setCopiedTemplate(templateType)
+      setTimeout(() => setCopiedTemplate(null), 2000)
+    } catch (err) {
+      console.error('Failed to copy text: ', err)
     }
   }
 
-  const handleHubSpotSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-    searchHubSpot(hubspotSearchTerm)
-  }
+  if (!isOpen) return null
 
-  const selectHubSpotContact = (contact: HubSpotContact) => {
-    setEquipmentData(prev => ({
-      ...prev,
-      contactName: `${contact.firstName} ${contact.lastName}`.trim(),
-      email: contact.email,
-      phone: contact.phone,
-      companyName: contact.companyName || prev.companyName,
-      projectAddress: contact.contactAddress || contact.companyAddress || prev.projectAddress,
-      city: contact.contactCity || contact.companyCity || prev.city,
-      state: contact.contactState || contact.companyState || prev.state,
-      zipCode: contact.contactZip || contact.companyZip || prev.zipCode
-    }))
-    setHubspotResults([])
-    setHubspotSearchTerm('')
-  }
-
-  const handleEquipmentChange = (field: string, value: string) => {
-    setEquipmentData(prev => ({ ...prev, [field]: value }))
-  }
-
-  const handleLogisticsChange = (field: string, value: string) => {
-    setLogisticsData(prev => ({ ...prev, [field]: value }))
-  }
-
-  const handlePieceChange = (index: number, field: string, value: string | number) => {
-    setLogisticsData(prev => ({
-      ...prev,
-      pieces: prev.pieces.map((piece, i) => 
-        i === index ? { ...piece, [field]: value } : piece
-      )
-    }))
-  }
-
-  const addPiece = () => {
-    setLogisticsData(prev => ({
-      ...prev,
-      pieces: [...prev.pieces, { description: '', quantity: 1, length: '', width: '', height: '', weight: '' }]
-    }))
-  }
-
-  const removePiece = (index: number) => {
-    if (logisticsData.pieces.length > 1) {
-      setLogisticsData(prev => ({
-        ...prev,
-        pieces: prev.pieces.filter((_, i) => i !== index)
-      }))
-    }
-  }
-
-  const handleAIExtraction = (extractedEquipmentData: any, extractedLogisticsData: any) => {
-    if (extractedEquipmentData) {
-      setEquipmentData(prev => ({ ...prev, ...extractedEquipmentData }))
-    }
-    if (extractedLogisticsData) {
-      setLogisticsData(prev => ({ ...prev, ...extractedLogisticsData }))
-    }
-  }
-
-  const handleLoadQuote = (loadedEquipmentData: any, loadedLogisticsData: any) => {
-    setEquipmentData(loadedEquipmentData)
-    setLogisticsData(loadedLogisticsData)
-  }
-
-  const handleApiKeyChange = (hasKey: boolean) => {
-    refetchApiKey()
-  }
+  const emailTemplate = generateEmailTemplate()
+  const scopeTemplate = generateScopeTemplate()
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      <div className="container mx-auto px-4 py-8">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-gray-900 border-2 border-accent rounded-2xl text-white shadow-2xl w-full max-w-4xl h-[80vh] flex flex-col">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">OM Quote Generator</h1>
-          <p className="text-white">Professional quote generation system for Omega Morgan</p>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex flex-wrap justify-center gap-4 mb-8">
+        <div className="flex items-center justify-between p-6 border-b-2 border-accent">
+          <div className="flex items-center">
+            <Eye className="w-6 h-6 text-white mr-2" />
+            <h3 className="text-xl font-bold text-white">Preview Templates</h3>
+          </div>
           <button
-            onClick={() => setShowApiKeySetup(true)}
-            className="flex items-center px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors border border-accent"
+            onClick={onClose}
+            className="p-2 hover:bg-white rounded-lg transition-colors"
           >
-            <Key className="w-4 h-4 mr-2" />
-            API Key Setup
-          </button>
-          
-          <button
-            onClick={() => setShowAIExtractor(true)}
-            disabled={!hasApiKey}
-            className="flex items-center px-4 py-2 bg-accent text-black rounded-lg hover:bg-green-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            <Bot className="w-4 h-4 mr-2" />
-            AI Extractor
-          </button>
-          
-          <button
-            onClick={() => setShowPreview(true)}
-            className="flex items-center px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors border border-accent"
-          >
-            <Eye className="w-4 h-4 mr-2" />
-            Preview Templates
-          </button>
-          
-          <button
-            onClick={() => setShowHistory(true)}
-            className="flex items-center px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors border border-accent"
-          >
-            <Archive className="w-4 h-4 mr-2" />
-            Quote History
+            <X className="w-5 h-5 text-white" />
           </button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Equipment Quote Form */}
-          <div className="bg-gray-900 rounded-lg border-2 border-accent p-6">
-            <div className="flex items-center mb-6">
-              <FileText className="w-6 h-6 text-white mr-2" />
-              <h2 className="text-2xl font-bold text-white">Equipment Quote</h2>
-            </div>
+        {/* Template Tabs */}
+        <div className="flex border-b-2 border-accent">
+          <button
+            onClick={() => setActiveTemplate('email')}
+            className={`flex-1 flex items-center justify-center px-6 py-3 transition-colors ${
+              activeTemplate === 'email'
+                ? 'bg-gray-900 text-white border-b-2 border-accent'
+                : 'text-white hover:text-white hover:bg-gray-800'
+            }`}
+          >
+            <Mail className="w-4 h-4 mr-2" />
+            Email Template
+          </button>
+          <button
+            onClick={() => setActiveTemplate('scope')}
+            className={`flex-1 flex items-center justify-center px-6 py-3 transition-colors ${
+              activeTemplate === 'scope'
+                ? 'bg-gray-900 text-white border-b-2 border-accent'
+                : 'text-white hover:text-white hover:bg-gray-800'
+            }`}
+          >
+            <FileText className="w-4 h-4 mr-2" />
+            Scope Template
+          </button>
+        </div>
 
-            {/* HubSpot Contact Search */}
-            <div className="mb-6 p-4 bg-black rounded-lg border border-accent">
-              <h3 className="text-lg font-semibold text-white mb-3">HubSpot Contact Search</h3>
-              <form onSubmit={handleHubSpotSearch} className="space-y-3">
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={hubspotSearchTerm}
-                    onChange={(e) => setHubspotSearchTerm(e.target.value)}
-                    placeholder="Search contacts by name..."
-                    className="flex-1 px-3 py-2 bg-gray-900 border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white placeholder-white"
-                  />
-                  <button
-                    type="submit"
-                    disabled={hubspotLoading}
-                    className="px-4 py-2 bg-accent text-black rounded-lg hover:bg-green-400 disabled:opacity-50 transition-colors"
-                  >
-                    <Search className="w-4 h-4" />
-                  </button>
-                </div>
-                
-                {hubspotError && (
-                  <p className="text-red-400 text-sm">{hubspotError}</p>
+        {/* Template Content */}
+        <div className="flex-1 overflow-hidden flex flex-col">
+          <div className="p-6 border-b-2 border-accent">
+            <div className="flex items-center justify-between">
+              <h4 className="text-lg font-semibold text-white">
+                {activeTemplate === 'email' ? 'Email Template' : 'Scope of Work Template'}
+              </h4>
+              <button
+                onClick={() => copyToClipboard(
+                  activeTemplate === 'email' ? emailTemplate : scopeTemplate,
+                  activeTemplate
                 )}
-                
-                {hubspotResults.length > 0 && (
-                  <div className="max-h-48 overflow-y-auto space-y-2">
-                    {hubspotResults.map((contact) => (
-                      <div
-                        key={contact.id}
-                        onClick={() => selectHubSpotContact(contact)}
-                        className="p-3 bg-gray-900 rounded-lg border border-gray-600 hover:border-accent cursor-pointer transition-colors"
-                      >
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="font-medium text-white">
-                              {contact.firstName} {contact.lastName}
-                            </p>
-                            {contact.companyName && (
-                              <p className="text-sm text-gray-300">{contact.companyName}</p>
-                            )}
-                            {contact.email && (
-                              <p className="text-sm text-gray-400">{contact.email}</p>
-                            )}
-                          </div>
-                          <div className="text-right">
-                            {contact.phone && (
-                              <p className="text-sm text-gray-400">{contact.phone}</p>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                className="flex items-center px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 hover:text-white transition-colors"
+              >
+                {copiedTemplate === activeTemplate ? (
+                  <>
+                    <CheckCircle className="w-4 h-4 mr-2" />
+                    Copied!
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-4 h-4 mr-2" />
+                    Copy Template
+                  </>
                 )}
-              </form>
-            </div>
-
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-white mb-2">
-                    <FileText className="w-4 h-4 inline mr-1" />
-                    Project Name
-                  </label>
-                  <input
-                    type="text"
-                    value={equipmentData.projectName}
-                    onChange={(e) => handleEquipmentChange('projectName', e.target.value)}
-                    className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                    placeholder="Enter project name"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-white mb-2">
-                    <Building className="w-4 h-4 inline mr-1" />
-                    Company Name
-                  </label>
-                  <input
-                    type="text"
-                    value={equipmentData.companyName}
-                    onChange={(e) => handleEquipmentChange('companyName', e.target.value)}
-                    className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                    placeholder="Enter company name"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-white mb-2">
-                    <User className="w-4 h-4 inline mr-1" />
-                    Contact Name
-                  </label>
-                  <input
-                    type="text"
-                    value={equipmentData.contactName}
-                    onChange={(e) => handleEquipmentChange('contactName', e.target.value)}
-                    className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                    placeholder="Enter contact name"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-white mb-2">
-                    <Mail className="w-4 h-4 inline mr-1" />
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    value={equipmentData.email}
-                    onChange={(e) => handleEquipmentChange('email', e.target.value)}
-                    className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                    placeholder="Enter email"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-white mb-2">
-                    <Phone className="w-4 h-4 inline mr-1" />
-                    Phone
-                  </label>
-                  <input
-                    type="tel"
-                    value={equipmentData.phone}
-                    onChange={(e) => handleEquipmentChange('phone', e.target.value)}
-                    className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                    placeholder="Enter phone number"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-white mb-2">
-                  <MapPin className="w-4 h-4 inline mr-1" />
-                  Project Address
-                </label>
-                <input
-                  type="text"
-                  value={equipmentData.projectAddress}
-                  onChange={(e) => handleEquipmentChange('projectAddress', e.target.value)}
-                  className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                  placeholder="Enter project address"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-white mb-2">City</label>
-                  <input
-                    type="text"
-                    value={equipmentData.city}
-                    onChange={(e) => handleEquipmentChange('city', e.target.value)}
-                    className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                    placeholder="Enter city"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-white mb-2">State</label>
-                  <input
-                    type="text"
-                    value={equipmentData.state}
-                    onChange={(e) => handleEquipmentChange('state', e.target.value)}
-                    className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                    placeholder="Enter state"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-white mb-2">Zip Code</label>
-                  <input
-                    type="text"
-                    value={equipmentData.zipCode}
-                    onChange={(e) => handleEquipmentChange('zipCode', e.target.value)}
-                    className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                    placeholder="Enter zip code"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-white mb-2">Project Description</label>
-                <textarea
-                  value={equipmentData.projectDescription}
-                  onChange={(e) => handleEquipmentChange('projectDescription', e.target.value)}
-                  rows={4}
-                  className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent resize-none text-white"
-                  placeholder="Describe the project and work to be performed"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-white mb-2">Special Instructions</label>
-                <textarea
-                  value={equipmentData.specialInstructions}
-                  onChange={(e) => handleEquipmentChange('specialInstructions', e.target.value)}
-                  rows={3}
-                  className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent resize-none text-white"
-                  placeholder="Any special instructions or requirements"
-                />
-              </div>
+              </button>
             </div>
           </div>
 
-          {/* Logistics Quote Form */}
-          <div className="bg-gray-900 rounded-lg border-2 border-accent p-6">
-            <div className="flex items-center mb-6">
-              <Truck className="w-6 h-6 text-white mr-2" />
-              <h2 className="text-2xl font-bold text-white">Logistics Quote</h2>
-            </div>
-
-            <div className="space-y-6">
-              {/* Items to Transport */}
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <label className="block text-sm font-medium text-white">
-                    <Package className="w-4 h-4 inline mr-1" />
-                    Items to Transport
-                  </label>
-                  <button
-                    onClick={addPiece}
-                    className="flex items-center px-3 py-1 bg-accent text-black rounded-lg hover:bg-green-400 transition-colors"
-                  >
-                    <Plus className="w-4 h-4 mr-1" />
-                    Add Item
-                  </button>
-                </div>
-
-                <div className="space-y-3">
-                  {logisticsData.pieces.map((piece, index) => (
-                    <div key={index} className="grid grid-cols-12 gap-2 items-end">
-                      <div className="col-span-4">
-                        <input
-                          type="text"
-                          value={piece.description}
-                          onChange={(e) => handlePieceChange(index, 'description', e.target.value)}
-                          className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white text-sm"
-                          placeholder="Description"
-                        />
-                      </div>
-                      <div className="col-span-1">
-                        <input
-                          type="number"
-                          value={piece.quantity}
-                          onChange={(e) => handlePieceChange(index, 'quantity', parseInt(e.target.value) || 1)}
-                          className="w-16 px-2 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white text-sm text-center"
-                          placeholder="Qty"
-                          min="1"
-                          max="99"
-                        />
-                      </div>
-                      <div className="col-span-1">
-                        <input
-                          type="text"
-                          value={piece.length}
-                          onChange={(e) => handlePieceChange(index, 'length', e.target.value)}
-                          className="w-full px-2 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white text-sm"
-                          placeholder="L"
-                        />
-                      </div>
-                      <div className="col-span-1">
-                        <input
-                          type="text"
-                          value={piece.width}
-                          onChange={(e) => handlePieceChange(index, 'width', e.target.value)}
-                          className="w-full px-2 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white text-sm"
-                          placeholder="W"
-                        />
-                      </div>
-                      <div className="col-span-1">
-                        <input
-                          type="text"
-                          value={piece.height}
-                          onChange={(e) => handlePieceChange(index, 'height', e.target.value)}
-                          className="w-full px-2 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white text-sm"
-                          placeholder="H"
-                        />
-                      </div>
-                      <div className="col-span-2">
-                        <input
-                          type="text"
-                          value={piece.weight}
-                          onChange={(e) => handlePieceChange(index, 'weight', e.target.value)}
-                          className="w-full px-2 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white text-sm"
-                          placeholder="Weight (lbs)"
-                        />
-                      </div>
-                      <div className="col-span-1">
-                        {logisticsData.pieces.length > 1 && (
-                          <button
-                            onClick={() => removePiece(index)}
-                            className="w-full p-2 bg-red-600 text-white rounded-lg hover:bg-red-500 transition-colors"
-                          >
-                            <Minus className="w-4 h-4" />
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Pickup Location */}
-              <div>
-                <label className="block text-sm font-medium text-white mb-2">Pickup Location</label>
-                <div className="space-y-3">
-                  <input
-                    type="text"
-                    value={logisticsData.pickupAddress}
-                    onChange={(e) => handleLogisticsChange('pickupAddress', e.target.value)}
-                    className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                    placeholder="Pickup address"
-                  />
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <input
-                      type="text"
-                      value={logisticsData.pickupCity}
-                      onChange={(e) => handleLogisticsChange('pickupCity', e.target.value)}
-                      className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                      placeholder="City"
-                    />
-                    <input
-                      type="text"
-                      value={logisticsData.pickupState}
-                      onChange={(e) => handleLogisticsChange('pickupState', e.target.value)}
-                      className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                      placeholder="State"
-                    />
-                    <input
-                      type="text"
-                      value={logisticsData.pickupZip}
-                      onChange={(e) => handleLogisticsChange('pickupZip', e.target.value)}
-                      className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                      placeholder="Zip"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Delivery Location */}
-              <div>
-                <label className="block text-sm font-medium text-white mb-2">Delivery Location</label>
-                <div className="space-y-3">
-                  <input
-                    type="text"
-                    value={logisticsData.deliveryAddress}
-                    onChange={(e) => handleLogisticsChange('deliveryAddress', e.target.value)}
-                    className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                    placeholder="Delivery address"
-                  />
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <input
-                      type="text"
-                      value={logisticsData.deliveryCity}
-                      onChange={(e) => handleLogisticsChange('deliveryCity', e.target.value)}
-                      className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                      placeholder="City"
-                    />
-                    <input
-                      type="text"
-                      value={logisticsData.deliveryState}
-                      onChange={(e) => handleLogisticsChange('deliveryState', e.target.value)}
-                      className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                      placeholder="State"
-                    />
-                    <input
-                      type="text"
-                      value={logisticsData.deliveryZip}
-                      onChange={(e) => handleLogisticsChange('deliveryZip', e.target.value)}
-                      className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                      placeholder="Zip"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Service Type */}
-              <div>
-                <label className="block text-sm font-medium text-white mb-2">Service Type</label>
-                <select
-                  value={logisticsData.serviceType}
-                  onChange={(e) => handleLogisticsChange('serviceType', e.target.value)}
-                  className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                >
-                  <option value="Standard Delivery">Standard Delivery</option>
-                  <option value="White Glove">White Glove</option>
-                  <option value="Inside Delivery">Inside Delivery</option>
-                  <option value="Curbside">Curbside</option>
-                </select>
-              </div>
-
-              {/* Special Handling */}
-              <div>
-                <label className="block text-sm font-medium text-white mb-2">Special Handling</label>
-                <textarea
-                  value={logisticsData.specialHandling}
-                  onChange={(e) => handleLogisticsChange('specialHandling', e.target.value)}
-                  rows={3}
-                  className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent resize-none text-white"
-                  placeholder="Any special handling requirements"
-                />
-              </div>
+          <div className="flex-1 overflow-y-auto p-6">
+            <div className="bg-black rounded-lg p-4 border border-accent">
+              <pre className="whitespace-pre-wrap text-sm text-white font-mono leading-relaxed">
+                {activeTemplate === 'email' ? emailTemplate : scopeTemplate}
+              </pre>
             </div>
           </div>
         </div>
 
-        {/* Modals */}
-        <AIExtractorModal
-          isOpen={showAIExtractor}
-          onClose={() => setShowAIExtractor(false)}
-          onExtract={handleAIExtraction}
-          sessionId={sessionId}
-        />
-
-        <PreviewTemplates
-          equipmentData={equipmentData}
-          logisticsData={logisticsData}
-          isOpen={showPreview}
-          onClose={() => setShowPreview(false)}
-        />
-
-        <QuoteHistoryModal
-          isOpen={showHistory}
-          onClose={() => setShowHistory(false)}
-          onLoadQuote={handleLoadQuote}
-          currentEquipmentData={equipmentData}
-          currentLogisticsData={logisticsData}
-        />
-
-        {showApiKeySetup && (
-          <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
-            <div className="bg-gray-900 border-2 border-accent rounded-2xl shadow-2xl w-full max-w-md">
-              <div className="flex items-center justify-between p-6 border-b-2 border-accent">
-                <h3 className="text-xl font-bold text-white">API Key Setup</h3>
-                <button
-                  onClick={() => setShowApiKeySetup(false)}
-                  className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
-                >
-                  <X className="w-5 h-5 text-white" />
-                </button>
-              </div>
-              <div className="p-6">
-                <ApiKeySetup onApiKeyChange={handleApiKeyChange} />
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Footer */}
+        <div className="p-6 border-t-2 border-accent bg-gray-900">
+          <p className="text-sm text-white">
+            Templates are automatically populated with extracted data. Fields in brackets [ ] need manual completion.
+          </p>
+        </div>
       </div>
     </div>
   )
 }
 
-export default App
+export default PreviewTemplates
