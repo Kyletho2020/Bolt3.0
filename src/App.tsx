@@ -45,6 +45,7 @@ interface FormData {
   // Storage/Logistics
   pieces: Array<{
     description: string
+    quantity: string
     length: string
     width: string
     height: string
@@ -83,7 +84,7 @@ const initialFormData: FormData = {
   trailers: [],
 
   // Storage/Logistics
-  pieces: [{ description: '', length: '', width: '', height: '', weight: '' }],
+  pieces: [{ description: '', quantity: '', length: '', width: '', height: '', weight: '' }],
   pickupAddress: '',
   pickupCity: '',
   pickupState: '',
@@ -186,7 +187,8 @@ const App: React.FC = () => {
     const totalSqFt = formData.pieces.reduce((sum, piece) => {
       const length = parseFloat(piece.length) || 0
       const width = parseFloat(piece.width) || 0
-      return sum + (length * width) / 144
+      const qty = parseInt(piece.quantity) || 1
+      return sum + (length * width * qty) / 144
     }, 0)
     setFormData(prev => {
       const formatted = totalSqFt ? totalSqFt.toFixed(2) : ''
@@ -402,7 +404,7 @@ const App: React.FC = () => {
   const addPiece = () => {
     setFormData(prev => ({
       ...prev,
-      pieces: [...prev.pieces, { description: '', length: '', width: '', height: '', weight: '' }]
+      pieces: [...prev.pieces, { description: '', quantity: '', length: '', width: '', height: '', weight: '' }]
     }))
   }
 
@@ -1151,8 +1153,17 @@ const App: React.FC = () => {
                     </button>
                   )}
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-                  <div className="md:col-span-1">
+                <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+                  <div>
+                    <input
+                      type="text"
+                      value={piece.quantity}
+                      onChange={(e) => updatePiece(index, 'quantity', e.target.value)}
+                      placeholder="Qty"
+                      className="w-full px-3 py-2 bg-black border border-white rounded-lg focus:ring-2 focus:ring-white focus:border-transparent text-white placeholder-white"
+                    />
+                  </div>
+                  <div className="md:col-span-2">
                     <input
                       type="text"
                       value={piece.description}
@@ -1404,8 +1415,8 @@ const App: React.FC = () => {
     
     let itemsText = ''
     if (formData.pieces && formData.pieces.length > 0 && formData.pieces[0].description) {
-      itemsText = formData.pieces.map(piece => 
-        `${piece.description || '[description]'} - ${piece.length || '[L]'}"L x ${piece.width || '[W]'}"W x ${piece.height || '[H]'}"H, ${piece.weight || '[weight]'} lbs`
+      itemsText = formData.pieces.map(piece =>
+        `${piece.quantity ? `(${piece.quantity}) ` : ''}${piece.description || '[description]'} - ${piece.length || '[L]'}"L x ${piece.width || '[W]'}"W x ${piece.height || '[H]'}"H, ${piece.weight || '[weight]'} lbs`
       ).join('\n\n')
     }
 
@@ -1471,13 +1482,15 @@ When job is complete clean up debris and return to ${shopLocation}.`
 
     if (formData.pieces && formData.pieces.length > 0 && formData.pieces[0].description) {
       piecesText = formData.pieces.map(piece =>
-        `${piece.length || '[L]'}" x ${piece.width || '[W]'}" x ${piece.height || '[H]'}" – approx. ${piece.weight || '[Weight]'} lbs`
+        `${piece.quantity ? `Qty ${piece.quantity}: ` : ''}${piece.description ? `${piece.description} - ` : ''}${piece.length || '[L]'}" x ${piece.width || '[W]'}" x ${piece.height || '[H]'}" – approx. ${piece.weight || '[Weight]'} lbs`
       ).join('\n\n')
 
-      pieceCount = formData.pieces.length.toString()
+      pieceCount = formData.pieces
+        .reduce((count, p) => count + (parseInt(p.quantity) || 1), 0)
+        .toString()
 
       const totalWeightNum = formData.pieces.reduce((sum, piece) => {
-        const weight = parseInt(piece.weight) || 0
+        const weight = (parseInt(piece.weight) || 0) * (parseInt(piece.quantity) || 1)
         return sum + weight
       }, 0)
       totalWeight = totalWeightNum > 0 ? `${totalWeightNum.toLocaleString()} lbs` : '2,400 lbs'

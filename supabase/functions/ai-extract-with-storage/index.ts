@@ -42,7 +42,7 @@ Return a JSON object with two main sections: "equipment" and "logistics". Struct
     "specialInstructions": "string"
   },
   "logistics": {
-    "pieces": [{"description": "string", "length": "number", "width": "number", "height": "number", "weight": "number"}],
+    "pieces": [{"description": "string", "quantity": "number", "length": "number", "width": "number", "height": "number", "weight": "number"}],
     "pickupAddress": "string",
     "pickupCity": "string", 
     "pickupState": "string",
