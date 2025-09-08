@@ -64,7 +64,7 @@ export class QuoteService {
         site_phone: equipmentData.phone || null,
         shop_location: 'Shop',
         site_address: equipmentData.projectAddress || null,
-        scope_of_work: equipmentData.projectDescription || null,
+        scope_of_work: equipmentData.additionalDetails || null,
         logistics_data: logisticsData || {},
         email_template: emailTemplate || null,
         scope_template: scopeTemplate || null,

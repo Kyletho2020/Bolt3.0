@@ -37,8 +37,7 @@ Return a JSON object with two main sections: "equipment" and "logistics". Struct
     "projectAddress": "string",
     "city": "string",
     "state": "string",
-    "zipCode": "string",
-    "projectDescription": "string"
+    "zipCode": "string"
   },
   "logistics": {
     "pieces": [{"description": "string", "quantity": "number", "length": "number", "width": "number", "height": "number", "weight": "number"}],

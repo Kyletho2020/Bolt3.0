@@ -147,7 +147,7 @@ const QuoteHistoryModal: React.FC<QuoteHistoryModalProps> = ({
           contactName: quote.contact_name || '',
           phone: quote.site_phone || '',
           projectAddress: quote.site_address || '',
-          projectDescription: quote.scope_of_work || '',
+          additionalDetails: quote.scope_of_work || '',
         }
         
         onLoadQuote(loadedEquipmentData, quote.logistics_data || {})
