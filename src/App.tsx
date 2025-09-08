@@ -540,36 +540,6 @@ const App: React.FC = () => {
           <div className="bg-gray-900 rounded-lg border-2 border-accent p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center">
-                <Mail className="w-6 h-6 text-white mr-2" />
-                <h2 className="text-2xl font-bold text-white">Email Template</h2>
-              </div>
-              <button
-                onClick={() => copyToClipboard(emailTemplate, 'email')}
-                className="flex items-center px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors border border-accent"
-              >
-                {copiedTemplate === 'email' ? (
-                  <>
-                    <CheckCircle className="w-4 h-4 mr-2" />
-                    Copied!
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-4 h-4 mr-2" />
-                    Copy
-                  </>
-                )}
-              </button>
-            </div>
-            <div className="bg-black rounded-lg p-4 border border-accent">
-              <pre className="whitespace-pre-wrap text-sm text-white font-mono leading-relaxed">
-                {emailTemplate}
-              </pre>
-            </div>
-          </div>
-
-          <div className="bg-gray-900 rounded-lg border-2 border-accent p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center">
                 <FileText className="w-6 h-6 text-white mr-2" />
                 <h2 className="text-2xl font-bold text-white">Scope of Work Template</h2>
               </div>
@@ -593,6 +563,36 @@ const App: React.FC = () => {
             <div className="bg-black rounded-lg p-4 border border-accent">
               <pre className="whitespace-pre-wrap text-sm text-white font-mono leading-relaxed">
                 {scopeTemplate}
+              </pre>
+            </div>
+          </div>
+
+          <div className="bg-gray-900 rounded-lg border-2 border-accent p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center">
+                <Mail className="w-6 h-6 text-white mr-2" />
+                <h2 className="text-2xl font-bold text-white">Email Template</h2>
+              </div>
+              <button
+                onClick={() => copyToClipboard(emailTemplate, 'email')}
+                className="flex items-center px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors border border-accent"
+              >
+                {copiedTemplate === 'email' ? (
+                  <>
+                    <CheckCircle className="w-4 h-4 mr-2" />
+                    Copied!
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-4 h-4 mr-2" />
+                    Copy
+                  </>
+                )}
+              </button>
+            </div>
+            <div className="bg-black rounded-lg p-4 border border-accent">
+              <pre className="whitespace-pre-wrap text-sm text-white font-mono leading-relaxed">
+                {emailTemplate}
               </pre>
             </div>
           </div>
