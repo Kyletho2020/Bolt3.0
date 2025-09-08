@@ -49,9 +49,10 @@ Return a JSON object with two main sections: "equipment" and "logistics". Struct
     "pickupZip": "string",
     "deliveryAddress": "string",
     "deliveryCity": "string",
-    "deliveryState": "string", 
+    "deliveryState": "string",
     "deliveryZip": "string",
     "serviceType": "string (Standard Delivery, White Glove, Inside Delivery, or Curbside)",
+    "truckType": "string (Flatbed, Flatbed with tarp, Conestoga)",
     "specialHandling": "string"
   }
 }
