@@ -2,17 +2,18 @@
 import React, { useState, useEffect } from 'react'
 import { Save, History, Search, Trash2, Edit3, Copy, Calendar, Building, User, FileText, X, Plus } from 'lucide-react'
 import { QuoteService, QuoteListItem } from '../services/quoteService'
+import { generateEmailTemplate, generateScopeTemplate } from './PreviewTemplates'
 
 interface QuoteSaveManagerProps {
   equipmentData: any
   logisticsData: any
   equipmentRequirements: any
-  emailTemplate?: string
-  scopeTemplate?: string
   onLoadQuote: (
     equipmentData: any,
     logisticsData: any,
-    equipmentRequirements: any
+    equipmentRequirements: any,
+    emailTemplate: string,
+    scopeTemplate: string
   ) => void
   isOpen: boolean
   onClose: () => void
@@ -22,8 +23,6 @@ const QuoteSaveManager: React.FC<QuoteSaveManagerProps> = ({
   equipmentData,
   logisticsData,
   equipmentRequirements,
-  emailTemplate,
-  scopeTemplate,
   onLoadQuote,
   isOpen,
   onClose
@@ -97,6 +96,17 @@ const QuoteSaveManager: React.FC<QuoteSaveManagerProps> = ({
     setMessage(null)
 
     try {
+      const emailTemplate = generateEmailTemplate(
+        equipmentData,
+        logisticsData,
+        equipmentRequirements
+      )
+      const scopeTemplate = generateScopeTemplate(
+        equipmentData,
+        logisticsData,
+        equipmentRequirements
+      )
+
       const result = await QuoteService.saveQuote(
         quoteNumber,
         equipmentData,
@@ -149,7 +159,13 @@ const QuoteSaveManager: React.FC<QuoteSaveManagerProps> = ({
             trailers: []
           }
 
-        onLoadQuote(loadedEquipmentData, quote.logistics_data || {}, loadedRequirements)
+        onLoadQuote(
+          loadedEquipmentData,
+          quote.logistics_data || {},
+          loadedRequirements,
+          quote.email_template || '',
+          quote.scope_template || ''
+        )
         setMessage({ type: 'success', text: 'Quote loaded successfully!' })
         setShowHistory(false)
       }
