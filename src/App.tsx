@@ -55,6 +55,7 @@ const App: React.FC = () => {
     deliveryState: '',
     deliveryZip: '',
     serviceType: 'Standard Delivery',
+    shipmentType: 'LTL',
     truckType: ''
   })
 
@@ -147,7 +148,7 @@ const App: React.FC = () => {
       ...loadedEquipmentData,
       equipmentRequirements: loadedEquipmentRequirements || initialEquipmentRequirements
     })
-    setLogisticsData({ truckType: '', ...loadedLogisticsData })
+    setLogisticsData({ truckType: '', shipmentType: 'LTL', ...loadedLogisticsData })
   }
 
   const handleApiKeyChange = () => {
@@ -403,6 +404,19 @@ const App: React.FC = () => {
                   <option value="White Glove">White Glove</option>
                   <option value="Inside Delivery">Inside Delivery</option>
                   <option value="Curbside">Curbside</option>
+                </select>
+              </div>
+
+              {/* Shipment Type */}
+              <div>
+                <label className="block text-sm font-medium text-white mb-2">Shipment Type</label>
+                <select
+                  value={logisticsData.shipmentType}
+                  onChange={(e) => handleLogisticsChange('shipmentType', e.target.value)}
+                  className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
+                >
+                  <option value="LTL">LTL</option>
+                  <option value="FTL">FTL</option>
                 </select>
               </div>
 
