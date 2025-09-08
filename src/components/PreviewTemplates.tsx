@@ -54,6 +54,7 @@ LOGISTICS REQUIREMENTS:
 • Pickup Location: ${pickupAddress}, ${pickupCity}, ${pickupState}
 • Delivery Location: ${deliveryAddress}, ${deliveryCity}, ${deliveryState}
 • Service Type: ${logisticsData.serviceType || 'Standard Delivery'}
+${logisticsData.truckType ? `• Truck Type: ${logisticsData.truckType}` : ''}
 ${logisticsData.specialHandling ? `• Special Handling: ${logisticsData.specialHandling}` : ''}
 
     ${logisticsData.pieces && logisticsData.pieces.length > 0 ? `ITEMS TO TRANSPORT:
@@ -90,6 +91,8 @@ ${contactName}
 ${phone}
 
 Omega Morgan to supply 3-man crew, Gear Truck and Trailer.
+
+${logisticsData.truckType ? `Truck Type Requested: ${logisticsData.truckType}\n\n` : ''}
 
 ${equipmentData.projectDescription ? `PROJECT DESCRIPTION:
 ${equipmentData.projectDescription}
