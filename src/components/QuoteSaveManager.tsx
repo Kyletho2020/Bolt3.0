@@ -160,9 +160,7 @@ const QuoteSaveManager: React.FC<QuoteSaveManagerProps> = ({
           }
 
         const loadedLogisticsData = {
-          ...(quote.logistics_data || {}),
-          ...(quote.logistics_shipment ? { shipment: quote.logistics_shipment } : {}),
-          ...(quote.logistics_storage ? { storage: quote.logistics_storage } : {})
+          ...(quote.logistics_data || {})
         }
 
         onLoadQuote(
