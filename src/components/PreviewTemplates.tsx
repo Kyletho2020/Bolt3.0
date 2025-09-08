@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from 'react'
-import { FileText, Mail, Copy, CheckCircle, Eye, X } from 'lucide-react'
+import { FileText, Mail, Copy, CheckCircle, Eye, X, Truck } from 'lucide-react'
 
 export const generateEmailTemplate = (
   equipmentData: any,
@@ -179,6 +179,77 @@ Omega Morgan to supply ${equipmentSummary || 'necessary crew and equipment'}.
 ${logisticsSection}${scopeOfWork ? `${scopeOfWork}\n\n` : ''}${itemsSection}When job is complete clean up debris and return to ${shopLocation}.`
 }
 
+export const generateLogisticsTemplate = (
+  equipmentData: any,
+  logisticsData: any
+) => {
+  const shipmentType = logisticsData.shipmentType || '[shipment type]'
+  const pickupZip = logisticsData.pickupZip || '[pickup location zip code]'
+  const deliveryZip = logisticsData.deliveryZip || '[delivery location zip code]'
+
+  const pieces = logisticsData.pieces || []
+  const totalPieces = pieces.length
+    ? pieces.reduce(
+        (sum: number, piece: any) => sum + (piece.quantity || 1),
+        0
+      )
+    : '[total number of items to transport]'
+  const itemsSection = pieces.length
+    ? pieces
+        .map(
+          (piece: any, index: number) =>
+            `${index + 1}. (Qty: ${piece.quantity || 1}) ${
+              piece.description || '[Description]'
+            } - ${piece.length || '[L]'}"L x ${piece.width || '[W]'}"W x ${
+              piece.height || '[H]'
+            }"H, ${piece.weight || '[Weight]'} lbs`
+        )
+        .join('\n')
+    : '[list all items with dimensions and weights]'
+  const totalWeight = pieces.length
+    ? `${pieces.reduce(
+        (sum: number, piece: any) =>
+          sum + (piece.weight || 0) * (piece.quantity || 1),
+        0
+      )} lbs`
+    : '[total weight]'
+
+  const pickupLocation = logisticsData.pickupAddress || '[pickup location]'
+  const deliveryLocation = logisticsData.deliveryAddress || '[delivery location]'
+  const truckType = logisticsData.truckType || '[truck type requested]'
+  const contactName = equipmentData.contactName || ''
+  const companyName = equipmentData.companyName || ''
+
+  return `To: Logistics@omegamorgan.com; MachineryLogistics@omegamorgan.com
+
+Subject: Quote for Truck Request for ${shipmentType} - ${pickupZip} - ${deliveryZip}
+
+Hello Team,
+
+I'm reaching out to request a logistics quote for an upcoming project. Please see the load and transport details below:
+
+Number of Pieces: ${totalPieces}
+
+${itemsSection}
+
+Total Load Weight: ${totalWeight}
+
+Pick-Up Location: ${pickupLocation}
+
+Delivery/Set Location: ${deliveryLocation}
+
+Truck Type Requested: ${truckType}
+
+Shipment Type: ${shipmentType}
+
+Please let me know if you need any additional information or documents to complete the quote.
+
+Looking forward to your response.
+
+Thanks,
+${contactName}${companyName ? `\n${companyName}` : ''}`
+}
+
 interface PreviewTemplatesProps {
   equipmentData: any
   logisticsData: any
@@ -194,7 +265,9 @@ const PreviewTemplates: React.FC<PreviewTemplatesProps> = ({
   isOpen,
   onClose
 }) => {
-  const [activeTemplate, setActiveTemplate] = useState<'email' | 'scope'>('email')
+  const [activeTemplate, setActiveTemplate] = useState<
+    'email' | 'scope' | 'logistics'
+  >('email')
   const [copiedTemplate, setCopiedTemplate] = useState<string | null>(null)
 
   const emailTemplate = generateEmailTemplate(
@@ -206,6 +279,10 @@ const PreviewTemplates: React.FC<PreviewTemplatesProps> = ({
     equipmentData,
     logisticsData,
     equipmentRequirements
+  )
+  const logisticsTemplate = generateLogisticsTemplate(
+    equipmentData,
+    logisticsData
   )
 
   const copyToClipboard = async (text: string, templateType: string) => {
@@ -261,6 +338,17 @@ const PreviewTemplates: React.FC<PreviewTemplatesProps> = ({
             <FileText className="w-4 h-4 mr-2" />
             Scope Template
           </button>
+          <button
+            onClick={() => setActiveTemplate('logistics')}
+            className={`flex-1 flex items-center justify-center px-6 py-3 transition-colors ${
+              activeTemplate === 'logistics'
+                ? 'bg-gray-900 text-white border-b-2 border-accent'
+                : 'text-white hover:text-white hover:bg-gray-800'
+            }`}
+          >
+            <Truck className="w-4 h-4 mr-2" />
+            Logistics Template
+          </button>
         </div>
 
         {/* Template Content */}
@@ -268,12 +356,20 @@ const PreviewTemplates: React.FC<PreviewTemplatesProps> = ({
           <div className="p-6 border-b-2 border-accent">
             <div className="flex items-center justify-between">
               <h4 className="text-lg font-semibold text-white">
-                {activeTemplate === 'email' ? 'Email Template' : 'Scope of Work Template'}
+                {activeTemplate === 'email'
+                  ? 'Email Template'
+                  : activeTemplate === 'scope'
+                  ? 'Scope of Work Template'
+                  : 'Logistics Template'}
               </h4>
               <button
                 onClick={() =>
                   copyToClipboard(
-                    activeTemplate === 'email' ? emailTemplate : scopeTemplate,
+                    activeTemplate === 'email'
+                      ? emailTemplate
+                      : activeTemplate === 'scope'
+                      ? scopeTemplate
+                      : logisticsTemplate,
                     activeTemplate
                   )
                 }
@@ -297,7 +393,11 @@ const PreviewTemplates: React.FC<PreviewTemplatesProps> = ({
           <div className="flex-1 overflow-y-auto p-6">
             <div className="bg-black rounded-lg p-4 border border-accent">
               <pre className="whitespace-pre-wrap text-sm text-white font-mono leading-relaxed">
-                {activeTemplate === 'email' ? emailTemplate : scopeTemplate}
+                {activeTemplate === 'email'
+                  ? emailTemplate
+                  : activeTemplate === 'scope'
+                  ? scopeTemplate
+                  : logisticsTemplate}
               </pre>
             </div>
           </div>
