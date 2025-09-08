@@ -43,7 +43,7 @@ const App: React.FC = () => {
     contactName: '',
     siteAddress: '',
     sitePhone: '',
-    shopLocation: '',
+    shopLocation: 'Shop',
     scopeOfWork: '',
     email: '',
     equipmentRequirements: initialEquipmentRequirements
