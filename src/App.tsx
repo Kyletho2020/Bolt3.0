@@ -56,7 +56,9 @@ const App: React.FC = () => {
     deliveryZip: '',
     serviceType: 'Standard Delivery',
     shipmentType: 'LTL',
-    truckType: ''
+    truckType: '',
+    storageType: '',
+    storageSqFt: ''
   })
 
   // Modal states
@@ -148,7 +150,13 @@ const App: React.FC = () => {
       ...loadedEquipmentData,
       equipmentRequirements: loadedEquipmentRequirements || initialEquipmentRequirements
     })
-    setLogisticsData({ truckType: '', shipmentType: 'LTL', ...loadedLogisticsData })
+    setLogisticsData({
+      truckType: '',
+      shipmentType: 'LTL',
+      storageType: '',
+      storageSqFt: '',
+      ...loadedLogisticsData
+    })
   }
 
   const handleApiKeyChange = () => {
@@ -433,6 +441,30 @@ const App: React.FC = () => {
                   <option value="Flatbed with tarp">Flatbed with tarp</option>
                   <option value="Conestoga">Conestoga</option>
                 </select>
+              </div>
+
+              {/* Storage Requirements */}
+              <div>
+                <label className="block text-sm font-medium text-white mb-2">Storage</label>
+                <select
+                  value={logisticsData.storageType}
+                  onChange={(e) => handleLogisticsChange('storageType', e.target.value)}
+                  className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
+                >
+                  <option value="">No Storage</option>
+                  <option value="inside">Inside Storage ($1.50/sq ft)</option>
+                  <option value="outside">Outside Storage ($0.75/sq ft)</option>
+                </select>
+                {logisticsData.storageType && (
+                  <input
+                    type="number"
+                    value={logisticsData.storageSqFt}
+                    onChange={(e) => handleLogisticsChange('storageSqFt', e.target.value)}
+                    className="mt-2 w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
+                    placeholder="Square footage"
+                    min="0"
+                  />
+                )}
               </div>
 
             </div>

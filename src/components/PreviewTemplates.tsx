@@ -46,6 +46,9 @@ const PreviewTemplates: React.FC<PreviewTemplatesProps> = ({
     const pickupAddress = logisticsData.pickupAddress || siteAddress
     const deliveryAddress = logisticsData.deliveryAddress || '[Delivery Address]'
 
+    const storageLine = logisticsData.storageType
+      ? `• Storage: ${logisticsData.storageType === 'inside' ? 'Inside' : 'Outside'} (${logisticsData.storageSqFt || '[Sq Ft]'} sq ft)`
+      : ''
 
     return `Subject: Quote Request - ${projectName}
 
@@ -61,12 +64,12 @@ PROJECT DETAILS:
 • Site Address: ${siteAddress}
 • Shop Location: ${shopLocation}
 
-${scopeOfWork ? `SCOPE OF WORK:\n${scopeOfWork}\n\n` : ''}${equipmentLines}LOGISTICS REQUIREMENTS:
-• Pickup Location: ${pickupAddress}
-• Delivery Location: ${deliveryAddress}
-• Service Type: ${logisticsData.serviceType || 'Standard Delivery'}
-• Shipment Type: ${logisticsData.shipmentType || 'LTL'}
-${logisticsData.truckType ? `• Truck Type: ${logisticsData.truckType}` : ''}
+    ${scopeOfWork ? `SCOPE OF WORK:\n${scopeOfWork}\n\n` : ''}${equipmentLines}LOGISTICS REQUIREMENTS:
+    • Pickup Location: ${pickupAddress}
+    • Delivery Location: ${deliveryAddress}
+    • Service Type: ${logisticsData.serviceType || 'Standard Delivery'}
+    • Shipment Type: ${logisticsData.shipmentType || 'LTL'}
+    ${storageLine ? `${storageLine}\n` : ''}${logisticsData.truckType ? `• Truck Type: ${logisticsData.truckType}` : ''}
 
     ${
       logisticsData.pieces && logisticsData.pieces.length > 0
@@ -117,6 +120,14 @@ ${sitePhone}`
       .filter(Boolean)
       .join(', ')
 
+    const storageLine = logisticsData.storageType
+      ? `Storage: ${
+          logisticsData.storageType === 'inside'
+            ? 'Inside Storage'
+            : 'Outside Storage'
+        } - ${logisticsData.storageSqFt || '[Sq Ft]'} sq ft`
+      : ''
+
     return `SCOPE OF WORK
 
 Mobilize crew and Omega Morgan equipment to site: ${siteAddress}
@@ -128,10 +139,10 @@ Omega Morgan to supply ${
       equipmentSummary || 'necessary crew and equipment'
     }.
 
-Shipment Type: ${logisticsData.shipmentType || 'LTL'}
-${logisticsData.truckType ? `Truck Type Requested: ${logisticsData.truckType}\n\n` : '\n'}${
-      scopeOfWork ? `${scopeOfWork}\n\n` : ''
-    }${
+  Shipment Type: ${logisticsData.shipmentType || 'LTL'}
+  ${logisticsData.truckType ? `Truck Type Requested: ${logisticsData.truckType}\n` : ''}${
+      storageLine ? `${storageLine}\n\n` : '\n'
+    }${scopeOfWork ? `${scopeOfWork}\n\n` : ''}${
       logisticsData.pieces && logisticsData.pieces.length > 0
         ? `ITEMS TO HANDLE:
 ${logisticsData.pieces
