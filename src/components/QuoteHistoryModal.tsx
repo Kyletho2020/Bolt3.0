@@ -161,7 +161,7 @@ const QuoteHistoryModal: React.FC<QuoteHistoryModalProps> = ({
         const loadedRequirements =
           quote.equipment_requirements || {
             crewSize: '',
-            forkliftModels: [],
+            forklifts: [],
             tractors: [],
             trailers: []
           }
