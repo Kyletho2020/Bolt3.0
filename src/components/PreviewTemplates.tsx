@@ -65,6 +65,7 @@ ${scopeOfWork ? `SCOPE OF WORK:\n${scopeOfWork}\n\n` : ''}${equipmentLines}LOGIS
 • Pickup Location: ${pickupAddress}
 • Delivery Location: ${deliveryAddress}
 • Service Type: ${logisticsData.serviceType || 'Standard Delivery'}
+• Shipment Type: ${logisticsData.shipmentType || 'LTL'}
 ${logisticsData.truckType ? `• Truck Type: ${logisticsData.truckType}` : ''}
 
     ${
@@ -127,7 +128,8 @@ Omega Morgan to supply ${
       equipmentSummary || 'necessary crew and equipment'
     }.
 
-${logisticsData.truckType ? `Truck Type Requested: ${logisticsData.truckType}\n\n` : ''}${
+Shipment Type: ${logisticsData.shipmentType || 'LTL'}
+${logisticsData.truckType ? `Truck Type Requested: ${logisticsData.truckType}\n\n` : '\n'}${
       scopeOfWork ? `${scopeOfWork}\n\n` : ''
     }${
       logisticsData.pieces && logisticsData.pieces.length > 0
