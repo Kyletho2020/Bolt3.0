@@ -152,7 +152,7 @@ const QuoteHistoryModal: React.FC<QuoteHistoryModalProps> = ({
           companyName: quote.company_name || '',
           contactName: quote.contact_name || '',
           sitePhone: quote.site_phone || '',
-          shopLocation: quote.shop_location || '',
+          shopLocation: quote.shop_location || 'Shop',
           siteAddress: quote.site_address || '',
           scopeOfWork: quote.scope_of_work || '',
           email: '',

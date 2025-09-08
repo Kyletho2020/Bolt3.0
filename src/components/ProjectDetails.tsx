@@ -26,9 +26,10 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ data, onChange, onSelec
   }
 
   const clearSection = () => {
-    ;(['projectName', 'companyName', 'contactName', 'siteAddress', 'sitePhone', 'shopLocation', 'scopeOfWork', 'email'] as (keyof ProjectDetailsData)[]).forEach(field => {
+    ;(['projectName', 'companyName', 'contactName', 'siteAddress', 'sitePhone', 'scopeOfWork', 'email'] as (keyof ProjectDetailsData)[]).forEach(field => {
       onChange(field, '')
     })
+    onChange('shopLocation', 'Shop')
   }
 
   return (
@@ -126,13 +127,15 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ data, onChange, onSelec
           <MapPin className="w-4 h-4 inline mr-1" />
           Shop Location
         </label>
-        <input
-          type="text"
+        <select
           value={data.shopLocation}
           onChange={(e) => handleFieldChange('shopLocation', e.target.value)}
           className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-          placeholder="Enter shop location"
-        />
+        >
+          <option value="Shop">Shop</option>
+          <option value="Mukilteo">Mukilteo</option>
+          <option value="Fife">Fife</option>
+        </select>
       </div>
 
       <div>
