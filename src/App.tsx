@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react'
 import {
   FileText,
-  Eye,
   X,
   Bot,
   Archive,
@@ -11,12 +10,18 @@ import {
   Package,
   Truck,
   Key,
-  Trash2
+  Trash2,
+  Copy,
+  CheckCircle,
+  Mail
 } from 'lucide-react'
 import { useSessionId } from './hooks/useSessionId'
 import { useApiKey } from './hooks/useApiKey'
 import AIExtractorModal from './components/AIExtractorModal'
-import PreviewTemplates from './components/PreviewTemplates'
+import {
+  generateEmailTemplate,
+  generateScopeTemplate
+} from './components/PreviewTemplates'
 import QuoteSaveManager from './components/QuoteSaveManager'
 import ApiKeySetup from './components/ApiKeySetup'
 import ProjectDetails from './components/ProjectDetails'
@@ -66,7 +71,6 @@ const App: React.FC = () => {
 
   // Modal states
   const [showAIExtractor, setShowAIExtractor] = useState(false)
-  const [showPreview, setShowPreview] = useState(false)
   const [showHistory, setShowHistory] = useState(false)
   const [showApiKeySetup, setShowApiKeySetup] = useState(false)
 
@@ -186,6 +190,33 @@ const App: React.FC = () => {
     refetchApiKey()
   }
 
+  const [copiedTemplate, setCopiedTemplate] = useState<string | null>(null)
+
+  const emailTemplate = generateEmailTemplate(
+    equipmentData,
+    logisticsData,
+    equipmentData.equipmentRequirements
+  )
+
+  const scopeTemplate = generateScopeTemplate(
+    equipmentData,
+    logisticsData,
+    equipmentData.equipmentRequirements
+  )
+
+  const copyToClipboard = async (
+    text: string,
+    templateType: 'email' | 'scope'
+  ) => {
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopiedTemplate(templateType)
+      setTimeout(() => setCopiedTemplate(null), 2000)
+    } catch (err) {
+      console.error('Failed to copy text: ', err)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="container mx-auto px-4 py-8">
@@ -214,21 +245,13 @@ const App: React.FC = () => {
             AI Extractor
           </button>
           
-          <button
-            onClick={() => setShowPreview(true)}
-            className="flex items-center px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors border border-accent"
-          >
-            <Eye className="w-4 h-4 mr-2" />
-            Preview Templates
-          </button>
-          
-          <button
-            onClick={() => setShowHistory(true)}
-            className="flex items-center px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors border border-accent"
-          >
-            <Archive className="w-4 h-4 mr-2" />
-            Quote History
-          </button>
+            <button
+              onClick={() => setShowHistory(true)}
+              className="flex items-center px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors border border-accent"
+            >
+              <Archive className="w-4 h-4 mr-2" />
+              Quote History
+            </button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -512,20 +535,79 @@ const App: React.FC = () => {
           </div>
         </div>
 
+        {/* Templates */}
+        <div className="mt-8 space-y-8">
+          <div className="bg-gray-900 rounded-lg border-2 border-accent p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center">
+                <Mail className="w-6 h-6 text-white mr-2" />
+                <h2 className="text-2xl font-bold text-white">Email Template</h2>
+              </div>
+              <button
+                onClick={() => copyToClipboard(emailTemplate, 'email')}
+                className="flex items-center px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors border border-accent"
+              >
+                {copiedTemplate === 'email' ? (
+                  <>
+                    <CheckCircle className="w-4 h-4 mr-2" />
+                    Copied!
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-4 h-4 mr-2" />
+                    Copy
+                  </>
+                )}
+              </button>
+            </div>
+            <div className="bg-black rounded-lg p-4 border border-accent">
+              <pre className="whitespace-pre-wrap text-sm text-white font-mono leading-relaxed">
+                {emailTemplate}
+              </pre>
+            </div>
+          </div>
+
+          <div className="bg-gray-900 rounded-lg border-2 border-accent p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center">
+                <FileText className="w-6 h-6 text-white mr-2" />
+                <h2 className="text-2xl font-bold text-white">Scope of Work Template</h2>
+              </div>
+              <button
+                onClick={() => copyToClipboard(scopeTemplate, 'scope')}
+                className="flex items-center px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors border border-accent"
+              >
+                {copiedTemplate === 'scope' ? (
+                  <>
+                    <CheckCircle className="w-4 h-4 mr-2" />
+                    Copied!
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-4 h-4 mr-2" />
+                    Copy
+                  </>
+                )}
+              </button>
+            </div>
+            <div className="bg-black rounded-lg p-4 border border-accent">
+              <pre className="whitespace-pre-wrap text-sm text-white font-mono leading-relaxed">
+                {scopeTemplate}
+              </pre>
+            </div>
+          </div>
+
+          <p className="text-sm text-white">
+            Templates are automatically populated with extracted data. Fields in brackets [ ] need manual completion.
+          </p>
+        </div>
+
         {/* Modals */}
         <AIExtractorModal
           isOpen={showAIExtractor}
           onClose={() => setShowAIExtractor(false)}
           onExtract={handleAIExtraction}
           sessionId={sessionId}
-        />
-
-        <PreviewTemplates
-          equipmentData={equipmentData}
-          logisticsData={logisticsData}
-          equipmentRequirements={equipmentData.equipmentRequirements}
-          isOpen={showPreview}
-          onClose={() => setShowPreview(false)}
         />
 
         <QuoteSaveManager
