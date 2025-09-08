@@ -24,10 +24,10 @@ const PreviewTemplates: React.FC<PreviewTemplatesProps> = ({
     const projectName = equipmentData.projectName || '[project name]'
     const companyName = equipmentData.companyName || '[Company Name]'
     const contactName = equipmentData.contactName || '[Contact Name]'
-    const projectAddress = equipmentData.projectAddress || '[Project Address]'
-    const city = equipmentData.city || '[City]'
-    const state = equipmentData.state || '[State]'
-    const additionalDetails = equipmentData.additionalDetails || ''
+    const siteAddress = equipmentData.siteAddress || '[Site Address]'
+    const sitePhone = equipmentData.sitePhone || '[Site Phone]'
+    const shopLocation = equipmentData.shopLocation || '[Shop Location]'
+    const scopeOfWork = equipmentData.scopeOfWork || ''
 
     const crewSize = equipmentRequirements.crewSize || ''
     const forklifts = (equipmentRequirements.forkliftModels || []).filter((f: string) => f)
@@ -43,13 +43,8 @@ const PreviewTemplates: React.FC<PreviewTemplatesProps> = ({
           }${trailers.length ? `• Trailers: ${trailers.join(', ')}` : ''}\n\n`
         : ''
 
-    const pickupAddress = logisticsData.pickupAddress || projectAddress
-    const pickupCity = logisticsData.pickupCity || city
-    const pickupState = logisticsData.pickupState || state
-    
+    const pickupAddress = logisticsData.pickupAddress || siteAddress
     const deliveryAddress = logisticsData.deliveryAddress || '[Delivery Address]'
-    const deliveryCity = logisticsData.deliveryCity || '[Delivery City]'
-    const deliveryState = logisticsData.deliveryState || '[Delivery State]'
 
 
     return `Subject: Quote Request - ${projectName}
@@ -62,11 +57,13 @@ PROJECT DETAILS:
 • Project Name: ${projectName}
 • Company: ${companyName}
 • Contact: ${contactName}
-• Project Location: ${projectAddress}, ${city}, ${state}
+• Site Phone: ${sitePhone}
+• Site Address: ${siteAddress}
+• Shop Location: ${shopLocation}
 
-${additionalDetails ? `ADDITIONAL DETAILS:\n${additionalDetails}\n\n` : ''}${equipmentLines}LOGISTICS REQUIREMENTS:
-• Pickup Location: ${pickupAddress}, ${pickupCity}, ${pickupState}
-• Delivery Location: ${deliveryAddress}, ${deliveryCity}, ${deliveryState}
+${scopeOfWork ? `SCOPE OF WORK:\n${scopeOfWork}\n\n` : ''}${equipmentLines}LOGISTICS REQUIREMENTS:
+• Pickup Location: ${pickupAddress}
+• Delivery Location: ${deliveryAddress}
 • Service Type: ${logisticsData.serviceType || 'Standard Delivery'}
 ${logisticsData.truckType ? `• Truck Type: ${logisticsData.truckType}` : ''}
 
@@ -95,15 +92,15 @@ Best regards,
 ${contactName}
 ${companyName}
 ${equipmentData.email || '[Email]'}
-${equipmentData.phone || '[Phone]'}`
+${sitePhone}`
   }
 
   const generateScopeTemplate = () => {
-    const projectAddress = equipmentData.projectAddress || '[Project Address]'
-    const city = equipmentData.city || '[City]'
-    const state = equipmentData.state || '[State]'
+    const siteAddress = equipmentData.siteAddress || '[Site Address]'
     const contactName = equipmentData.contactName || '[Site Contact]'
-    const phone = equipmentData.phone || '[Site Contact Phone Number]'
+    const phone = equipmentData.sitePhone || '[Site Contact Phone Number]'
+    const shopLocation = equipmentData.shopLocation || '[Shop]'
+    const scopeOfWork = equipmentData.scopeOfWork || ''
 
     const crewSize = equipmentRequirements.crewSize || '[Crew Size]'
     const forklifts = (equipmentRequirements.forkliftModels || []).filter((f: string) => f)
@@ -121,7 +118,7 @@ ${equipmentData.phone || '[Phone]'}`
 
     return `SCOPE OF WORK
 
-Mobilize crew and Omega Morgan equipment to site: ${projectAddress}, ${city}, ${state}
+Mobilize crew and Omega Morgan equipment to site: ${siteAddress}
 
 ${contactName}
 ${phone}
@@ -131,9 +128,7 @@ Omega Morgan to supply ${
     }.
 
 ${logisticsData.truckType ? `Truck Type Requested: ${logisticsData.truckType}\n\n` : ''}${
-      equipmentData.additionalDetails
-        ? `${equipmentData.additionalDetails}\n\n`
-        : ''
+      scopeOfWork ? `${scopeOfWork}\n\n` : ''
     }${
       logisticsData.pieces && logisticsData.pieces.length > 0
         ? `ITEMS TO HANDLE:
@@ -147,10 +142,9 @@ ${logisticsData.pieces
       } lbs`
   )
   .join('\n')}
-
-`
+\n`
         : ''
-    }When job is complete clean up debris and return to [Shop].`
+    }When job is complete clean up debris and return to ${shopLocation}.`
   }
 
   const copyToClipboard = async (text: string, templateType: string) => {

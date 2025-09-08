@@ -1,18 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from 'react'
-import { 
-  FileText, 
-  Mail, 
-  Eye, 
-  X, 
-  Bot, 
-  Archive, 
-  Plus, 
-  Minus, 
-  Building,
-  User,
-  Phone,
-  MapPin,
+import {
+  FileText,
+  Eye,
+  X,
+  Bot,
+  Archive,
+  Plus,
+  Minus,
   Package,
   Truck,
   Key
@@ -23,7 +18,7 @@ import AIExtractorModal from './components/AIExtractorModal'
 import PreviewTemplates from './components/PreviewTemplates'
 import QuoteSaveManager from './components/QuoteSaveManager'
 import ApiKeySetup from './components/ApiKeySetup'
-import HubSpotContactSearch from './components/HubSpotContactSearch'
+import ProjectDetails from './components/ProjectDetails'
 import { HubSpotContact } from './services/hubspotService'
 import EquipmentRequired, { EquipmentRequirements } from './components/EquipmentRequired'
 
@@ -40,13 +35,11 @@ const App: React.FC = () => {
     projectName: '',
     companyName: '',
     contactName: '',
+    siteAddress: '',
+    sitePhone: '',
+    shopLocation: '',
+    scopeOfWork: '',
     email: '',
-    phone: '',
-    projectAddress: '',
-    city: '',
-    state: '',
-    zipCode: '',
-    additionalDetails: '',
     equipmentRequirements: initialEquipmentRequirements
   })
 
@@ -78,28 +71,22 @@ const App: React.FC = () => {
 
   // Auto-populate pickup address from project address
   useEffect(() => {
-    if (equipmentData.projectAddress && !logisticsData.pickupAddress) {
+    if (equipmentData.siteAddress && !logisticsData.pickupAddress) {
       setLogisticsData(prev => ({
         ...prev,
-        pickupAddress: equipmentData.projectAddress,
-        pickupCity: equipmentData.city,
-        pickupState: equipmentData.state,
-        pickupZip: equipmentData.zipCode
+        pickupAddress: equipmentData.siteAddress
       }))
     }
-  }, [equipmentData.projectAddress, equipmentData.city, equipmentData.state, equipmentData.zipCode])
+  }, [equipmentData.siteAddress])
 
   const handleSelectHubSpotContact = (contact: HubSpotContact) => {
     setEquipmentData(prev => ({
       ...prev,
       contactName: `${contact.firstName} ${contact.lastName}`.trim(),
       email: contact.email,
-      phone: contact.phone,
+      sitePhone: contact.phone || prev.sitePhone,
       companyName: contact.companyName || prev.companyName,
-      projectAddress: contact.contactAddress || contact.companyAddress || prev.projectAddress,
-      city: contact.contactCity || contact.companyCity || prev.city,
-      state: contact.contactState || contact.companyState || prev.state,
-      zipCode: contact.contactZip || contact.companyZip || prev.zipCode
+      siteAddress: contact.contactAddress || contact.companyAddress || prev.siteAddress
     }))
   }
 
@@ -220,180 +207,16 @@ const App: React.FC = () => {
               <h2 className="text-2xl font-bold text-white">Equipment Quote</h2>
             </div>
 
-            <HubSpotContactSearch onSelectContact={handleSelectHubSpotContact} />
+            <ProjectDetails
+              data={equipmentData}
+              onChange={handleEquipmentChange}
+              onSelectContact={handleSelectHubSpotContact}
+            />
 
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-white mb-2">
-                    <FileText className="w-4 h-4 inline mr-1" />
-                    Project Name
-                  </label>
-                  <input
-                    type="text"
-                    value={equipmentData.projectName}
-                    onChange={(e) => handleEquipmentChange('projectName', e.target.value)}
-                    className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                    placeholder="Enter project name"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-white mb-2">
-                    <Building className="w-4 h-4 inline mr-1" />
-                    Company Name
-                  </label>
-                  <input
-                    type="text"
-                    value={equipmentData.companyName}
-                    onChange={(e) => handleEquipmentChange('companyName', e.target.value)}
-                    className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                    placeholder="Enter company name"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-white mb-2">
-                    <User className="w-4 h-4 inline mr-1" />
-                    Contact Name
-                  </label>
-                  <input
-                    type="text"
-                    value={equipmentData.contactName}
-                    onChange={(e) => handleEquipmentChange('contactName', e.target.value)}
-                    className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                    placeholder="Enter contact name"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-white mb-2">
-                    <Mail className="w-4 h-4 inline mr-1" />
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    value={equipmentData.email}
-                    onChange={(e) => handleEquipmentChange('email', e.target.value)}
-                    className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                    placeholder="Enter email"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-white mb-2">
-                    <Phone className="w-4 h-4 inline mr-1" />
-                    Phone
-                  </label>
-                  <input
-                    type="tel"
-                    value={equipmentData.phone}
-                    onChange={(e) => handleEquipmentChange('phone', e.target.value)}
-                    className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                    placeholder="Enter phone number"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-white mb-2">
-                  <MapPin className="w-4 h-4 inline mr-1" />
-                  Project Address
-                </label>
-                <input
-                  type="text"
-                  value={equipmentData.projectAddress}
-                  onChange={(e) => handleEquipmentChange('projectAddress', e.target.value)}
-                  className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                  placeholder="Enter project address"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-white mb-2">City</label>
-                  <select
-                    value={equipmentData.city}
-                    onChange={(e) => handleEquipmentChange('city', e.target.value)}
-                    className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                  >
-                    <option value="">Select city</option>
-                    <option value="Portland">Portland</option>
-                    <option value="Seattle">Seattle</option>
-                    <option value="Spokane">Spokane</option>
-                    <option value="Tacoma">Tacoma</option>
-                    <option value="Vancouver">Vancouver</option>
-                    <option value="Bellevue">Bellevue</option>
-                    <option value="Everett">Everett</option>
-                    <option value="Kent">Kent</option>
-                    <option value="Renton">Renton</option>
-                    <option value="Yakima">Yakima</option>
-                    <option value="Bellingham">Bellingham</option>
-                    <option value="Olympia">Olympia</option>
-                    <option value="Beaverton">Beaverton</option>
-                    <option value="Gresham">Gresham</option>
-                    <option value="Hillsboro">Hillsboro</option>
-                    <option value="Bend">Bend</option>
-                    <option value="Medford">Medford</option>
-                    <option value="Springfield">Springfield</option>
-                    <option value="Corvallis">Corvallis</option>
-                    <option value="Albany">Albany</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-white mb-2">State</label>
-                  <select
-                    value={equipmentData.state}
-                    onChange={(e) => handleEquipmentChange('state', e.target.value)}
-                    className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                  >
-                    <option value="">Select state</option>
-                    <option value="WA">Washington</option>
-                    <option value="OR">Oregon</option>
-                    <option value="CA">California</option>
-                    <option value="ID">Idaho</option>
-                    <option value="MT">Montana</option>
-                    <option value="NV">Nevada</option>
-                    <option value="UT">Utah</option>
-                    <option value="AZ">Arizona</option>
-                    <option value="CO">Colorado</option>
-                    <option value="WY">Wyoming</option>
-                    <option value="AK">Alaska</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-white mb-2">Zip Code</label>
-                  <input
-                    type="text"
-                    value={equipmentData.zipCode}
-                    onChange={(e) => handleEquipmentChange('zipCode', e.target.value)}
-                    className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                    placeholder="Enter zip code"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-white mb-2">Additional Project Details</label>
-                <textarea
-                  value={equipmentData.additionalDetails || ''}
-                  onChange={(e) => handleEquipmentChange('additionalDetails', e.target.value)}
-                  rows={3}
-                  className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent resize-none text-white"
-                  placeholder="Additional details about the project and work to be performed"
-                />
-              </div>
-
-              <EquipmentRequired
-                data={equipmentData.equipmentRequirements}
-                onChange={handleEquipmentRequirementsChange}
-              />
-
-            </div>
+            <EquipmentRequired
+              data={equipmentData.equipmentRequirements}
+              onChange={handleEquipmentRequirementsChange}
+            />
           </div>
 
           {/* Logistics Quote Form */}

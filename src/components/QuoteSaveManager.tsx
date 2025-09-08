@@ -134,9 +134,11 @@ const QuoteSaveManager: React.FC<QuoteSaveManagerProps> = ({
           projectName: quote.project_name || '',
           companyName: quote.company_name || '',
           contactName: quote.contact_name || '',
-          phone: quote.site_phone || '',
-          projectAddress: quote.site_address || '',
-          additionalDetails: quote.scope_of_work || '',
+          sitePhone: quote.site_phone || '',
+          shopLocation: quote.shop_location || '',
+          siteAddress: quote.site_address || '',
+          scopeOfWork: quote.scope_of_work || '',
+          email: '',
         }
 
         const loadedRequirements =
