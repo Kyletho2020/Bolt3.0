@@ -5,18 +5,17 @@ import {
   Mail, 
   Eye, 
   X, 
-  Bot, 
-  Archive, 
-  Plus, 
-  Minus, 
-  Search, 
-  Building, 
-  User, 
-  Phone, 
-  MapPin, 
-  Package, 
-  Truck, 
-  Key 
+  Bot,
+  Archive,
+  Plus,
+  Minus,
+  Building,
+  User,
+  Phone,
+  MapPin,
+  Package,
+  Truck,
+  Key
 } from 'lucide-react'
 import { useSessionId } from './hooks/useSessionId'
 import { useApiKey } from './hooks/useApiKey'
@@ -25,7 +24,7 @@ import PreviewTemplates from './components/PreviewTemplates'
 import QuoteHistoryModal from './components/QuoteHistoryModal'
 import ApiKeySetup from './components/ApiKeySetup'
 import HubSpotContactSearch from './components/HubSpotContactSearch'
-import { HubSpotService, HubSpotContact } from './services/hubspotService'
+import { HubSpotContact } from './services/hubspotService'
 
 const App: React.FC = () => {
   // State for equipment form
@@ -41,7 +40,9 @@ const App: React.FC = () => {
     zipCode: '',
     projectDescription: '',
     additionalDetails: '',
-    specialInstructions: ''
+    specialInstructions: '',
+    crewSize: '',
+    equipmentList: [] as string[]
   })
 
   // State for logistics form
@@ -99,6 +100,22 @@ const App: React.FC = () => {
 
   const handleEquipmentChange = (field: string, value: string) => {
     setEquipmentData(prev => ({ ...prev, [field]: value }))
+  }
+
+  const addEquipmentItem = (item: string) => {
+    setEquipmentData(prev => ({
+      ...prev,
+      equipmentList: prev.equipmentList.includes(item)
+        ? prev.equipmentList
+        : [...prev.equipmentList, item]
+    }))
+  }
+
+  const removeEquipmentItem = (item: string) => {
+    setEquipmentData(prev => ({
+      ...prev,
+      equipmentList: prev.equipmentList.filter((eq: string) => eq !== item)
+    }))
   }
 
   const handleLogisticsChange = (field: string, value: string) => {
@@ -404,6 +421,90 @@ const App: React.FC = () => {
                   className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent resize-none text-white"
                   placeholder="Any special instructions or requirements"
                 />
+              </div>
+
+              <div className="border-2 border-accent rounded-lg p-4">
+                <h3 className="text-lg font-medium text-white mb-4">Equipment Required</h3>
+
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-white mb-2">Crew Size</label>
+                  <select
+                    value={equipmentData.crewSize}
+                    onChange={(e) => handleEquipmentChange('crewSize', e.target.value)}
+                    className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
+                  >
+                    <option value="">Select crew size</option>
+                    <option value="2-man crew">2 man crew</option>
+                    <option value="3-man crew">3 man crew</option>
+                    <option value="4-man crew">4 man crew</option>
+                    <option value="5-man crew">5 man crew</option>
+                    <option value="6-man crew">6 man crew</option>
+                  </select>
+                </div>
+
+                <div className="mb-4">
+                  <p className="text-sm font-medium text-white mb-2">Forklifts</p>
+                  <div className="flex flex-wrap gap-2">
+                    {['Forklift 3K','Forklift 5K','Forklift 6K','Forklift 8K','Versalift 25/35','Versalift 40','Versalift 60','Versalift 80','Versalift 88','Versalift 93'].map(item => (
+                      <button
+                        key={item}
+                        onClick={() => addEquipmentItem(item)}
+                        className="px-3 py-1 bg-accent text-black rounded-lg hover:bg-green-400 text-sm"
+                      >
+                        + {item}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="mb-4">
+                  <p className="text-sm font-medium text-white mb-2">Tractors</p>
+                  <div className="flex flex-wrap gap-2">
+                    {['3 axle tractor','4 axle tractor','Rollback'].map(item => (
+                      <button
+                        key={item}
+                        onClick={() => addEquipmentItem(item)}
+                        className="px-3 py-1 bg-accent text-black rounded-lg hover:bg-green-400 text-sm"
+                      >
+                        + {item}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-sm font-medium text-white mb-2">Trailers</p>
+                  <div className="flex flex-wrap gap-2">
+                    {['Double Drop','Flatbed','Landoll','Step Deck'].map(item => (
+                      <button
+                        key={item}
+                        onClick={() => addEquipmentItem(item)}
+                        className="px-3 py-1 bg-accent text-black rounded-lg hover:bg-green-400 text-sm"
+                      >
+                        + {item}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {equipmentData.equipmentList.length > 0 && (
+                  <div className="mt-4">
+                    <p className="text-sm font-medium text-white mb-2">Selected Equipment</p>
+                    <div className="flex flex-wrap gap-2">
+                      {equipmentData.equipmentList.map(item => (
+                        <span key={item} className="flex items-center bg-gray-800 px-2 py-1 rounded-lg text-sm">
+                          {item}
+                          <button
+                            onClick={() => removeEquipmentItem(item)}
+                            className="ml-1 text-red-400 hover:text-red-300"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>

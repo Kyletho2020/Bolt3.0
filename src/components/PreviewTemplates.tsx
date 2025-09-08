@@ -89,9 +89,8 @@ Mobilize crew and Omega Morgan equipment to site: ${projectAddress}, ${city}, ${
 ${contactName}
 ${phone}
 
-Omega Morgan to supply 3-man crew, Gear Truck and Trailer.
-
-${equipmentData.projectDescription ? `PROJECT DESCRIPTION:
+Omega Morgan to supply ${equipmentData.crewSize || '3-man crew'}, Gear Truck and Trailer.
+${equipmentData.equipmentList && equipmentData.equipmentList.length > 0 ? `${equipmentData.equipmentList.map((item: string) => `• ${item}`).join('\\n')}\\n\\n` : '\\n'}${equipmentData.projectDescription ? `PROJECT DESCRIPTION:
 ${equipmentData.projectDescription}
 
 ` : ''}${logisticsData.pieces && logisticsData.pieces.length > 0 ? `ITEMS TO HANDLE:
