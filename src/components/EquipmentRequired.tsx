@@ -95,13 +95,20 @@ const EquipmentRequired: React.FC<EquipmentRequiredProps> = ({ data, onChange })
 
       <div>
         <label className="block text-sm font-medium text-white mb-2">Crew Size</label>
-        <input
-          type="text"
+        <select
           value={data.crewSize}
           onChange={(e) => handleFieldChange('crewSize', e.target.value)}
-          className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-          placeholder="Enter crew size"
-        />
+          className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white" 
+        >
+          <option value="" disabled>
+            Select crew size
+          </option>
+          {Array.from({ length: 9 }, (_, i) => i + 2).map((size) => (
+            <option key={size} value={size}>
+              {size}
+            </option>
+          ))}
+        </select>
       </div>
 
       {renderList('Forklift Models', 'forkliftModels')}
