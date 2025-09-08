@@ -68,7 +68,7 @@ const EquipmentRequired: React.FC<EquipmentRequiredProps> = ({ data, onChange })
             key={index}
             className="flex items-center bg-gray-900 border border-accent text-white rounded-full px-3 py-1"
           >
-            <span className="mr-1">{item}</span>
+            <span className="mr-1">+ {item}</span>
             <button
               type="button"
               onClick={() => removeItem(field, index)}
