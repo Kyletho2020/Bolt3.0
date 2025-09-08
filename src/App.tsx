@@ -39,7 +39,6 @@ const App: React.FC = () => {
     city: '',
     state: '',
     zipCode: '',
-    projectDescription: '',
     additionalDetails: ''
   })
 
@@ -131,7 +130,8 @@ const App: React.FC = () => {
 
   const handleAIExtraction = (extractedEquipmentData: any, extractedLogisticsData: any) => {
     if (extractedEquipmentData) {
-      setEquipmentData(prev => ({ ...prev, ...extractedEquipmentData }))
+      const { projectDescription, ...rest } = extractedEquipmentData
+      setEquipmentData(prev => ({ ...prev, ...rest }))
     }
     if (extractedLogisticsData) {
       setLogisticsData(prev => ({ ...prev, ...extractedLogisticsData }))
@@ -355,32 +355,6 @@ const App: React.FC = () => {
                     placeholder="Enter zip code"
                   />
                 </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-white mb-2">Project Description</label>
-                <select
-                  value={equipmentData.projectDescription}
-                  onChange={(e) => handleEquipmentChange('projectDescription', e.target.value)}
-                  className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent resize-none text-white"
-                >
-                  <option value="">Select project type</option>
-                  <option value="Heavy Equipment Transport">Heavy Equipment Transport</option>
-                  <option value="Machinery Rigging & Installation">Machinery Rigging & Installation</option>
-                  <option value="Industrial Plant Relocation">Industrial Plant Relocation</option>
-                  <option value="Construction Equipment Moving">Construction Equipment Moving</option>
-                  <option value="Manufacturing Equipment Setup">Manufacturing Equipment Setup</option>
-                  <option value="Warehouse Equipment Installation">Warehouse Equipment Installation</option>
-                  <option value="Medical Equipment Transport">Medical Equipment Transport</option>
-                  <option value="Server Room Equipment Moving">Server Room Equipment Moving</option>
-                  <option value="Laboratory Equipment Relocation">Laboratory Equipment Relocation</option>
-                  <option value="HVAC System Installation">HVAC System Installation</option>
-                  <option value="Generator Installation">Generator Installation</option>
-                  <option value="Transformer Installation">Transformer Installation</option>
-                  <option value="Crane Services">Crane Services</option>
-                  <option value="Millwright Services">Millwright Services</option>
-                  <option value="Custom Project">Custom Project</option>
-                </select>
               </div>
 
               <div>

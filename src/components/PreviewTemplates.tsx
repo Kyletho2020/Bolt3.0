@@ -25,7 +25,7 @@ const PreviewTemplates: React.FC<PreviewTemplatesProps> = ({
     const projectAddress = equipmentData.projectAddress || '[Project Address]'
     const city = equipmentData.city || '[City]'
     const state = equipmentData.state || '[State]'
-    const projectDescription = equipmentData.projectDescription || '[Project Description]'
+    const additionalDetails = equipmentData.additionalDetails || ''
     
     const pickupAddress = logisticsData.pickupAddress || projectAddress
     const pickupCity = logisticsData.pickupCity || city
@@ -48,10 +48,7 @@ PROJECT DETAILS:
 • Contact: ${contactName}
 • Project Location: ${projectAddress}, ${city}, ${state}
 
-PROJECT DESCRIPTION:
-${projectDescription}
-
-LOGISTICS REQUIREMENTS:
+${additionalDetails ? `ADDITIONAL DETAILS:\n${additionalDetails}\n\n` : ''}LOGISTICS REQUIREMENTS:
 • Pickup Location: ${pickupAddress}, ${pickupCity}, ${pickupState}
 • Delivery Location: ${deliveryAddress}, ${deliveryCity}, ${deliveryState}
 • Service Type: ${logisticsData.serviceType || 'Standard Delivery'}
@@ -80,7 +77,7 @@ ${equipmentData.phone || '[Phone]'}`
     const state = equipmentData.state || '[State]'
     const contactName = equipmentData.contactName || '[Site Contact]'
     const phone = equipmentData.phone || '[Site Contact Phone Number]'
-    
+
     return `SCOPE OF WORK
 
 Mobilize crew and Omega Morgan equipment to site: ${projectAddress}, ${city}, ${state}
@@ -90,12 +87,7 @@ ${phone}
 
 Omega Morgan to supply 3-man crew, Gear Truck and Trailer.
 
-${logisticsData.truckType ? `Truck Type Requested: ${logisticsData.truckType}\n\n` : ''}
-
-${equipmentData.projectDescription ? `PROJECT DESCRIPTION:
-${equipmentData.projectDescription}
-
-` : ''}${logisticsData.pieces && logisticsData.pieces.length > 0 ? `ITEMS TO HANDLE:
+${logisticsData.truckType ? `Truck Type Requested: ${logisticsData.truckType}\n\n` : ''}${equipmentData.additionalDetails ? `${equipmentData.additionalDetails}\n\n` : ''}${logisticsData.pieces && logisticsData.pieces.length > 0 ? `ITEMS TO HANDLE:
 ${logisticsData.pieces.map((piece: any) =>
   `• (Qty: ${piece.quantity || 1}) ${piece.description || '[Item Description]'} - ${piece.length || '[L]'}"L x ${piece.width || '[W]'}"W x ${piece.height || '[H]'}"H, ${piece.weight || '[Weight]'} lbs`
 ).join('\n')}
