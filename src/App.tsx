@@ -27,6 +27,7 @@ import ApiKeySetup from './components/ApiKeySetup'
 import ProjectDetails from './components/ProjectDetails'
 import { HubSpotContact } from './services/hubspotService'
 import EquipmentRequired, { EquipmentRequirements } from './components/EquipmentRequired'
+import ClarificationsSection from './components/ClarificationsSection'
 
 const App: React.FC = () => {
   // State for equipment form
@@ -584,6 +585,31 @@ const App: React.FC = () => {
           <p className="text-sm text-white">
             Templates are automatically populated with extracted data. Fields in brackets [ ] need manual completion.
           </p>
+        </div>
+
+        {/* Clarifications */}
+        <div className="mt-8 space-y-8">
+          <ClarificationsSection
+            title="Machinery Moving"
+            initialItems={[
+              'Any change to the job will require approval in writing prior to completion of work.',
+              'Customer is to supply clear pathway for all items to be loaded onto trailers',
+              'Quote is based on no site visit and is not responsible for cracks in pavement or other unforeseen causes to not be able to perform work'
+            ]}
+          />
+          <ClarificationsSection
+            title="Crane"
+            initialItems={[
+              'Crew to take half hour meal break between 4 - 5 hour start of shift in yard.',
+              'Customer may work crew through first meal break and pay missed meal charge of $175 per crew member.',
+              '60 ton boom truck quoted and 6 and 8 hour minimums. 8 hour quoted for budget.',
+              'Quoted straight time and portal to portal.',
+              'Overtime overtime to be charged $65/hour.',
+              'Straight time is the first 8 hours worked between 5am - 6pm Monday through Friday including travel and dismantle.',
+              'Customer may work crew through meal with signature on work ticket and pay missed meal charge of $175 per crew member per missed meal.',
+              'Mandatory missed meal charge at 10 hours from start of shift.'
+            ]}
+          />
         </div>
 
         {/* Modals */}
