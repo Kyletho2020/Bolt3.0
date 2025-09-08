@@ -35,6 +35,7 @@ const PreviewTemplates: React.FC<PreviewTemplatesProps> = ({
     const deliveryCity = logisticsData.deliveryCity || '[Delivery City]'
     const deliveryState = logisticsData.deliveryState || '[Delivery State]'
 
+
     return `Subject: Quote Request - ${projectName}
 
 Dear Omega Morgan Team,
@@ -55,7 +56,6 @@ LOGISTICS REQUIREMENTS:
 • Delivery Location: ${deliveryAddress}, ${deliveryCity}, ${deliveryState}
 • Service Type: ${logisticsData.serviceType || 'Standard Delivery'}
 ${logisticsData.truckType ? `• Truck Type: ${logisticsData.truckType}` : ''}
-${logisticsData.specialHandling ? `• Special Handling: ${logisticsData.specialHandling}` : ''}
 
     ${logisticsData.pieces && logisticsData.pieces.length > 0 ? `ITEMS TO TRANSPORT:
     ${logisticsData.pieces.map((piece: any, index: number) =>
@@ -64,8 +64,6 @@ ${logisticsData.specialHandling ? `• Special Handling: ${logisticsData.special
 
 Please provide a detailed quote including all equipment, labor, and transportation costs. We would appreciate receiving this quote at your earliest convenience.
 
-${equipmentData.specialInstructions ? `SPECIAL INSTRUCTIONS:
-${equipmentData.specialInstructions}` : ''}
 
 Thank you for your time and consideration. I look forward to hearing from you soon.
 
@@ -101,12 +99,6 @@ ${equipmentData.projectDescription}
 ${logisticsData.pieces.map((piece: any) =>
   `• (Qty: ${piece.quantity || 1}) ${piece.description || '[Item Description]'} - ${piece.length || '[L]'}"L x ${piece.width || '[W]'}"W x ${piece.height || '[H]'}"H, ${piece.weight || '[Weight]'} lbs`
 ).join('\n')}
-
-` : ''}${logisticsData.specialHandling ? `SPECIAL HANDLING REQUIREMENTS:
-${logisticsData.specialHandling}
-
-` : ''}${equipmentData.specialInstructions ? `SPECIAL INSTRUCTIONS:
-${equipmentData.specialInstructions}
 
 ` : ''}When job is complete clean up debris and return to [Shop].`
   }
