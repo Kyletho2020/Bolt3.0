@@ -5,15 +5,17 @@ import { FileText, Mail, Copy, CheckCircle, Eye, X } from 'lucide-react'
 interface PreviewTemplatesProps {
   equipmentData: any
   logisticsData: any
+  equipmentRequirements: any
   isOpen: boolean
   onClose: () => void
 }
 
-const PreviewTemplates: React.FC<PreviewTemplatesProps> = ({ 
-  equipmentData, 
-  logisticsData, 
-  isOpen, 
-  onClose 
+const PreviewTemplates: React.FC<PreviewTemplatesProps> = ({
+  equipmentData,
+  logisticsData,
+  equipmentRequirements,
+  isOpen,
+  onClose
 }) => {
   const [activeTemplate, setActiveTemplate] = useState<'email' | 'scope'>('email')
   const [copiedTemplate, setCopiedTemplate] = useState<string | null>(null)
@@ -26,7 +28,21 @@ const PreviewTemplates: React.FC<PreviewTemplatesProps> = ({
     const city = equipmentData.city || '[City]'
     const state = equipmentData.state || '[State]'
     const additionalDetails = equipmentData.additionalDetails || ''
-    
+
+    const crewSize = equipmentRequirements.crewSize || ''
+    const forklifts = (equipmentRequirements.forkliftModels || []).filter((f: string) => f)
+    const tractors = (equipmentRequirements.tractors || []).filter((t: string) => t)
+    const trailers = (equipmentRequirements.trailers || []).filter((t: string) => t)
+
+    const equipmentLines =
+      crewSize || forklifts.length || tractors.length || trailers.length
+        ? `EQUIPMENT REQUIREMENTS:\n${
+            crewSize ? `• Crew Size: ${crewSize}\n` : ''
+          }${forklifts.length ? `• Forklifts: ${forklifts.join(', ')}\n` : ''}${
+            tractors.length ? `• Tractors: ${tractors.join(', ')}\n` : ''
+          }${trailers.length ? `• Trailers: ${trailers.join(', ')}` : ''}\n\n`
+        : ''
+
     const pickupAddress = logisticsData.pickupAddress || projectAddress
     const pickupCity = logisticsData.pickupCity || city
     const pickupState = logisticsData.pickupState || state
@@ -48,16 +64,27 @@ PROJECT DETAILS:
 • Contact: ${contactName}
 • Project Location: ${projectAddress}, ${city}, ${state}
 
-${additionalDetails ? `ADDITIONAL DETAILS:\n${additionalDetails}\n\n` : ''}LOGISTICS REQUIREMENTS:
+${additionalDetails ? `ADDITIONAL DETAILS:\n${additionalDetails}\n\n` : ''}${equipmentLines}LOGISTICS REQUIREMENTS:
 • Pickup Location: ${pickupAddress}, ${pickupCity}, ${pickupState}
 • Delivery Location: ${deliveryAddress}, ${deliveryCity}, ${deliveryState}
 • Service Type: ${logisticsData.serviceType || 'Standard Delivery'}
 ${logisticsData.truckType ? `• Truck Type: ${logisticsData.truckType}` : ''}
 
-    ${logisticsData.pieces && logisticsData.pieces.length > 0 ? `ITEMS TO TRANSPORT:
-    ${logisticsData.pieces.map((piece: any, index: number) =>
-      `${index + 1}. (Qty: ${piece.quantity || 1}) ${piece.description || '[Description]'} - ${piece.length || '[L]'}"L x ${piece.width || '[W]'}"W x ${piece.height || '[H]'}"H, ${piece.weight || '[Weight]'} lbs`
-    ).join('\n')}` : ''}
+    ${
+      logisticsData.pieces && logisticsData.pieces.length > 0
+        ? `ITEMS TO TRANSPORT:
+    ${logisticsData.pieces
+      .map(
+        (piece: any, index: number) =>
+          `${index + 1}. (Qty: ${piece.quantity || 1}) ${
+            piece.description || '[Description]'
+          } - ${piece.length || '[L]'}"L x ${piece.width || '[W]'}"W x ${
+            piece.height || '[H]'
+          }"H, ${piece.weight || '[Weight]'} lbs`
+      )
+      .join('\n')}`
+        : ''
+    }
 
 Please provide a detailed quote including all equipment, labor, and transportation costs. We would appreciate receiving this quote at your earliest convenience.
 
@@ -78,6 +105,20 @@ ${equipmentData.phone || '[Phone]'}`
     const contactName = equipmentData.contactName || '[Site Contact]'
     const phone = equipmentData.phone || '[Site Contact Phone Number]'
 
+    const crewSize = equipmentRequirements.crewSize || '[Crew Size]'
+    const forklifts = (equipmentRequirements.forkliftModels || []).filter((f: string) => f)
+    const tractors = (equipmentRequirements.tractors || []).filter((t: string) => t)
+    const trailers = (equipmentRequirements.trailers || []).filter((t: string) => t)
+
+    const equipmentSummary = [
+      crewSize ? `${crewSize} crew` : '',
+      forklifts.length ? `${forklifts.join(', ')} forklift(s)` : '',
+      tractors.length ? `${tractors.join(', ')} tractor(s)` : '',
+      trailers.length ? `${trailers.join(', ')} trailer(s)` : ''
+    ]
+      .filter(Boolean)
+      .join(', ')
+
     return `SCOPE OF WORK
 
 Mobilize crew and Omega Morgan equipment to site: ${projectAddress}, ${city}, ${state}
@@ -85,14 +126,31 @@ Mobilize crew and Omega Morgan equipment to site: ${projectAddress}, ${city}, ${
 ${contactName}
 ${phone}
 
-Omega Morgan to supply 3-man crew, Gear Truck and Trailer.
+Omega Morgan to supply ${
+      equipmentSummary || 'necessary crew and equipment'
+    }.
 
-${logisticsData.truckType ? `Truck Type Requested: ${logisticsData.truckType}\n\n` : ''}${equipmentData.additionalDetails ? `${equipmentData.additionalDetails}\n\n` : ''}${logisticsData.pieces && logisticsData.pieces.length > 0 ? `ITEMS TO HANDLE:
-${logisticsData.pieces.map((piece: any) =>
-  `• (Qty: ${piece.quantity || 1}) ${piece.description || '[Item Description]'} - ${piece.length || '[L]'}"L x ${piece.width || '[W]'}"W x ${piece.height || '[H]'}"H, ${piece.weight || '[Weight]'} lbs`
-).join('\n')}
+${logisticsData.truckType ? `Truck Type Requested: ${logisticsData.truckType}\n\n` : ''}${
+      equipmentData.additionalDetails
+        ? `${equipmentData.additionalDetails}\n\n`
+        : ''
+    }${
+      logisticsData.pieces && logisticsData.pieces.length > 0
+        ? `ITEMS TO HANDLE:
+${logisticsData.pieces
+  .map(
+    (piece: any) =>
+      `• (Qty: ${piece.quantity || 1}) ${piece.description || '[Item Description]'} - ${
+        piece.length || '[L]'
+      }"L x ${piece.width || '[W]'}"W x ${piece.height || '[H]'}"H, ${
+        piece.weight || '[Weight]'
+      } lbs`
+  )
+  .join('\n')}
 
-` : ''}When job is complete clean up debris and return to [Shop].`
+`
+        : ''
+    }When job is complete clean up debris and return to [Shop].`
   }
 
   const copyToClipboard = async (text: string, templateType: string) => {

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { supabase } from '../lib/supabase'
 
 export interface QuoteListItem {
@@ -21,6 +22,7 @@ export interface SavedQuote {
   site_address: string | null
   scope_of_work: string | null
   logistics_data: any
+  equipment_requirements: any
   email_template: string | null
   scope_template: string | null
   created_at: string
@@ -48,9 +50,10 @@ export class QuoteService {
   }
 
   static async saveQuote(
-    quoteNumber: string, 
-    equipmentData: any, 
+    quoteNumber: string,
+    equipmentData: any,
     logisticsData: any,
+    equipmentRequirements: any,
     emailTemplate?: string,
     scopeTemplate?: string,
     existingId?: string
@@ -66,6 +69,7 @@ export class QuoteService {
         site_address: equipmentData.projectAddress || null,
         scope_of_work: equipmentData.additionalDetails || null,
         logistics_data: logisticsData || {},
+        equipment_requirements: equipmentRequirements || null,
         email_template: emailTemplate || null,
         scope_template: scopeTemplate || null,
       }

@@ -9,26 +9,33 @@ import {
   Archive, 
   Plus, 
   Minus, 
-  Search, 
-  Building, 
-  User, 
-  Phone, 
-  MapPin, 
-  Package, 
-  Truck, 
-  Key 
+  Building,
+  User,
+  Phone,
+  MapPin,
+  Package,
+  Truck,
+  Key
 } from 'lucide-react'
 import { useSessionId } from './hooks/useSessionId'
 import { useApiKey } from './hooks/useApiKey'
 import AIExtractorModal from './components/AIExtractorModal'
 import PreviewTemplates from './components/PreviewTemplates'
-import QuoteHistoryModal from './components/QuoteHistoryModal'
+import QuoteSaveManager from './components/QuoteSaveManager'
 import ApiKeySetup from './components/ApiKeySetup'
 import HubSpotContactSearch from './components/HubSpotContactSearch'
-import { HubSpotService, HubSpotContact } from './services/hubspotService'
+import { HubSpotContact } from './services/hubspotService'
+import EquipmentRequired, { EquipmentRequirements } from './components/EquipmentRequired'
 
 const App: React.FC = () => {
   // State for equipment form
+  const initialEquipmentRequirements: EquipmentRequirements = {
+    crewSize: '',
+    forkliftModels: [''],
+    tractors: [''],
+    trailers: ['']
+  }
+
   const [equipmentData, setEquipmentData] = useState({
     projectName: '',
     companyName: '',
@@ -39,7 +46,8 @@ const App: React.FC = () => {
     city: '',
     state: '',
     zipCode: '',
-    additionalDetails: ''
+    additionalDetails: '',
+    equipmentRequirements: initialEquipmentRequirements
   })
 
   // State for logistics form
@@ -128,8 +136,13 @@ const App: React.FC = () => {
     }
   }
 
+  const handleEquipmentRequirementsChange = (data: EquipmentRequirements) => {
+    setEquipmentData(prev => ({ ...prev, equipmentRequirements: data }))
+  }
+
   const handleAIExtraction = (extractedEquipmentData: any, extractedLogisticsData: any) => {
     if (extractedEquipmentData) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { projectDescription, ...rest } = extractedEquipmentData
       setEquipmentData(prev => ({ ...prev, ...rest }))
     }
@@ -138,8 +151,15 @@ const App: React.FC = () => {
     }
   }
 
-  const handleLoadQuote = (loadedEquipmentData: any, loadedLogisticsData: any) => {
-    setEquipmentData(loadedEquipmentData)
+  const handleLoadQuote = (
+    loadedEquipmentData: any,
+    loadedLogisticsData: any,
+    loadedEquipmentRequirements?: EquipmentRequirements
+  ) => {
+    setEquipmentData({
+      ...loadedEquipmentData,
+      equipmentRequirements: loadedEquipmentRequirements || initialEquipmentRequirements
+    })
     setLogisticsData({ truckType: '', ...loadedLogisticsData })
   }
 
@@ -368,6 +388,11 @@ const App: React.FC = () => {
                 />
               </div>
 
+              <EquipmentRequired
+                data={equipmentData.equipmentRequirements}
+                onChange={handleEquipmentRequirementsChange}
+              />
+
             </div>
           </div>
 
@@ -588,16 +613,18 @@ const App: React.FC = () => {
         <PreviewTemplates
           equipmentData={equipmentData}
           logisticsData={logisticsData}
+          equipmentRequirements={equipmentData.equipmentRequirements}
           isOpen={showPreview}
           onClose={() => setShowPreview(false)}
         />
 
-        <QuoteHistoryModal
+        <QuoteSaveManager
+          equipmentData={equipmentData}
+          equipmentRequirements={equipmentData.equipmentRequirements}
+          logisticsData={logisticsData}
           isOpen={showHistory}
           onClose={() => setShowHistory(false)}
           onLoadQuote={handleLoadQuote}
-          currentEquipmentData={equipmentData}
-          currentLogisticsData={logisticsData}
         />
 
         {showApiKeySetup && (

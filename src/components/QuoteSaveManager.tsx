@@ -1,14 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from 'react'
 import { Save, History, Search, Trash2, Edit3, Copy, Calendar, Building, User, FileText, X, Plus } from 'lucide-react'
-import { QuoteService, QuoteListItem, SavedQuote } from '../services/quoteService'
+import { QuoteService, QuoteListItem } from '../services/quoteService'
 
 interface QuoteSaveManagerProps {
   equipmentData: any
   logisticsData: any
+  equipmentRequirements: any
   emailTemplate?: string
   scopeTemplate?: string
-  onLoadQuote: (equipmentData: any, logisticsData: any) => void
+  onLoadQuote: (
+    equipmentData: any,
+    logisticsData: any,
+    equipmentRequirements: any
+  ) => void
   isOpen: boolean
   onClose: () => void
 }
@@ -16,6 +21,7 @@ interface QuoteSaveManagerProps {
 const QuoteSaveManager: React.FC<QuoteSaveManagerProps> = ({
   equipmentData,
   logisticsData,
+  equipmentRequirements,
   emailTemplate,
   scopeTemplate,
   onLoadQuote,
@@ -95,6 +101,7 @@ const QuoteSaveManager: React.FC<QuoteSaveManagerProps> = ({
         quoteNumber,
         equipmentData,
         logisticsData,
+        equipmentRequirements,
         emailTemplate,
         scopeTemplate,
         overwriteId
@@ -110,7 +117,7 @@ const QuoteSaveManager: React.FC<QuoteSaveManagerProps> = ({
       } else {
         setMessage({ type: 'error', text: result.error || 'Failed to save quote' })
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'Failed to save quote' })
     } finally {
       setLoading(false)
@@ -131,12 +138,20 @@ const QuoteSaveManager: React.FC<QuoteSaveManagerProps> = ({
           projectAddress: quote.site_address || '',
           additionalDetails: quote.scope_of_work || '',
         }
-        
-        onLoadQuote(loadedEquipmentData, quote.logistics_data || {})
+
+        const loadedRequirements =
+          quote.equipment_requirements || {
+            crewSize: '',
+            forkliftModels: [],
+            tractors: [],
+            trailers: []
+          }
+
+        onLoadQuote(loadedEquipmentData, quote.logistics_data || {}, loadedRequirements)
         setMessage({ type: 'success', text: 'Quote loaded successfully!' })
         setShowHistory(false)
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'Failed to load quote' })
     } finally {
       setLoading(false)
@@ -156,7 +171,7 @@ const QuoteSaveManager: React.FC<QuoteSaveManagerProps> = ({
       } else {
         setMessage({ type: 'error', text: 'Failed to delete quote' })
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'Failed to delete quote' })
     } finally {
       setLoading(false)

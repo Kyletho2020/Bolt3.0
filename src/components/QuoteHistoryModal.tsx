@@ -1,12 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from 'react'
 import { Archive, Search, Trash2, Download, Save, X, Calendar, Building, User, FileText, Loader, CheckCircle, AlertCircle, Plus } from 'lucide-react'
-import { QuoteService, QuoteListItem, SavedQuote } from '../services/quoteService'
+import { QuoteService, QuoteListItem } from '../services/quoteService'
 
 interface QuoteHistoryModalProps {
   isOpen: boolean
   onClose: () => void
-  onLoadQuote: (equipmentData: any, logisticsData: any) => void
+  onLoadQuote: (
+    equipmentData: any,
+    logisticsData: any,
+    equipmentRequirements: any
+  ) => void
   currentEquipmentData: any
   currentLogisticsData: any
 }
@@ -53,8 +57,8 @@ const QuoteHistoryModal: React.FC<QuoteHistoryModalProps> = ({
     try {
       const quoteList = await QuoteService.listQuotes()
       setQuotes(quoteList)
-    } catch (error) {
-      console.error('Error loading quotes:', error)
+    } catch {
+      console.error('Error loading quotes')
       setMessage({ type: 'error', text: 'Failed to load quote history' })
     } finally {
       setLoading(false)
@@ -68,8 +72,8 @@ const QuoteHistoryModal: React.FC<QuoteHistoryModalProps> = ({
     try {
       const results = await QuoteService.searchQuotes(searchTerm)
       setQuotes(results)
-    } catch (error) {
-      console.error('Error searching quotes:', error)
+    } catch {
+      console.error('Error searching quotes')
       setMessage({ type: 'error', text: 'Failed to search quotes' })
     } finally {
       setLoading(false)
@@ -89,7 +93,8 @@ const QuoteHistoryModal: React.FC<QuoteHistoryModalProps> = ({
       const result = await QuoteService.saveQuote(
         quoteNumber,
         currentEquipmentData,
-        currentLogisticsData
+        currentLogisticsData,
+        currentEquipmentData.equipmentRequirements
       )
 
       if (result.success) {
@@ -99,7 +104,7 @@ const QuoteHistoryModal: React.FC<QuoteHistoryModalProps> = ({
       } else {
         setMessage({ type: 'error', text: result.error || 'Failed to save quote' })
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'Failed to save quote' })
     } finally {
       setLoading(false)
@@ -117,6 +122,7 @@ const QuoteHistoryModal: React.FC<QuoteHistoryModalProps> = ({
         quoteNumber,
         currentEquipmentData,
         currentLogisticsData,
+        currentEquipmentData.equipmentRequirements,
         undefined,
         undefined,
         selectedQuote
@@ -129,7 +135,7 @@ const QuoteHistoryModal: React.FC<QuoteHistoryModalProps> = ({
       } else {
         setMessage({ type: 'error', text: result.error || 'Failed to update quote' })
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'Failed to update quote' })
     } finally {
       setLoading(false)
@@ -149,12 +155,20 @@ const QuoteHistoryModal: React.FC<QuoteHistoryModalProps> = ({
           projectAddress: quote.site_address || '',
           additionalDetails: quote.scope_of_work || '',
         }
-        
-        onLoadQuote(loadedEquipmentData, quote.logistics_data || {})
+
+        const loadedRequirements =
+          quote.equipment_requirements || {
+            crewSize: '',
+            forkliftModels: [],
+            tractors: [],
+            trailers: []
+          }
+
+        onLoadQuote(loadedEquipmentData, quote.logistics_data || {}, loadedRequirements)
         setMessage({ type: 'success', text: 'Quote loaded successfully!' })
         setTimeout(() => onClose(), 1500) // Close modal after success message
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'Failed to load quote' })
     } finally {
       setLoading(false)
@@ -174,7 +188,7 @@ const QuoteHistoryModal: React.FC<QuoteHistoryModalProps> = ({
       } else {
         setMessage({ type: 'error', text: 'Failed to delete quote' })
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'Failed to delete quote' })
     } finally {
       setLoading(false)
