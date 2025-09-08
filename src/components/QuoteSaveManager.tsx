@@ -159,9 +159,15 @@ const QuoteSaveManager: React.FC<QuoteSaveManagerProps> = ({
             trailers: []
           }
 
+        const loadedLogisticsData = {
+          ...(quote.logistics_data || {}),
+          ...(quote.logistics_shipment ? { shipment: quote.logistics_shipment } : {}),
+          ...(quote.logistics_storage ? { storage: quote.logistics_storage } : {})
+        }
+
         onLoadQuote(
           loadedEquipmentData,
-          quote.logistics_data || {},
+          loadedLogisticsData,
           loadedRequirements,
           quote.email_template || '',
           quote.scope_template || ''
