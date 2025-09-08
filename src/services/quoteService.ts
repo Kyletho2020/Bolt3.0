@@ -22,6 +22,8 @@ export interface SavedQuote {
   site_address: string | null
   scope_of_work: string | null
   logistics_data: any
+  logistics_shipment: any
+  logistics_storage: any
   equipment_requirements: any
   email_template: string | null
   scope_template: string | null
@@ -74,6 +76,8 @@ export class QuoteService {
           storageType: logisticsData?.storageType || '',
           storageSqFt: logisticsData?.storageSqFt || ''
         },
+        logistics_shipment: logisticsData?.shipment || null,
+        logistics_storage: logisticsData?.storage || null,
         equipment_requirements: equipmentRequirements || null,
         email_template: emailTemplate || null,
         scope_template: scopeTemplate || null,

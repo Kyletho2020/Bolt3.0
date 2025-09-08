@@ -166,7 +166,13 @@ const QuoteHistoryModal: React.FC<QuoteHistoryModalProps> = ({
             trailers: []
           }
 
-        onLoadQuote(loadedEquipmentData, quote.logistics_data || {}, loadedRequirements)
+        const loadedLogisticsData = {
+          ...(quote.logistics_data || {}),
+          ...(quote.logistics_shipment ? { shipment: quote.logistics_shipment } : {}),
+          ...(quote.logistics_storage ? { storage: quote.logistics_storage } : {})
+        }
+
+        onLoadQuote(loadedEquipmentData, loadedLogisticsData, loadedRequirements)
         setMessage({ type: 'success', text: 'Quote loaded successfully!' })
         setTimeout(() => onClose(), 1500) // Close modal after success message
       }
