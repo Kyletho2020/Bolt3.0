@@ -40,8 +40,7 @@ const App: React.FC = () => {
     state: '',
     zipCode: '',
     projectDescription: '',
-    additionalDetails: '',
-    specialInstructions: ''
+    additionalDetails: ''
   })
 
   // State for logistics form
@@ -56,8 +55,7 @@ const App: React.FC = () => {
     deliveryState: '',
     deliveryZip: '',
     serviceType: 'Standard Delivery',
-    truckType: '',
-    specialHandling: ''
+    truckType: ''
   })
 
   // Modal states
@@ -396,16 +394,6 @@ const App: React.FC = () => {
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-white mb-2">Special Instructions</label>
-                <textarea
-                  value={equipmentData.specialInstructions}
-                  onChange={(e) => handleEquipmentChange('specialInstructions', e.target.value)}
-                  rows={3}
-                  className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent resize-none text-white"
-                  placeholder="Any special instructions or requirements"
-                />
-              </div>
             </div>
           </div>
 
@@ -611,17 +599,6 @@ const App: React.FC = () => {
                 </select>
               </div>
 
-              {/* Special Handling */}
-              <div>
-                <label className="block text-sm font-medium text-white mb-2">Special Handling</label>
-                <textarea
-                  value={logisticsData.specialHandling}
-                  onChange={(e) => handleLogisticsChange('specialHandling', e.target.value)}
-                  rows={3}
-                  className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent resize-none text-white"
-                  placeholder="Any special handling requirements"
-                />
-              </div>
             </div>
           </div>
         </div>
