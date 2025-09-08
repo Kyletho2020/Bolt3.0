@@ -68,7 +68,12 @@ export class QuoteService {
         shop_location: equipmentData.shopLocation || null,
         site_address: equipmentData.siteAddress || null,
         scope_of_work: equipmentData.scopeOfWork || null,
-        logistics_data: { shipmentType: logisticsData?.shipmentType || 'LTL', ...logisticsData },
+        logistics_data: {
+          ...logisticsData,
+          shipmentType: logisticsData?.shipmentType || 'LTL',
+          storageType: logisticsData?.storageType || '',
+          storageSqFt: logisticsData?.storageSqFt || ''
+        },
         equipment_requirements: equipmentRequirements || null,
         email_template: emailTemplate || null,
         scope_template: scopeTemplate || null,
