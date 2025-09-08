@@ -16,17 +16,33 @@ export const generateEmailTemplate = (
   const scopeOfWork = equipmentData.scopeOfWork || ''
 
   const crewSize = equipmentRequirements.crewSize || ''
-  const forklifts = (equipmentRequirements.forkliftModels || []).filter((f: string) => f)
-  const tractors = (equipmentRequirements.tractors || []).filter((t: string) => t)
-  const trailers = (equipmentRequirements.trailers || []).filter((t: string) => t)
+  const forklifts = (equipmentRequirements.forklifts || []).filter((f: any) => f.quantity > 0)
+  const tractors = (equipmentRequirements.tractors || []).filter((t: any) => t.quantity > 0)
+  const trailers = (equipmentRequirements.trailers || []).filter((t: any) => t.quantity > 0)
 
   const equipmentLines =
     crewSize || forklifts.length || tractors.length || trailers.length
       ? `EQUIPMENT REQUIREMENTS:\n${
           crewSize ? `• Crew Size: ${crewSize}\n` : ''
-        }${forklifts.length ? `• Forklifts: ${forklifts.join(', ')}\n` : ''}${
-          tractors.length ? `• Tractors: ${tractors.join(', ')}\n` : ''
-        }${trailers.length ? `• Trailers: ${trailers.join(', ')}\n` : ''}\n`
+        }${
+          forklifts.length
+            ? `• Forklifts: ${forklifts
+                .map((f: any) => `${f.quantity} x ${f.name}`)
+                .join(', ')}\n`
+            : ''
+        }${
+          tractors.length
+            ? `• Tractors: ${tractors
+                .map((t: any) => `${t.quantity} x ${t.name}`)
+                .join(', ')}\n`
+            : ''
+        }${
+          trailers.length
+            ? `• Trailers: ${trailers
+                .map((t: any) => `${t.quantity} x ${t.name}`)
+                .join(', ')}\n`
+            : ''
+        }\n`
       : ''
 
   const pickupAddress = logisticsData.pickupAddress || siteAddress
@@ -102,15 +118,21 @@ export const generateScopeTemplate = (
   const scopeOfWork = equipmentData.scopeOfWork || ''
 
   const crewSize = equipmentRequirements.crewSize || ''
-  const forklifts = (equipmentRequirements.forkliftModels || []).filter((f: string) => f)
-  const tractors = (equipmentRequirements.tractors || []).filter((t: string) => t)
-  const trailers = (equipmentRequirements.trailers || []).filter((t: string) => t)
+  const forklifts = (equipmentRequirements.forklifts || []).filter((f: any) => f.quantity > 0)
+  const tractors = (equipmentRequirements.tractors || []).filter((t: any) => t.quantity > 0)
+  const trailers = (equipmentRequirements.trailers || []).filter((t: any) => t.quantity > 0)
 
   const equipmentSummary = [
     crewSize ? `${crewSize} crew` : '',
-    forklifts.length ? `${forklifts.join(', ')} forklift(s)` : '',
-    tractors.length ? `${tractors.join(', ')} tractor(s)` : '',
-    trailers.length ? `${trailers.join(', ')} trailer(s)` : ''
+    forklifts.length
+      ? `${forklifts.map((f: any) => `${f.quantity} x ${f.name}`).join(', ')} forklift(s)`
+      : '',
+    tractors.length
+      ? `${tractors.map((t: any) => `${t.quantity} x ${t.name}`).join(', ')} tractor(s)`
+      : '',
+    trailers.length
+      ? `${trailers.map((t: any) => `${t.quantity} x ${t.name}`).join(', ')} trailer(s)`
+      : ''
   ]
     .filter(Boolean)
     .join(', ')

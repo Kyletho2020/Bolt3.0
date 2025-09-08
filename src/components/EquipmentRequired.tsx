@@ -1,11 +1,16 @@
 import React from 'react'
-import { X } from 'lucide-react'
+import { X, Plus, Minus } from 'lucide-react'
+
+export interface EquipmentItem {
+  name: string
+  quantity: number
+}
 
 export interface EquipmentRequirements {
   crewSize: string
-  forkliftModels: string[]
-  tractors: string[]
-  trailers: string[]
+  forklifts: EquipmentItem[]
+  tractors: EquipmentItem[]
+  trailers: EquipmentItem[]
 }
 
 interface EquipmentRequiredProps {
@@ -37,49 +42,73 @@ const EquipmentRequired: React.FC<EquipmentRequiredProps> = ({ data, onChange })
     onChange({ ...data, [field]: value })
   }
 
-  const handleArrayChange = (
-    field: 'forkliftModels' | 'tractors' | 'trailers',
-    items: string[]
+  const adjustQuantity = (
+    field: 'forklifts' | 'tractors' | 'trailers',
+    name: string,
+    delta: number
   ) => {
-    handleFieldChange(field, items)
+    const items = data[field]
+    const index = items.findIndex((i) => i.name === name)
+    if (index >= 0) {
+      const newQty = items[index].quantity + delta
+      if (newQty <= 0) {
+        handleFieldChange(
+          field,
+          items.filter((_, i) => i !== index)
+        )
+      } else {
+        const newItems = [...items]
+        newItems[index] = { name, quantity: newQty }
+        handleFieldChange(field, newItems)
+      }
+    } else if (delta > 0) {
+      handleFieldChange(field, [...items, { name, quantity: 1 }])
+    }
   }
 
+  const getQuantity = (
+    field: 'forklifts' | 'tractors' | 'trailers',
+    name: string
+  ) => data[field].find((i) => i.name === name)?.quantity || 0
+
   const clearSection = () => {
-    onChange({ crewSize: '', forkliftModels: [], tractors: [], trailers: [] })
+    onChange({ crewSize: '', forklifts: [], tractors: [], trailers: [] })
   }
 
   const renderOptionList = (
     label: string,
-    field: 'forkliftModels' | 'tractors' | 'trailers',
+    field: 'forklifts' | 'tractors' | 'trailers',
     options: string[]
   ) => (
     <div>
       <label className="block text-sm font-medium text-white mb-2">{label}</label>
-      <div className="flex flex-wrap gap-2">
+      <div className="space-y-2">
         {options.map((option) => {
-          const checked = data[field].includes(option)
+          const qty = getQuantity(field, option)
           return (
-            <label
+            <div
               key={option}
-              className="flex items-center bg-gray-900 border border-accent text-white rounded-full px-3 py-1 space-x-2"
+              className="flex items-center justify-between bg-gray-900 border border-accent rounded-lg px-3 py-1 text-white"
             >
-              <input
-                type="checkbox"
-                className="form-checkbox h-4 w-4 text-accent"
-                checked={checked}
-                onChange={(e) => {
-                  if (e.target.checked) {
-                    handleArrayChange(field, [...data[field], option])
-                  } else {
-                    handleArrayChange(
-                      field,
-                      data[field].filter((item) => item !== option)
-                    )
-                  }
-                }}
-              />
               <span>{option}</span>
-            </label>
+              <div className="flex items-center space-x-2">
+                <button
+                  type="button"
+                  onClick={() => adjustQuantity(field, option, -1)}
+                  className="p-1 bg-gray-800 rounded hover:bg-gray-700"
+                >
+                  <Minus className="w-4 h-4" />
+                </button>
+                <span>{qty}</span>
+                <button
+                  type="button"
+                  onClick={() => adjustQuantity(field, option, 1)}
+                  className="p-1 bg-gray-800 rounded hover:bg-gray-700"
+                >
+                  <Plus className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
           )
         })}
       </div>
@@ -89,7 +118,7 @@ const EquipmentRequired: React.FC<EquipmentRequiredProps> = ({ data, onChange })
   return (
     <div className="mt-6 space-y-6">
       <div className="flex items-center justify-between">
-        <h3 className="text-xl font-bold text-white">Equipment Requirements</h3>
+      <h3 className="text-xl font-bold text-white">Equipment Requirements</h3>
         <button
           type="button"
           onClick={clearSection}
@@ -105,7 +134,7 @@ const EquipmentRequired: React.FC<EquipmentRequiredProps> = ({ data, onChange })
         <select
           value={data.crewSize}
           onChange={(e) => handleFieldChange('crewSize', e.target.value)}
-          className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white" 
+          className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
         >
           <option value="" disabled>
             Select crew size
@@ -118,7 +147,7 @@ const EquipmentRequired: React.FC<EquipmentRequiredProps> = ({ data, onChange })
         </select>
       </div>
 
-      {renderOptionList('Forklift Models', 'forkliftModels', forkliftOptions)}
+      {renderOptionList('Forklifts', 'forklifts', forkliftOptions)}
       {renderOptionList('Tractors', 'tractors', tractorOptions)}
       {renderOptionList('Trailers', 'trailers', trailerOptions)}
     </div>

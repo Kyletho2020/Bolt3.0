@@ -27,9 +27,9 @@ const App: React.FC = () => {
   // State for equipment form
   const initialEquipmentRequirements: EquipmentRequirements = {
     crewSize: '',
-    forkliftModels: [''],
-    tractors: [''],
-    trailers: ['']
+    forklifts: [],
+    tractors: [],
+    trailers: []
   }
 
   const [equipmentData, setEquipmentData] = useState({

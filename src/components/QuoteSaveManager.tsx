@@ -154,7 +154,7 @@ const QuoteSaveManager: React.FC<QuoteSaveManagerProps> = ({
         const loadedRequirements =
           quote.equipment_requirements || {
             crewSize: '',
-            forkliftModels: [],
+            forklifts: [],
             tractors: [],
             trailers: []
           }
