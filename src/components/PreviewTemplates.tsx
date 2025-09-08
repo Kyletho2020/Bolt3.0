@@ -4,7 +4,9 @@ import { FileText, Mail, Copy, CheckCircle, Eye, X, Truck } from 'lucide-react'
 
 export const generateEmailTemplate = (
   equipmentData: any,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _logisticsData: any,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _equipmentRequirements: any
 ) => {
   const projectName = equipmentData.projectName || '[project name]'
@@ -31,20 +33,40 @@ export const generateScopeTemplate = (
   const tractors = (equipmentRequirements.tractors || []).filter((t: any) => t.quantity > 0)
   const trailers = (equipmentRequirements.trailers || []).filter((t: any) => t.quantity > 0)
 
-  const equipmentSummary = [
-    crewSize ? `${crewSize} crew` : '',
-    forklifts.length
-      ? `${forklifts.map((f: any) => `${f.quantity} x ${f.name}`).join(', ')} forklift(s)`
-      : '',
-    tractors.length
-      ? `${tractors.map((t: any) => `${t.quantity} x ${t.name}`).join(', ')} tractor(s)`
-      : '',
-    trailers.length
-      ? `${trailers.map((t: any) => `${t.quantity} x ${t.name}`).join(', ')} trailer(s)`
-      : ''
-  ]
-    .filter(Boolean)
-    .join(', ')
+  const formatEquipmentItem = (quantity: number, name: string) => {
+    const needsPlural = quantity > 1 && !name.toLowerCase().endsWith('s')
+    return quantity > 1
+      ? `${quantity} ${needsPlural ? `${name}s` : name}`
+      : name
+  }
+
+  const crewDescription = crewSize
+    ? `${crewSize === '8' ? 'an' : 'a'} ${crewSize}-man crew`
+    : ''
+
+  const equipmentItems = [
+    crewDescription,
+    ...forklifts.map((f: any) => formatEquipmentItem(f.quantity, f.name)),
+    ...tractors.map((t: any) => formatEquipmentItem(t.quantity, t.name)),
+    ...trailers.map((t: any) =>
+      formatEquipmentItem(
+        t.quantity,
+        t.name.toLowerCase().includes('trailer')
+          ? t.name
+          : `${t.name} trailer`
+      )
+    )
+  ].filter(Boolean)
+
+  const equipmentSummary = (() => {
+    if (equipmentItems.length === 0) return ''
+    if (equipmentItems.length === 1) return equipmentItems[0]
+    if (equipmentItems.length === 2)
+      return `${equipmentItems[0]} and ${equipmentItems[1]}`
+    return `${equipmentItems.slice(0, -1).join(', ')} and ${
+      equipmentItems[equipmentItems.length - 1]
+    }`
+  })()
 
   const shipmentLine = logisticsData.shipmentType
     ? `Shipment Type: ${logisticsData.shipmentType}\n`
