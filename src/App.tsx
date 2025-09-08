@@ -26,6 +26,23 @@ import ApiKeySetup from './components/ApiKeySetup'
 import HubSpotContactSearch from './components/HubSpotContactSearch'
 import { HubSpotContact } from './services/hubspotService'
 
+const FORKLIFT_OPTIONS = [
+  'Forklift 3K',
+  'Forklift 5K',
+  'Forklift 6K',
+  'Forklift 8K',
+  'Versalift 25/35',
+  'Versalift 40',
+  'Versalift 60',
+  'Versalift 80',
+  'Versalift 88',
+  'Versalift 93'
+]
+
+const TRACTOR_OPTIONS = ['3 axle tractor', '4 axle tractor', 'Rollback']
+
+const TRAILER_OPTIONS = ['Double Drop', 'Flatbed', 'Landoll', 'Step Deck']
+
 const App: React.FC = () => {
   // State for equipment form
   const [equipmentData, setEquipmentData] = useState({
@@ -102,19 +119,12 @@ const App: React.FC = () => {
     setEquipmentData(prev => ({ ...prev, [field]: value }))
   }
 
-  const addEquipmentItem = (item: string) => {
+  const toggleEquipmentItem = (item: string) => {
     setEquipmentData(prev => ({
       ...prev,
       equipmentList: prev.equipmentList.includes(item)
-        ? prev.equipmentList
+        ? prev.equipmentList.filter((eq: string) => eq !== item)
         : [...prev.equipmentList, item]
-    }))
-  }
-
-  const removeEquipmentItem = (item: string) => {
-    setEquipmentData(prev => ({
-      ...prev,
-      equipmentList: prev.equipmentList.filter((eq: string) => eq !== item)
     }))
   }
 
@@ -445,10 +455,10 @@ const App: React.FC = () => {
                 <div className="mb-4">
                   <p className="text-sm font-medium text-white mb-2">Forklifts</p>
                   <div className="flex flex-wrap gap-2">
-                    {['Forklift 3K','Forklift 5K','Forklift 6K','Forklift 8K','Versalift 25/35','Versalift 40','Versalift 60','Versalift 80','Versalift 88','Versalift 93'].map(item => (
+                    {FORKLIFT_OPTIONS.map(item => (
                       <button
                         key={item}
-                        onClick={() => addEquipmentItem(item)}
+                        onClick={() => toggleEquipmentItem(item)}
                         className="px-3 py-1 bg-accent text-black rounded-lg hover:bg-green-400 text-sm"
                       >
                         + {item}
@@ -460,10 +470,10 @@ const App: React.FC = () => {
                 <div className="mb-4">
                   <p className="text-sm font-medium text-white mb-2">Tractors</p>
                   <div className="flex flex-wrap gap-2">
-                    {['3 axle tractor','4 axle tractor','Rollback'].map(item => (
+                    {TRACTOR_OPTIONS.map(item => (
                       <button
                         key={item}
-                        onClick={() => addEquipmentItem(item)}
+                        onClick={() => toggleEquipmentItem(item)}
                         className="px-3 py-1 bg-accent text-black rounded-lg hover:bg-green-400 text-sm"
                       >
                         + {item}
@@ -475,10 +485,10 @@ const App: React.FC = () => {
                 <div>
                   <p className="text-sm font-medium text-white mb-2">Trailers</p>
                   <div className="flex flex-wrap gap-2">
-                    {['Double Drop','Flatbed','Landoll','Step Deck'].map(item => (
+                    {TRAILER_OPTIONS.map(item => (
                       <button
                         key={item}
-                        onClick={() => addEquipmentItem(item)}
+                        onClick={() => toggleEquipmentItem(item)}
                         className="px-3 py-1 bg-accent text-black rounded-lg hover:bg-green-400 text-sm"
                       >
                         + {item}
@@ -495,7 +505,7 @@ const App: React.FC = () => {
                         <span key={item} className="flex items-center bg-gray-800 px-2 py-1 rounded-lg text-sm">
                           {item}
                           <button
-                            onClick={() => removeEquipmentItem(item)}
+                            onClick={() => toggleEquipmentItem(item)}
                             className="ml-1 text-red-400 hover:text-red-300"
                           >
                             <X className="w-3 h-3" />

@@ -81,7 +81,19 @@ ${equipmentData.phone || '[Phone]'}`
     const state = equipmentData.state || '[State]'
     const contactName = equipmentData.contactName || '[Site Contact]'
     const phone = equipmentData.phone || '[Site Contact Phone Number]'
-    
+    const equipmentLines = equipmentData.equipmentList
+      .map((item: string) => `• ${item}`)
+      .join('\n')
+
+    const piecesLines = logisticsData.pieces
+      ?.map(
+        (piece: any) =>
+          `• (Qty: ${piece.quantity || 1}) ${piece.description || '[Item Description]'} - ${piece.length || '[L]'}"L x ${
+            piece.width || '[W]'
+          }"W x ${piece.height || '[H]'}"H, ${piece.weight || '[Weight]'} lbs`
+      )
+      .join('\n')
+
     return `SCOPE OF WORK
 
 Mobilize crew and Omega Morgan equipment to site: ${projectAddress}, ${city}, ${state}
@@ -90,21 +102,7 @@ ${contactName}
 ${phone}
 
 Omega Morgan to supply ${equipmentData.crewSize || '3-man crew'}, Gear Truck and Trailer.
-${equipmentData.equipmentList && equipmentData.equipmentList.length > 0 ? `${equipmentData.equipmentList.map((item: string) => `• ${item}`).join('\\n')}\\n\\n` : '\\n'}${equipmentData.projectDescription ? `PROJECT DESCRIPTION:
-${equipmentData.projectDescription}
-
-` : ''}${logisticsData.pieces && logisticsData.pieces.length > 0 ? `ITEMS TO HANDLE:
-${logisticsData.pieces.map((piece: any) =>
-  `• (Qty: ${piece.quantity || 1}) ${piece.description || '[Item Description]'} - ${piece.length || '[L]'}"L x ${piece.width || '[W]'}"W x ${piece.height || '[H]'}"H, ${piece.weight || '[Weight]'} lbs`
-).join('\n')}
-
-` : ''}${logisticsData.specialHandling ? `SPECIAL HANDLING REQUIREMENTS:
-${logisticsData.specialHandling}
-
-` : ''}${equipmentData.specialInstructions ? `SPECIAL INSTRUCTIONS:
-${equipmentData.specialInstructions}
-
-` : ''}When job is complete clean up debris and return to [Shop].`
+${equipmentData.equipmentList.length ? equipmentLines + '\n\n' : '\n'}${equipmentData.projectDescription ? `PROJECT DESCRIPTION:\n${equipmentData.projectDescription}\n\n` : ''}${logisticsData.pieces && logisticsData.pieces.length ? `ITEMS TO HANDLE:\n${piecesLines}\n\n` : ''}${logisticsData.specialHandling ? `SPECIAL HANDLING REQUIREMENTS:\n${logisticsData.specialHandling}\n\n` : ''}${equipmentData.specialInstructions ? `SPECIAL INSTRUCTIONS:\n${equipmentData.specialInstructions}\n\n` : ''}When job is complete clean up debris and return to [Shop].`
   }
 
   const copyToClipboard = async (text: string, templateType: string) => {
