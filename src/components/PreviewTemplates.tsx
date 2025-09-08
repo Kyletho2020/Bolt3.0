@@ -4,105 +4,15 @@ import { FileText, Mail, Copy, CheckCircle, Eye, X, Truck } from 'lucide-react'
 
 export const generateEmailTemplate = (
   equipmentData: any,
-  logisticsData: any,
-  equipmentRequirements: any
+  _logisticsData: any,
+  _equipmentRequirements: any
 ) => {
   const projectName = equipmentData.projectName || '[project name]'
-  const companyName = equipmentData.companyName || '[Company Name]'
-  const contactName = equipmentData.contactName || '[Contact Name]'
-  const siteAddress = equipmentData.siteAddress || '[Site Address]'
-  const sitePhone = equipmentData.sitePhone || '[Site Phone]'
-  const shopLocation = equipmentData.shopLocation || '[Shop Location]'
-  const scopeOfWork = equipmentData.scopeOfWork || ''
+  const contactName = equipmentData.contactName || '[contact name]'
+  const siteAddress = equipmentData.siteAddress || '[site address]'
+  const scopeOfWork = equipmentData.scopeOfWork || '[Scope of Work]'
 
-  const crewSize = equipmentRequirements.crewSize || ''
-  const forklifts = (equipmentRequirements.forklifts || []).filter((f: any) => f.quantity > 0)
-  const tractors = (equipmentRequirements.tractors || []).filter((t: any) => t.quantity > 0)
-  const trailers = (equipmentRequirements.trailers || []).filter((t: any) => t.quantity > 0)
-
-  const equipmentLines =
-    crewSize || forklifts.length || tractors.length || trailers.length
-      ? `EQUIPMENT REQUIREMENTS:\n${
-          crewSize ? `• Crew Size: ${crewSize}\n` : ''
-        }${
-          forklifts.length
-            ? `• Forklifts: ${forklifts
-                .map((f: any) => `${f.quantity} x ${f.name}`)
-                .join(', ')}\n`
-            : ''
-        }${
-          tractors.length
-            ? `• Tractors: ${tractors
-                .map((t: any) => `${t.quantity} x ${t.name}`)
-                .join(', ')}\n`
-            : ''
-        }${
-          trailers.length
-            ? `• Trailers: ${trailers
-                .map((t: any) => `${t.quantity} x ${t.name}`)
-                .join(', ')}\n`
-            : ''
-        }\n`
-      : ''
-
-  const pickupAddress = logisticsData.pickupAddress || siteAddress
-  const deliveryAddress = logisticsData.deliveryAddress || ''
-
-  const logisticsLines = [
-    pickupAddress ? `• Pickup Location: ${pickupAddress}` : '',
-    deliveryAddress ? `• Delivery Location: ${deliveryAddress}` : '',
-    logisticsData.shipmentType ? `• Shipment Type: ${logisticsData.shipmentType}` : '',
-    logisticsData.truckType ? `• Truck Type: ${logisticsData.truckType}` : '',
-    logisticsData.storageType
-      ? `• Storage: ${
-          logisticsData.storageType === 'inside' ? 'Inside' : 'Outside'
-        } (${logisticsData.storageSqFt || '[Sq Ft]'} sq ft)`
-      : ''
-  ]
-    .filter(Boolean)
-    .join('\n')
-
-  const logisticsSection = logisticsLines
-    ? `LOGISTICS REQUIREMENTS:\n${logisticsLines}\n\n`
-    : ''
-
-  const itemsSection =
-    logisticsData.pieces && logisticsData.pieces.length > 0
-      ? `ITEMS TO TRANSPORT:\n${logisticsData.pieces
-          .map(
-            (piece: any, index: number) =>
-              `${index + 1}. (Qty: ${piece.quantity || 1}) ${
-                piece.description || '[Description]'
-              } - ${piece.length || '[L]'}"L x ${piece.width || '[W]'}"W x ${
-                piece.height || '[H]'
-              }"H, ${piece.weight || '[Weight]'} lbs`
-          )
-          .join('\n')}\n\n`
-      : ''
-
-  return `Subject: Quote Request - ${projectName}
-
-Dear Omega Morgan Team,
-
-I hope this email finds you well. I am writing to request a quote for an upcoming project that requires your specialized equipment and logistics services.
-
-PROJECT DETAILS:
-• Project Name: ${projectName}
-• Company: ${companyName}
-• Contact: ${contactName}
-• Site Phone: ${sitePhone}
-• Site Address: ${siteAddress}
-• Shop Location: ${shopLocation}
-
-${scopeOfWork ? `SCOPE OF WORK:\n${scopeOfWork}\n\n` : ''}${equipmentLines}${logisticsSection}${itemsSection}Please provide a detailed quote including all equipment, labor, and transportation costs. We would appreciate receiving this quote at your earliest convenience.
-
-Thank you for your time and consideration. I look forward to hearing from you soon.
-
-Best regards,
-${contactName}
-${companyName}
-${equipmentData.email || '[Email]'}
-${sitePhone}`
+  return `Subject: Quote Request - ${projectName}\n\nDear ${contactName},\n\nI hope this email finds you well. Thank you for considering Omega Morgan for the scope of work attached and summarized below.\n\nPROJECT DETAILS:\n• Project Name: ${projectName}\n• Contact Name: ${contactName}\n• Project Location: ${siteAddress}\n\nSCOPE OF WORK:\n\n${scopeOfWork}\n\nThank you for your time and consideration. I look forward to hearing from you soon.\n\nBest regards,`
 }
 
 export const generateScopeTemplate = (
