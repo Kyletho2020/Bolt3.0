@@ -60,7 +60,6 @@ const App: React.FC = () => {
     deliveryCity: '',
     deliveryState: '',
     deliveryZip: '',
-    serviceType: 'Standard Delivery',
     shipmentType: 'LTL',
     truckType: '',
     storageType: '',
@@ -462,21 +461,6 @@ const App: React.FC = () => {
                     />
                   </div>
                 </div>
-              </div>
-
-              {/* Service Type */}
-              <div>
-                <label className="block text-sm font-medium text-white mb-2">Service Type</label>
-                <select
-                  value={logisticsData.serviceType}
-                  onChange={(e) => handleLogisticsChange('serviceType', e.target.value)}
-                  className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                >
-                  <option value="Standard Delivery">Standard Delivery</option>
-                  <option value="White Glove">White Glove</option>
-                  <option value="Inside Delivery">Inside Delivery</option>
-                  <option value="Curbside">Curbside</option>
-                </select>
               </div>
 
               {/* Shipment Type */}
