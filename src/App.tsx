@@ -61,7 +61,7 @@ const App: React.FC = () => {
     deliveryCity: '',
     deliveryState: '',
     deliveryZip: '',
-    shipmentType: 'LTL',
+    shipmentType: '',
     truckType: '',
     storageType: '',
     storageSqFt: ''
@@ -179,7 +179,7 @@ const App: React.FC = () => {
     })
     setLogisticsData({
       truckType: '',
-      shipmentType: 'LTL',
+      shipmentType: '',
       storageType: '',
       storageSqFt: '',
       ...loadedLogisticsData

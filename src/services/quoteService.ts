@@ -72,7 +72,7 @@ export class QuoteService {
         scope_of_work: equipmentData.scopeOfWork || null,
         logistics_data: {
           ...logisticsData,
-          shipmentType: logisticsData?.shipmentType || 'LTL',
+          shipmentType: logisticsData?.shipmentType || '',
           storageType: logisticsData?.storageType || '',
           storageSqFt: logisticsData?.storageSqFt || ''
         },
