@@ -53,7 +53,7 @@ ${projectDescription}
 LOGISTICS REQUIREMENTS:
 • Pickup Location: ${pickupAddress}, ${pickupCity}, ${pickupState}
 • Delivery Location: ${deliveryAddress}, ${deliveryCity}, ${deliveryState}
-• Service Type: ${logisticsData.serviceType || 'Standard Delivery'}
+• Truck Type: ${logisticsData.truckType || 'LTL (Less Than Truckload)'}
 ${logisticsData.specialHandling ? `• Special Handling: ${logisticsData.specialHandling}` : ''}
 
     ${logisticsData.pieces && logisticsData.pieces.length > 0 ? `ITEMS TO TRANSPORT:

@@ -51,7 +51,7 @@ Return a JSON object with two main sections: "equipment" and "logistics". Struct
     "deliveryCity": "string",
     "deliveryState": "string", 
     "deliveryZip": "string",
-    "serviceType": "string (Standard Delivery, White Glove, Inside Delivery, or Curbside)",
+    "truckType": "string (LTL (Less Than Truckload) or FTL (Full Truckload))",
     "specialHandling": "string"
   }
 }

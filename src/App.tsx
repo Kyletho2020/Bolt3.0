@@ -6,11 +6,10 @@ import {
   Eye, 
   X, 
   Bot, 
-  Archive, 
-  Plus, 
-  Minus, 
-  Search, 
-  Building, 
+  Archive,
+  Plus,
+  Minus,
+  Building,
   User, 
   Phone, 
   MapPin, 
@@ -25,7 +24,7 @@ import PreviewTemplates from './components/PreviewTemplates'
 import QuoteHistoryModal from './components/QuoteHistoryModal'
 import ApiKeySetup from './components/ApiKeySetup'
 import HubSpotContactSearch from './components/HubSpotContactSearch'
-import { HubSpotService, HubSpotContact } from './services/hubspotService'
+import { HubSpotContact } from './services/hubspotService'
 
 const App: React.FC = () => {
   // State for equipment form
@@ -55,7 +54,7 @@ const App: React.FC = () => {
     deliveryCity: '',
     deliveryState: '',
     deliveryZip: '',
-    serviceType: 'Standard Delivery',
+    truckType: 'LTL (Less Than Truckload)',
     specialHandling: ''
   })
 
@@ -580,18 +579,16 @@ const App: React.FC = () => {
                 </div>
               </div>
 
-              {/* Service Type */}
+              {/* Truck Type */}
               <div>
-                <label className="block text-sm font-medium text-white mb-2">Service Type</label>
+                <label className="block text-sm font-medium text-white mb-2">Truck Type</label>
                 <select
-                  value={logisticsData.serviceType}
-                  onChange={(e) => handleLogisticsChange('serviceType', e.target.value)}
+                  value={logisticsData.truckType}
+                  onChange={(e) => handleLogisticsChange('truckType', e.target.value)}
                   className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
                 >
-                  <option value="Standard Delivery">Standard Delivery</option>
-                  <option value="White Glove">White Glove</option>
-                  <option value="Inside Delivery">Inside Delivery</option>
-                  <option value="Curbside">Curbside</option>
+                  <option value="LTL (Less Than Truckload)">LTL (Less Than Truckload)</option>
+                  <option value="FTL (Full Truckload)">FTL (Full Truckload)</option>
                 </select>
               </div>
 
