@@ -51,7 +51,6 @@ export const generateEmailTemplate = (
   const logisticsLines = [
     pickupAddress ? `• Pickup Location: ${pickupAddress}` : '',
     deliveryAddress ? `• Delivery Location: ${deliveryAddress}` : '',
-    logisticsData.serviceType ? `• Service Type: ${logisticsData.serviceType}` : '',
     logisticsData.shipmentType ? `• Shipment Type: ${logisticsData.shipmentType}` : '',
     logisticsData.truckType ? `• Truck Type: ${logisticsData.truckType}` : '',
     logisticsData.storageType
