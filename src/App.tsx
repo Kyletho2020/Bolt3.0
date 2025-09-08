@@ -10,7 +10,8 @@ import {
   Minus,
   Package,
   Truck,
-  Key
+  Key,
+  Trash2
 } from 'lucide-react'
 import { useSessionId } from './hooks/useSessionId'
 import { useApiKey } from './hooks/useApiKey'
@@ -60,6 +61,8 @@ const App: React.FC = () => {
     storageType: '',
     storageSqFt: ''
   })
+
+  const [selectedPieces, setSelectedPieces] = useState<number[]>([])
 
   // Modal states
   const [showAIExtractor, setShowAIExtractor] = useState(false)
@@ -123,7 +126,27 @@ const App: React.FC = () => {
         ...prev,
         pieces: prev.pieces.filter((_, i) => i !== index)
       }))
+      setSelectedPieces(prev =>
+        prev
+          .filter(i => i !== index)
+          .map(i => (i > index ? i - 1 : i))
+      )
     }
+  }
+
+  const togglePieceSelection = (index: number) => {
+    setSelectedPieces(prev =>
+      prev.includes(index) ? prev.filter(i => i !== index) : [...prev, index]
+    )
+  }
+
+  const deleteSelectedPieces = () => {
+    if (selectedPieces.length === 0) return
+    setLogisticsData(prev => ({
+      ...prev,
+      pieces: prev.pieces.filter((_, i) => !selectedPieces.includes(i))
+    }))
+    setSelectedPieces([])
   }
 
   const handleEquipmentRequirementsChange = (data: EquipmentRequirements) => {
@@ -243,19 +266,37 @@ const App: React.FC = () => {
                     <Package className="w-4 h-4 inline mr-1" />
                     Items to Transport
                   </label>
-                  <button
-                    onClick={addPiece}
-                    className="flex items-center px-3 py-1 bg-accent text-black rounded-lg hover:bg-green-400 transition-colors"
-                  >
-                    <Plus className="w-4 h-4 mr-1" />
-                    Add Item
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={deleteSelectedPieces}
+                      disabled={selectedPieces.length === 0}
+                      className="flex items-center px-3 py-1 bg-red-600 text-white rounded-lg hover:bg-red-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <Trash2 className="w-4 h-4 mr-1" />
+                      Delete Selected
+                    </button>
+                    <button
+                      onClick={addPiece}
+                      className="flex items-center px-3 py-1 bg-accent text-black rounded-lg hover:bg-green-400 transition-colors"
+                    >
+                      <Plus className="w-4 h-4 mr-1" />
+                      Add Item
+                    </button>
+                  </div>
                 </div>
 
                 <div className="space-y-3">
                   {logisticsData.pieces.map((piece, index) => (
                     <div key={index} className="grid grid-cols-12 gap-2 items-end">
-                      <div className="col-span-5">
+                      <div className="col-span-1 flex justify-center">
+                        <input
+                          type="checkbox"
+                          checked={selectedPieces.includes(index)}
+                          onChange={() => togglePieceSelection(index)}
+                          className="form-checkbox h-4 w-4 text-accent"
+                        />
+                      </div>
+                      <div className="col-span-4">
                         <input
                           type="text"
                           value={piece.description}
