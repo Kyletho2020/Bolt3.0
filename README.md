@@ -10,6 +10,13 @@ Install dependencies:
 npm install
 ```
 
+Create a `.env` file in the project root with your Supabase credentials:
+
+```bash
+VITE_SUPABASE_URL=your-project-url
+VITE_SUPABASE_ANON_KEY=your-anon-key
+```
+
 Start the development server:
 
 ```bash
