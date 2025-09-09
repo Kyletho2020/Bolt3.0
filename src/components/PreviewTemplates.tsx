@@ -99,8 +99,8 @@ export const generateScopeTemplate = (
           .join('\n')}\n`
       : ''
 
-return'
-  
+  return `
+
 Mobilize crew and Omega Morgan equipment to site: ${siteAddress}
 
 ${contactName}
