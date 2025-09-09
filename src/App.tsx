@@ -312,7 +312,7 @@ const App: React.FC = () => {
           </div>
 
           <p className="text-sm text-white">
-            Templates are automatically populated with extracted data. Fields in brackets [ ] need manual completion.
+            
           </p>
         </div>
 
