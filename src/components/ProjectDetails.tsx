@@ -111,7 +111,7 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ data, onChange, onSelec
         <div>
           <label className="block text-sm font-medium text-white mb-2">
             <User className="w-4 h-4 inline mr-1" />
-            Contact Name
+            Site Contact
           </label>
           {(() => {
             const field = register('contactName')
@@ -125,7 +125,7 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ data, onChange, onSelec
                     handleFieldChange('contactName', e.target.value)
                   }}
                   className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                  placeholder="Enter contact name"
+                  placeholder="Enter site contact"
                 />
                 {errors.contactName && (
                   <p className="text-red-500 text-xs mt-1">{String(errors.contactName.message)}</p>

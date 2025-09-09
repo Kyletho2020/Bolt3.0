@@ -10,11 +10,11 @@ export const generateEmailTemplate = (
   _equipmentRequirements: any
 ) => {
   const projectName = equipmentData.projectName || '[project name]'
-  const contactName = equipmentData.contactName || '[contact name]'
+  const contactName = equipmentData.contactName || '[site contact]'
   const siteAddress = equipmentData.siteAddress || '[site address]'
   const scopeOfWork = equipmentData.scopeOfWork || '[Scope of Work]'
 
-  return `Subject: Quote Request - ${projectName}\n\nDear ${contactName},\n\nI hope this email finds you well. Thank you for considering Omega Morgan for the scope of work attached and summarized below.\n\nPROJECT DETAILS:\n• Project Name: ${projectName}\n• Contact Name: ${contactName}\n• Project Location: ${siteAddress}\n\nSCOPE OF WORK:\n\n${scopeOfWork}\n\nThank you for your time and consideration. I look forward to hearing from you soon.\n\nBest regards,`
+  return `Subject: Quote Request - ${projectName}\n\nDear ${contactName},\n\nI hope this email finds you well. Thank you for considering Omega Morgan for the scope of work attached and summarized below.\n\nPROJECT DETAILS:\n• Project Name: ${projectName}\n• Site Contact: ${contactName}\n• Project Location: ${siteAddress}\n\nSCOPE OF WORK:\n\n${scopeOfWork}\n\nThank you for your time and consideration. I look forward to hearing from you soon.\n\nBest regards,`
 }
 
 export const generateScopeTemplate = (
@@ -24,7 +24,7 @@ export const generateScopeTemplate = (
 ) => {
   const siteAddress = equipmentData.siteAddress || '[Site Address]'
   const contactName = equipmentData.contactName || '[Site Contact]'
-  const phone = equipmentData.sitePhone || '[Site Contact Phone Number]'
+  const phone = equipmentData.sitePhone || '[Site Phone]'
   const shopLocation = equipmentData.shopLocation || '[Shop]'
   const scopeOfWork = equipmentData.scopeOfWork || ''
 
@@ -68,22 +68,13 @@ export const generateScopeTemplate = (
     }`
   })()
 
-  const shipmentLine = logisticsData.shipmentType
-    ? `Shipment Type: ${logisticsData.shipmentType}\n`
-    : ''
-  const truckLine = logisticsData.truckType
-    ? `Truck Type Requested: ${logisticsData.truckType}\n`
-    : ''
   const storageLine = logisticsData.storageType
     ? `Storage: ${
         logisticsData.storageType === 'inside' ? 'Inside Storage' : 'Outside Storage'
       } - ${logisticsData.storageSqFt || '[Sq Ft]'} sq ft\n`
     : ''
 
-  const logisticsSection =
-    shipmentLine || truckLine || storageLine
-      ? `\n${shipmentLine}${truckLine}${storageLine}`
-      : '\n'
+  const logisticsSection = storageLine ? `\n${storageLine}` : '\n'
 
   const itemsSection =
     logisticsData.pieces && logisticsData.pieces.length > 0

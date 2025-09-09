@@ -31,6 +31,7 @@ import { EquipmentData, LogisticsData } from './types'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { equipmentSchema, logisticsSchema } from './lib/validation'
+import { HubSpotContact } from './services/hubspotService'
 
 const App: React.FC = () => {
   const {
@@ -39,7 +40,7 @@ const App: React.FC = () => {
     initialEquipmentData,
     handleEquipmentChange,
     handleEquipmentRequirementsChange,
-    handleSelectHubSpotContact
+    handleSelectHubSpotContact: baseHandleSelectHubSpotContact
   } = useEquipmentForm()
 
   const {
@@ -103,6 +104,16 @@ const App: React.FC = () => {
     }
   }, [equipmentData.siteAddress])
 
+  const handleSelectHubSpotContact = (contact: HubSpotContact) => {
+    baseHandleSelectHubSpotContact(contact)
+    setLogisticsData(prev => ({
+      ...prev,
+      pickupAddress: contact.contactAddress1 || contact.companyAddress1 || prev.pickupAddress,
+      pickupCity: contact.contactCity || contact.companyCity || prev.pickupCity,
+      pickupState: contact.contactState || contact.companyState || prev.pickupState,
+      pickupZip: contact.contactZip || contact.companyZip || prev.pickupZip
+    }))
+  }
 
   const handleAIExtraction = (
     extractedEquipmentData: Partial<EquipmentData>,
