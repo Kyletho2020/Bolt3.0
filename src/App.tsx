@@ -8,7 +8,8 @@ import {
   Key,
   Copy,
   CheckCircle,
-  Mail
+  Mail,
+  Save
 } from 'lucide-react'
 import { useSessionId } from './hooks/useSessionId'
 import { useApiKey } from './hooks/useApiKey'
@@ -75,11 +76,6 @@ const App: React.FC = () => {
     logisticsForm.reset(logisticsData)
   }, [logisticsData])
 
-  const validateForms = async () => {
-    const eqValid = await equipmentForm.trigger()
-    const lgValid = await logisticsForm.trigger()
-    return eqValid && lgValid
-  }
 
   const {
     showAIExtractor,
@@ -190,11 +186,27 @@ const App: React.FC = () => {
         {/* Action Buttons */}
         <div className="flex flex-wrap justify-center gap-4 mb-8">
           <button
+            onClick={openHistory}
+            className="flex items-center px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors border border-accent"
+          >
+            <Archive className="w-4 h-4 mr-2" />
+            Quote History
+          </button>
+
+          <button
             onClick={handleNewQuote}
             className="flex items-center px-4 py-2 bg-accent text-black rounded-lg hover:bg-green-400 transition-colors"
           >
             <Plus className="w-4 h-4 mr-2" />
             New Quote
+          </button>
+
+          <button
+            onClick={openHistory}
+            className="flex items-center px-4 py-2 bg-accent text-black rounded-lg hover:bg-green-400 transition-colors"
+          >
+            <Save className="w-4 h-4 mr-2" />
+            Save Quote
           </button>
 
           <button
@@ -212,14 +224,6 @@ const App: React.FC = () => {
           >
             <Bot className="w-4 h-4 mr-2" />
             AI Extractor
-          </button>
-
-          <button
-            onClick={openHistory}
-            className="flex items-center px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors border border-accent"
-          >
-            <Archive className="w-4 h-4 mr-2" />
-            Quote History
           </button>
         </div>
 
@@ -356,7 +360,6 @@ const App: React.FC = () => {
           isOpen={showHistory}
           onClose={closeHistory}
           onLoadQuote={handleLoadQuote}
-          onValidate={validateForms}
         />
 
         {showApiKeySetup && (

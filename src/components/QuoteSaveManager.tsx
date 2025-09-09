@@ -17,7 +17,6 @@ interface QuoteSaveManagerProps {
   ) => void
   isOpen: boolean
   onClose: () => void
-  onValidate?: () => Promise<boolean>
 }
 
 const QuoteSaveManager: React.FC<QuoteSaveManagerProps> = ({
@@ -26,8 +25,7 @@ const QuoteSaveManager: React.FC<QuoteSaveManagerProps> = ({
   equipmentRequirements,
   onLoadQuote,
   isOpen,
-  onClose,
-  onValidate
+  onClose
 }) => {
   const [quoteNumber, setQuoteNumber] = useState('')
   const [quotes, setQuotes] = useState<QuoteListItem[]>([])
@@ -89,13 +87,6 @@ const QuoteSaveManager: React.FC<QuoteSaveManagerProps> = ({
   }
 
   const handleSaveQuote = async (overwriteId?: string) => {
-    if (onValidate) {
-      const valid = await onValidate()
-      if (!valid) {
-        setMessage({ type: 'error', text: 'Please fix validation errors before saving' })
-        return
-      }
-    }
     if (!quoteNumber.trim()) {
       setMessage({ type: 'error', text: 'Quote number is required' })
       return
