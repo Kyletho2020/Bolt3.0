@@ -25,6 +25,8 @@ test('EquipmentForm renders Equipment Quote heading', () => {
       onFieldChange={() => {}}
       onRequirementsChange={() => {}}
       onSelectContact={() => ({}) as HubSpotContact}
+      register={() => ({ onChange: () => {}, onBlur: () => {}, ref: () => {} }) as any}
+      errors={{}}
     />
   );
 

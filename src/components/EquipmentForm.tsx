@@ -1,22 +1,27 @@
-import React from 'react';
-import { FileText } from 'lucide-react';
-import ProjectDetails from './ProjectDetails';
-import EquipmentRequired, { EquipmentRequirements } from './EquipmentRequired';
-import { HubSpotContact } from '../services/hubspotService';
+import React from 'react'
+import { FileText } from 'lucide-react'
+import ProjectDetails from './ProjectDetails'
+import EquipmentRequired, { EquipmentRequirements } from './EquipmentRequired'
+import { HubSpotContact } from '../services/hubspotService'
 import { EquipmentData } from '../types'
+import { UseFormRegister, FieldErrors } from 'react-hook-form'
 
 interface EquipmentFormProps {
   data: EquipmentData;
   onFieldChange: (field: string, value: string) => void;
   onRequirementsChange: (data: EquipmentRequirements) => void;
   onSelectContact: (contact: HubSpotContact) => void;
+  register: UseFormRegister<EquipmentData>;
+  errors: FieldErrors<EquipmentData>;
 }
 
 const EquipmentForm: React.FC<EquipmentFormProps> = ({
   data,
   onFieldChange,
   onRequirementsChange,
-  onSelectContact
+  onSelectContact,
+  register,
+  errors
 }) => {
   return (
     <div className="bg-gray-900 rounded-lg border-2 border-accent p-6">
@@ -28,6 +33,8 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({
         data={data}
         onChange={onFieldChange}
         onSelectContact={onSelectContact}
+        register={register}
+        errors={errors}
       />
       <EquipmentRequired
         data={data.equipmentRequirements}

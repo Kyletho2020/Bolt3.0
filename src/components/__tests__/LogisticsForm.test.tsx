@@ -31,6 +31,8 @@ test('LogisticsForm renders Logistics Quote heading', () => {
       removePiece={() => {}}
       togglePieceSelection={() => {}}
       deleteSelectedPieces={() => {}}
+      register={() => ({ onChange: () => {}, onBlur: () => {}, ref: () => {} }) as any}
+      errors={{}}
     />
   );
 

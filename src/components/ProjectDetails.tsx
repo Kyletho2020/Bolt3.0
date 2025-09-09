@@ -2,6 +2,7 @@ import React from 'react'
 import { FileText, Building, User, Phone, MapPin, ClipboardList, X } from 'lucide-react'
 import HubSpotContactSearch from './HubSpotContactSearch'
 import { HubSpotContact } from '../services/hubspotService'
+import { UseFormRegister, FieldErrors } from 'react-hook-form'
 
 export interface ProjectDetailsData {
   projectName: string
@@ -18,9 +19,11 @@ interface ProjectDetailsProps {
   data: ProjectDetailsData
   onChange: (field: keyof ProjectDetailsData, value: string) => void
   onSelectContact: (contact: HubSpotContact) => void
+  register: UseFormRegister<ProjectDetailsData>
+  errors: FieldErrors<ProjectDetailsData>
 }
 
-const ProjectDetails: React.FC<ProjectDetailsProps> = ({ data, onChange, onSelectContact }) => {
+const ProjectDetails: React.FC<ProjectDetailsProps> = ({ data, onChange, onSelectContact, register, errors }) => {
   const handleFieldChange = (field: keyof ProjectDetailsData, value: string) => {
     onChange(field, value)
   }
@@ -54,13 +57,26 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ data, onChange, onSelec
             <FileText className="w-4 h-4 inline mr-1" />
             Project Name
           </label>
-          <input
-            type="text"
-            value={data.projectName}
-            onChange={(e) => handleFieldChange('projectName', e.target.value)}
-            className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-            placeholder="Enter project name"
-          />
+          {(() => {
+            const field = register('projectName')
+            return (
+              <>
+                <input
+                  type="text"
+                  value={data.projectName}
+                  onChange={(e) => {
+                    field.onChange(e)
+                    handleFieldChange('projectName', e.target.value)
+                  }}
+                  className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
+                  placeholder="Enter project name"
+                />
+                {errors.projectName && (
+                  <p className="text-red-500 text-xs mt-1">{String(errors.projectName.message)}</p>
+                )}
+              </>
+            )
+          })()}
         </div>
 
         <div>
@@ -68,13 +84,26 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ data, onChange, onSelec
             <Building className="w-4 h-4 inline mr-1" />
             Company Name
           </label>
-          <input
-            type="text"
-            value={data.companyName}
-            onChange={(e) => handleFieldChange('companyName', e.target.value)}
-            className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-            placeholder="Enter company name"
-          />
+          {(() => {
+            const field = register('companyName')
+            return (
+              <>
+                <input
+                  type="text"
+                  value={data.companyName}
+                  onChange={(e) => {
+                    field.onChange(e)
+                    handleFieldChange('companyName', e.target.value)
+                  }}
+                  className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
+                  placeholder="Enter company name"
+                />
+                {errors.companyName && (
+                  <p className="text-red-500 text-xs mt-1">{String(errors.companyName.message)}</p>
+                )}
+              </>
+            )
+          })()}
         </div>
       </div>
 
@@ -84,13 +113,26 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ data, onChange, onSelec
             <User className="w-4 h-4 inline mr-1" />
             Contact Name
           </label>
-          <input
-            type="text"
-            value={data.contactName}
-            onChange={(e) => handleFieldChange('contactName', e.target.value)}
-            className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-            placeholder="Enter contact name"
-          />
+          {(() => {
+            const field = register('contactName')
+            return (
+              <>
+                <input
+                  type="text"
+                  value={data.contactName}
+                  onChange={(e) => {
+                    field.onChange(e)
+                    handleFieldChange('contactName', e.target.value)
+                  }}
+                  className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
+                  placeholder="Enter contact name"
+                />
+                {errors.contactName && (
+                  <p className="text-red-500 text-xs mt-1">{String(errors.contactName.message)}</p>
+                )}
+              </>
+            )
+          })()}
         </div>
 
         <div>
@@ -98,13 +140,26 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ data, onChange, onSelec
             <Phone className="w-4 h-4 inline mr-1" />
             Site Phone
           </label>
-          <input
-            type="tel"
-            value={data.sitePhone}
-            onChange={(e) => handleFieldChange('sitePhone', e.target.value)}
-            className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-            placeholder="Enter site phone"
-          />
+          {(() => {
+            const field = register('sitePhone')
+            return (
+              <>
+                <input
+                  type="tel"
+                  value={data.sitePhone}
+                  onChange={(e) => {
+                    field.onChange(e)
+                    handleFieldChange('sitePhone', e.target.value)
+                  }}
+                  className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
+                  placeholder="Enter site phone"
+                />
+                {errors.sitePhone && (
+                  <p className="text-red-500 text-xs mt-1">{String(errors.sitePhone.message)}</p>
+                )}
+              </>
+            )
+          })()}
         </div>
       </div>
 
@@ -113,13 +168,26 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ data, onChange, onSelec
           <MapPin className="w-4 h-4 inline mr-1" />
           Site Address
         </label>
-        <input
-          type="text"
-          value={data.siteAddress}
-          onChange={(e) => handleFieldChange('siteAddress', e.target.value)}
-          className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-          placeholder="Enter site address"
-        />
+        {(() => {
+          const field = register('siteAddress')
+          return (
+            <>
+              <input
+                type="text"
+                value={data.siteAddress}
+                onChange={(e) => {
+                  field.onChange(e)
+                  handleFieldChange('siteAddress', e.target.value)
+                }}
+                className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
+                placeholder="Enter site address"
+              />
+              {errors.siteAddress && (
+                <p className="text-red-500 text-xs mt-1">{String(errors.siteAddress.message)}</p>
+              )}
+            </>
+          )
+        })()}
       </div>
 
       <div>
@@ -127,15 +195,28 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ data, onChange, onSelec
           <MapPin className="w-4 h-4 inline mr-1" />
           Shop Location
         </label>
-        <select
-          value={data.shopLocation}
-          onChange={(e) => handleFieldChange('shopLocation', e.target.value)}
-          className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-        >
-          <option value="Shop">Shop</option>
-          <option value="Mukilteo">Mukilteo</option>
-          <option value="Fife">Fife</option>
-        </select>
+        {(() => {
+          const field = register('shopLocation')
+          return (
+            <>
+              <select
+                value={data.shopLocation}
+                onChange={(e) => {
+                  field.onChange(e)
+                  handleFieldChange('shopLocation', e.target.value)
+                }}
+                className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
+              >
+                <option value="Shop">Shop</option>
+                <option value="Mukilteo">Mukilteo</option>
+                <option value="Fife">Fife</option>
+              </select>
+              {errors.shopLocation && (
+                <p className="text-red-500 text-xs mt-1">{String(errors.shopLocation.message)}</p>
+              )}
+            </>
+          )
+        })()}
       </div>
 
       <div>
@@ -143,13 +224,26 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ data, onChange, onSelec
           <ClipboardList className="w-4 h-4 inline mr-1" />
           Scope of Work
         </label>
-        <textarea
-          value={data.scopeOfWork}
-          onChange={(e) => handleFieldChange('scopeOfWork', e.target.value)}
-          rows={3}
-          className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent resize-none text-white"
-          placeholder="Describe scope of work"
-        />
+        {(() => {
+          const field = register('scopeOfWork')
+          return (
+            <>
+              <textarea
+                value={data.scopeOfWork}
+                onChange={(e) => {
+                  field.onChange(e)
+                  handleFieldChange('scopeOfWork', e.target.value)
+                }}
+                rows={3}
+                className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent resize-none text-white"
+                placeholder="Describe scope of work"
+              />
+              {errors.scopeOfWork && (
+                <p className="text-red-500 text-xs mt-1">{String(errors.scopeOfWork.message)}</p>
+              )}
+            </>
+          )
+        })()}
       </div>
     </div>
   )
