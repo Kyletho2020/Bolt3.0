@@ -6,6 +6,25 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
 
+const decoder = new TextDecoder()
+
+async function getKey(): Promise<CryptoKey> {
+  const keyB64 = Deno.env.get('API_KEY_ENCRYPTION_KEY')
+  if (!keyB64) throw new Error('Missing API_KEY_ENCRYPTION_KEY environment variable')
+  const rawKey = Uint8Array.from(atob(keyB64), c => c.charCodeAt(0))
+  return crypto.subtle.importKey('raw', rawKey, 'AES-GCM', false, ['decrypt'])
+}
+
+async function decrypt(payload: string): Promise<string> {
+  const [ivB64, cipherB64] = payload.split(':')
+  if (!ivB64 || !cipherB64) throw new Error('Invalid encrypted payload')
+  const iv = Uint8Array.from(atob(ivB64), c => c.charCodeAt(0))
+  const cipher = Uint8Array.from(atob(cipherB64), c => c.charCodeAt(0))
+  const key = await getKey()
+  const decrypted = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, cipher)
+  return decoder.decode(decrypted)
+}
+
 interface ExtractRequest {
   text: string
   sessionId: string
@@ -98,10 +117,10 @@ Deno.serve(async (req) => {
       throw new Error('OpenAI API key not found. Please configure your API key first.')
     }
 
-    // Decrypt base64 encoded API key
+    // Decrypt stored API key
     let apiKey: string
     try {
-      apiKey = new TextDecoder().decode(Uint8Array.from(atob(keyData.encrypted_key), c => c.charCodeAt(0)))
+      apiKey = await decrypt(keyData.encrypted_key)
       console.log('API key decrypted successfully')
     } catch (decryptError) {
       console.error('Failed to decrypt API key:', decryptError)
