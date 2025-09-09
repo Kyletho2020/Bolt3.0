@@ -1,7 +1,7 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { FileText, Building, User, Phone, MapPin, ClipboardList, X } from 'lucide-react'
 import HubSpotContactSearch from './HubSpotContactSearch'
-import { HubSpotContact } from '../services/hubspotService'
+import { HubSpotContact, HubSpotService } from '../services/hubspotService'
 import { UseFormRegister, FieldErrors } from 'react-hook-form'
 
 export interface ProjectDetailsData {
@@ -24,8 +24,42 @@ interface ProjectDetailsProps {
 }
 
 const ProjectDetails: React.FC<ProjectDetailsProps> = ({ data, onChange, onSelectContact, register, errors }) => {
-  const handleFieldChange = (field: keyof ProjectDetailsData, value: string) => {
+  const [selectedContactId, setSelectedContactId] = useState<string | null>(null)
+  const [updateMessage, setUpdateMessage] = useState<string | null>(null)
+  const [updateError, setUpdateError] = useState<string | null>(null)
+
+  const handleFieldChange = async (field: keyof ProjectDetailsData, value: string) => {
     onChange(field, value)
+    if (selectedContactId) {
+      const payload: Partial<HubSpotContact> = {}
+      if (field === 'contactName') {
+        const [firstName, ...rest] = value.split(' ')
+        payload.firstName = firstName
+        payload.lastName = rest.join(' ')
+      } else if (field === 'sitePhone') {
+        payload.phone = value
+      } else if (field === 'email') {
+        payload.email = value
+      } else if (field === 'siteAddress') {
+        ;(payload as Record<string, unknown>).address = value
+      }
+
+      if (Object.keys(payload).length > 0) {
+        try {
+          await HubSpotService.updateContact(selectedContactId, payload)
+          setUpdateMessage('Contact updated')
+          setUpdateError(null)
+        } catch (err) {
+          setUpdateError(err instanceof Error ? err.message : 'Update failed')
+          setUpdateMessage(null)
+        }
+      }
+    }
+  }
+
+  const handleSelectContact = (contact: HubSpotContact) => {
+    setSelectedContactId(contact.id)
+    onSelectContact(contact)
   }
 
   const clearSection = () => {
@@ -49,7 +83,10 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ data, onChange, onSelec
         </button>
       </div>
 
-      <HubSpotContactSearch onSelectContact={onSelectContact} />
+      <HubSpotContactSearch onSelectContact={handleSelectContact} />
+
+      {updateMessage && <p className="text-sm text-green-400">{updateMessage}</p>}
+      {updateError && <p className="text-sm text-red-400">{updateError}</p>}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
