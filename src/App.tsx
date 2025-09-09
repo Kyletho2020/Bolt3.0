@@ -38,7 +38,7 @@ const App: React.FC = () => {
     trailers: []
   }
 
-  const [equipmentData, setEquipmentData] = useState({
+  const initialEquipmentData = {
     projectName: '',
     companyName: '',
     contactName: '',
@@ -48,10 +48,11 @@ const App: React.FC = () => {
     scopeOfWork: '',
     email: '',
     equipmentRequirements: initialEquipmentRequirements
-  })
+  }
+  const [equipmentData, setEquipmentData] = useState(initialEquipmentData)
 
   // State for logistics form
-  const [logisticsData, setLogisticsData] = useState({
+  const initialLogisticsData = {
     pieces: [{ description: '', quantity: 1, length: '', width: '', height: '', weight: '' }],
     pickupAddress: '',
     pickupCity: '',
@@ -65,7 +66,8 @@ const App: React.FC = () => {
     truckType: '',
     storageType: '',
     storageSqFt: ''
-  })
+  }
+  const [logisticsData, setLogisticsData] = useState(initialLogisticsData)
 
   const [selectedPieces, setSelectedPieces] = useState<number[]>([])
 
@@ -190,6 +192,12 @@ const App: React.FC = () => {
     refetchApiKey()
   }
 
+  const handleNewQuote = () => {
+    setEquipmentData(initialEquipmentData)
+    setLogisticsData(initialLogisticsData)
+    setSelectedPieces([])
+  }
+
   const [copiedTemplate, setCopiedTemplate] = useState<string | null>(null)
 
   const emailTemplate = generateEmailTemplate(
@@ -229,13 +237,21 @@ const App: React.FC = () => {
         {/* Action Buttons */}
         <div className="flex flex-wrap justify-center gap-4 mb-8">
           <button
+            onClick={handleNewQuote}
+            className="flex items-center px-4 py-2 bg-accent text-black rounded-lg hover:bg-green-400 transition-colors"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            New Quote
+          </button>
+
+          <button
             onClick={() => setShowApiKeySetup(true)}
             className="flex items-center px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors border border-accent"
           >
             <Key className="w-4 h-4 mr-2" />
             API Key Setup
           </button>
-          
+
           <button
             onClick={() => setShowAIExtractor(true)}
             disabled={!hasApiKey}
@@ -244,14 +260,14 @@ const App: React.FC = () => {
             <Bot className="w-4 h-4 mr-2" />
             AI Extractor
           </button>
-          
-            <button
-              onClick={() => setShowHistory(true)}
-              className="flex items-center px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors border border-accent"
-            >
-              <Archive className="w-4 h-4 mr-2" />
-              Quote History
-            </button>
+
+          <button
+            onClick={() => setShowHistory(true)}
+            className="flex items-center px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors border border-accent"
+          >
+            <Archive className="w-4 h-4 mr-2" />
+            Quote History
+          </button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
