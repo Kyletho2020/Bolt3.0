@@ -22,6 +22,7 @@ interface HubSpotSearchBody {
   properties: string[]
   limit?: number
   after?: string
+  query?: string
 }
 
 interface HubSpotContactResult {
@@ -106,23 +107,20 @@ Deno.serve(async (req) => {
     let pageCount = 0
     const MAX_PAGES = 50 // soft cap (approx up to 5k if limit=100)
     do {
+      const afterParam = after ? { after } : {}
       const hsBody: HubSpotSearchBody = partial
         ? {
-            // Use full-text query for typeahead/partial matching
-            // @ts-ignore query is supported by HubSpot search API
-            // deno-lint-ignore no-explicit-any
-            ...(after ? { after } : {} as any),
+            ...afterParam,
             properties: ['firstname', 'lastname', 'email', 'phone', 'address', 'city', 'state', 'zip'],
-            // @ts-ignore
             query: name,
             limit: 100,
             filterGroups: [],
-          } as unknown as HubSpotSearchBody
+          }
         : {
             filterGroups,
             properties: ['firstname', 'lastname', 'email', 'phone', 'address', 'city', 'state', 'zip'],
             limit: 100,
-            ...(after ? { after } : {}),
+            ...afterParam,
           }
 
       const hsRes = await fetch('https://api.hubapi.com/crm/v3/objects/contacts/search', {
@@ -149,7 +147,26 @@ Deno.serve(async (req) => {
     } while (after && pageCount < MAX_PAGES)
 
     // For each contact, try to get first associated company and read its address
-    const mapped = [] as any[]
+    interface HubSpotContact {
+      id: string
+      firstName: string
+      lastName: string
+      email: string
+      phone: string
+      companyName: string
+      contactAddress: string
+      contactAddress1: string
+      contactCity: string
+      contactState: string
+      contactZip: string
+      companyAddress: string
+      companyAddress1: string
+      companyCity: string
+      companyState: string
+      companyZip: string
+    }
+
+    const mapped: HubSpotContact[] = []
     for (const r of collected) {
       const p = r.properties || {}
       let companyName = ''
@@ -182,7 +199,7 @@ Deno.serve(async (req) => {
             }
           }
         }
-      } catch (_) {
+      } catch {
         // ignore enrichment errors per-contact
       }
 

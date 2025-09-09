@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from 'react'
 import {
   FileText,
@@ -21,13 +20,13 @@ import {
 import QuoteSaveManager from './components/QuoteSaveManager'
 import ApiKeySetup from './components/ApiKeySetup'
 import ClarificationsSection from './components/ClarificationsSection'
-import { HubSpotContact } from './services/hubspotService'
 import EquipmentForm from './components/EquipmentForm'
 import LogisticsForm from './components/LogisticsForm'
 import useEquipmentForm from './hooks/useEquipmentForm'
 import useLogisticsForm from './hooks/useLogisticsForm'
 import useModals from './hooks/useModals'
 import { EquipmentRequirements } from './components/EquipmentRequired'
+import { EquipmentData, LogisticsData } from './types'
 
 const App: React.FC = () => {
   const {
@@ -80,7 +79,10 @@ const App: React.FC = () => {
   }, [equipmentData.siteAddress])
 
 
-  const handleAIExtraction = (extractedEquipmentData: any, extractedLogisticsData: any) => {
+  const handleAIExtraction = (
+    extractedEquipmentData: Partial<EquipmentData>,
+    extractedLogisticsData: Partial<LogisticsData>
+  ) => {
     if (extractedEquipmentData) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { projectDescription, ...rest } = extractedEquipmentData
@@ -92,8 +94,8 @@ const App: React.FC = () => {
   }
 
   const handleLoadQuote = (
-    loadedEquipmentData: any,
-    loadedLogisticsData: any,
+    loadedEquipmentData: EquipmentData,
+    loadedLogisticsData: LogisticsData,
     loadedEquipmentRequirements?: EquipmentRequirements
   ) => {
     setEquipmentData({

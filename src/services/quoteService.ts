@@ -1,5 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { supabase } from '../lib/supabase'
+import { EquipmentData, LogisticsData } from '../types'
+import { EquipmentRequirements } from '../components/EquipmentRequired'
 
 export interface QuoteListItem {
   id: string
@@ -21,10 +22,10 @@ export interface SavedQuote {
   shop_location: string | null
   site_address: string | null
   scope_of_work: string | null
-  logistics_data: any
-  logistics_shipment: any
-  logistics_storage: any
-  equipment_requirements: any
+  logistics_data: LogisticsData | null
+  logistics_shipment: Record<string, unknown> | null
+  logistics_storage: Record<string, unknown> | null
+  equipment_requirements: EquipmentRequirements | null
   email_template: string | null
   scope_template: string | null
   created_at: string
@@ -53,9 +54,9 @@ export class QuoteService {
 
   static async saveQuote(
     quoteNumber: string,
-    equipmentData: any,
-    logisticsData: any,
-    equipmentRequirements: any,
+    equipmentData: EquipmentData,
+    logisticsData: LogisticsData,
+    equipmentRequirements: EquipmentRequirements,
     emailTemplate?: string,
     scopeTemplate?: string,
     existingId?: string
