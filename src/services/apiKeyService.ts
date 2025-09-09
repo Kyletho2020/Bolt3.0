@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase'
+import { encrypt, decrypt } from '../lib/encryption'
 
 export class ApiKeyService {
   private static readonly FIXED_KEY_ID = 'c9f1ba25-04c8-4e36-b942-ff20dfa3d8b3'
@@ -20,9 +21,8 @@ export class ApiKeyService {
         return null
       }
 
-      // Decrypt base64 encoded API key
       try {
-        return new TextDecoder().decode(Uint8Array.from(atob(data.encrypted_key), c => c.charCodeAt(0)))
+        return await decrypt(data.encrypted_key)
       } catch (decryptError) {
         console.error('Failed to decrypt API key:', decryptError)
         return null
@@ -35,8 +35,8 @@ export class ApiKeyService {
 
   static async saveApiKey(apiKey: string): Promise<boolean> {
     try {
-      // Encrypt the API key using base64 before storing
-      const encryptedApiKey = btoa(String.fromCharCode(...new TextEncoder().encode(apiKey)))
+      // Encrypt the API key using AES-GCM before storing
+      const encryptedApiKey = await encrypt(apiKey)
 
       const { error } = await supabase
         .from('api_key_storage')
