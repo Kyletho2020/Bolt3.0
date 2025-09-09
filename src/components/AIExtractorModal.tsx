@@ -1,8 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from 'react'
 import { Bot, Send, Loader, X, AlertCircle, CheckCircle } from 'lucide-react'
 import { useApiKey } from '../hooks/useApiKey'
 import { AIExtractionService } from '../services/aiExtractionService'
+import { EquipmentData, LogisticsData } from '../types'
 
 interface Message {
   id: string
@@ -14,7 +14,10 @@ interface Message {
 interface AIExtractorModalProps {
   isOpen: boolean
   onClose: () => void
-  onExtract: (equipmentData: any, logisticsData: any) => void
+  onExtract: (
+    equipmentData: Partial<EquipmentData>,
+    logisticsData: Partial<LogisticsData>
+  ) => void
   sessionId: string
 }
 
@@ -76,7 +79,7 @@ const AIExtractorModal: React.FC<AIExtractorModalProps> = ({ isOpen, onClose, on
       } else {
         addMessage('error', result.error || 'Extraction failed')
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Extraction error:', error)
       addMessage('error', `Sorry, there was an error: ${error instanceof Error ? error.message : 'Unknown error'}`)
     } finally {

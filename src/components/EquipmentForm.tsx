@@ -3,9 +3,10 @@ import { FileText } from 'lucide-react';
 import ProjectDetails from './ProjectDetails';
 import EquipmentRequired, { EquipmentRequirements } from './EquipmentRequired';
 import { HubSpotContact } from '../services/hubspotService';
+import { EquipmentData } from '../types'
 
 interface EquipmentFormProps {
-  data: any;
+  data: EquipmentData;
   onFieldChange: (field: string, value: string) => void;
   onRequirementsChange: (data: EquipmentRequirements) => void;
   onSelectContact: (contact: HubSpotContact) => void;

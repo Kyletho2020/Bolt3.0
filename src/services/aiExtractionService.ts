@@ -1,18 +1,14 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ApiKeyService } from './apiKeyService'
-
-interface ExtractionResult {
-  equipmentData?: any
-  logisticsData?: any
-  success: boolean
-  error?: string
-}
+import { ExtractionResult } from '../types'
 
 export class AIExtractionService {
   private static readonly SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || ''
   private static readonly SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || ''
 
-  static async extractProjectInfo(text: string, sessionId: string): Promise<ExtractionResult> {
+  static async extractProjectInfo(
+    text: string,
+    sessionId: string
+  ): Promise<ExtractionResult> {
     try {
       // Check if environment variables are available
       if (!this.SUPABASE_URL || !this.SUPABASE_ANON_KEY) {
@@ -52,8 +48,8 @@ export class AIExtractionService {
         throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`)
       }
 
-      const result = await response.json()
-      
+      const result: ExtractionResult = await response.json()
+
       if (!result.success) {
         throw new Error(result.error || 'Extraction failed')
       }
