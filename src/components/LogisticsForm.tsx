@@ -1,5 +1,6 @@
-import React from 'react';
-import { Truck, Package, Plus, Minus, Trash2 } from 'lucide-react';
+import React from 'react'
+import { Truck, Package, Plus, Minus, Trash2 } from 'lucide-react'
+import { UseFormRegister, FieldErrors } from 'react-hook-form'
 
 interface Piece {
   description: string;
@@ -39,6 +40,8 @@ interface LogisticsFormProps {
   removePiece: (index: number) => void;
   togglePieceSelection: (index: number) => void;
   deleteSelectedPieces: () => void;
+  register: UseFormRegister<LogisticsData>;
+  errors: FieldErrors<LogisticsData>;
 }
 
 const LogisticsForm: React.FC<LogisticsFormProps> = ({
@@ -49,7 +52,9 @@ const LogisticsForm: React.FC<LogisticsFormProps> = ({
   addPiece,
   removePiece,
   togglePieceSelection,
-  deleteSelectedPieces
+  deleteSelectedPieces,
+  register,
+  errors
 }) => {
   return (
     <div className="bg-gray-900 rounded-lg border-2 border-accent p-6">
@@ -97,24 +102,50 @@ const LogisticsForm: React.FC<LogisticsFormProps> = ({
                   />
                 </div>
                 <div className="col-span-4">
-                  <input
-                    type="text"
-                    value={piece.description}
-                    onChange={(e) => onPieceChange(index, 'description', e.target.value)}
-                    className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white text-sm"
-                    placeholder="Description"
-                  />
+                  {(() => {
+                    const field = register(`pieces.${index}.description` as const)
+                    return (
+                      <>
+                        <input
+                          type="text"
+                          value={piece.description}
+                          onChange={(e) => {
+                            field.onChange(e)
+                            onPieceChange(index, 'description', e.target.value)
+                          }}
+                          className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white text-sm"
+                          placeholder="Description"
+                        />
+                        {errors.pieces?.[index]?.description && (
+                          <p className="text-red-500 text-xs mt-1">{String(errors.pieces[index]?.description?.message)}</p>
+                        )}
+                      </>
+                    )
+                  })()}
                 </div>
                 <div className="col-span-1">
-                  <input
-                    type="number"
-                    value={piece.quantity}
-                    onChange={(e) => onPieceChange(index, 'quantity', parseInt(e.target.value) || 1)}
-                    className="w-16 px-2 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white text-sm text-center"
-                    placeholder="Qty"
-                    min="1"
-                    max="99"
-                  />
+                  {(() => {
+                    const field = register(`pieces.${index}.quantity` as const)
+                    return (
+                      <>
+                        <input
+                          type="number"
+                          value={piece.quantity}
+                          onChange={(e) => {
+                            field.onChange(e)
+                            onPieceChange(index, 'quantity', parseInt(e.target.value) || 1)
+                          }}
+                          className="w-16 px-2 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white text-sm text-center"
+                          placeholder="Qty"
+                          min="1"
+                          max="99"
+                        />
+                        {errors.pieces?.[index]?.quantity && (
+                          <p className="text-red-500 text-xs mt-1">{String(errors.pieces[index]?.quantity?.message)}</p>
+                        )}
+                      </>
+                    )
+                  })()}
                 </div>
                 <div className="col-span-1">
                   <input
@@ -144,13 +175,26 @@ const LogisticsForm: React.FC<LogisticsFormProps> = ({
                   />
                 </div>
                 <div className="col-span-2">
-                  <input
-                    type="text"
-                    value={piece.weight}
-                    onChange={(e) => onPieceChange(index, 'weight', e.target.value)}
-                    className="w-full px-2 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white text-sm"
-                    placeholder="Weight (lbs)"
-                  />
+                  {(() => {
+                    const field = register(`pieces.${index}.weight` as const)
+                    return (
+                      <>
+                        <input
+                          type="text"
+                          value={piece.weight}
+                          onChange={(e) => {
+                            field.onChange(e)
+                            onPieceChange(index, 'weight', e.target.value)
+                          }}
+                          className="w-full px-2 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white text-sm"
+                          placeholder="Weight (lbs)"
+                        />
+                        {errors.pieces?.[index]?.weight && (
+                          <p className="text-red-500 text-xs mt-1">{String(errors.pieces[index]?.weight?.message)}</p>
+                        )}
+                      </>
+                    )
+                  })()}
                 </div>
                 <div className="col-span-1">
                   {data.pieces.length > 1 && (
@@ -171,35 +215,87 @@ const LogisticsForm: React.FC<LogisticsFormProps> = ({
         <div>
           <label className="block text-sm font-medium text-white mb-2">Pickup Location</label>
           <div className="space-y-3">
-            <input
-              type="text"
-              value={data.pickupAddress}
-              onChange={(e) => onFieldChange('pickupAddress', e.target.value)}
-              className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-              placeholder="Pickup address"
-            />
+            {(() => {
+              const field = register('pickupAddress')
+              return (
+                <>
+                  <input
+                    type="text"
+                    value={data.pickupAddress}
+                    onChange={(e) => {
+                      field.onChange(e)
+                      onFieldChange('pickupAddress', e.target.value)
+                    }}
+                    className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
+                    placeholder="Pickup address"
+                  />
+                  {errors.pickupAddress && (
+                    <p className="text-red-500 text-xs mt-1">{String(errors.pickupAddress.message)}</p>
+                  )}
+                </>
+              )
+            })()}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <input
-                type="text"
-                value={data.pickupCity}
-                onChange={(e) => onFieldChange('pickupCity', e.target.value)}
-                className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                placeholder="City"
-              />
-              <input
-                type="text"
-                value={data.pickupState}
-                onChange={(e) => onFieldChange('pickupState', e.target.value)}
-                className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                placeholder="State"
-              />
-              <input
-                type="text"
-                value={data.pickupZip}
-                onChange={(e) => onFieldChange('pickupZip', e.target.value)}
-                className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                placeholder="Zip"
-              />
+              {(() => {
+                const field = register('pickupCity')
+                return (
+                  <>
+                    <input
+                      type="text"
+                      value={data.pickupCity}
+                      onChange={(e) => {
+                        field.onChange(e)
+                        onFieldChange('pickupCity', e.target.value)
+                      }}
+                      className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
+                      placeholder="City"
+                    />
+                    {errors.pickupCity && (
+                      <p className="text-red-500 text-xs mt-1">{String(errors.pickupCity.message)}</p>
+                    )}
+                  </>
+                )
+              })()}
+              {(() => {
+                const field = register('pickupState')
+                return (
+                  <>
+                    <input
+                      type="text"
+                      value={data.pickupState}
+                      onChange={(e) => {
+                        field.onChange(e)
+                        onFieldChange('pickupState', e.target.value)
+                      }}
+                      className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
+                      placeholder="State"
+                    />
+                    {errors.pickupState && (
+                      <p className="text-red-500 text-xs mt-1">{String(errors.pickupState.message)}</p>
+                    )}
+                  </>
+                )
+              })()}
+              {(() => {
+                const field = register('pickupZip')
+                return (
+                  <>
+                    <input
+                      type="text"
+                      value={data.pickupZip}
+                      onChange={(e) => {
+                        field.onChange(e)
+                        onFieldChange('pickupZip', e.target.value)
+                      }}
+                      className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
+                      placeholder="Zip"
+                    />
+                    {errors.pickupZip && (
+                      <p className="text-red-500 text-xs mt-1">{String(errors.pickupZip.message)}</p>
+                    )}
+                  </>
+                )
+              })()}
             </div>
           </div>
         </div>
@@ -208,35 +304,87 @@ const LogisticsForm: React.FC<LogisticsFormProps> = ({
         <div>
           <label className="block text-sm font-medium text-white mb-2">Delivery Location</label>
           <div className="space-y-3">
-            <input
-              type="text"
-              value={data.deliveryAddress}
-              onChange={(e) => onFieldChange('deliveryAddress', e.target.value)}
-              className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-              placeholder="Delivery address"
-            />
+            {(() => {
+              const field = register('deliveryAddress')
+              return (
+                <>
+                  <input
+                    type="text"
+                    value={data.deliveryAddress}
+                    onChange={(e) => {
+                      field.onChange(e)
+                      onFieldChange('deliveryAddress', e.target.value)
+                    }}
+                    className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
+                    placeholder="Delivery address"
+                  />
+                  {errors.deliveryAddress && (
+                    <p className="text-red-500 text-xs mt-1">{String(errors.deliveryAddress.message)}</p>
+                  )}
+                </>
+              )
+            })()}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <input
-                type="text"
-                value={data.deliveryCity}
-                onChange={(e) => onFieldChange('deliveryCity', e.target.value)}
-                className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                placeholder="City"
-              />
-              <input
-                type="text"
-                value={data.deliveryState}
-                onChange={(e) => onFieldChange('deliveryState', e.target.value)}
-                className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                placeholder="State"
-              />
-              <input
-                type="text"
-                value={data.deliveryZip}
-                onChange={(e) => onFieldChange('deliveryZip', e.target.value)}
-                className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                placeholder="Zip"
-              />
+              {(() => {
+                const field = register('deliveryCity')
+                return (
+                  <>
+                    <input
+                      type="text"
+                      value={data.deliveryCity}
+                      onChange={(e) => {
+                        field.onChange(e)
+                        onFieldChange('deliveryCity', e.target.value)
+                      }}
+                      className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
+                      placeholder="City"
+                    />
+                    {errors.deliveryCity && (
+                      <p className="text-red-500 text-xs mt-1">{String(errors.deliveryCity.message)}</p>
+                    )}
+                  </>
+                )
+              })()}
+              {(() => {
+                const field = register('deliveryState')
+                return (
+                  <>
+                    <input
+                      type="text"
+                      value={data.deliveryState}
+                      onChange={(e) => {
+                        field.onChange(e)
+                        onFieldChange('deliveryState', e.target.value)
+                      }}
+                      className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
+                      placeholder="State"
+                    />
+                    {errors.deliveryState && (
+                      <p className="text-red-500 text-xs mt-1">{String(errors.deliveryState.message)}</p>
+                    )}
+                  </>
+                )
+              })()}
+              {(() => {
+                const field = register('deliveryZip')
+                return (
+                  <>
+                    <input
+                      type="text"
+                      value={data.deliveryZip}
+                      onChange={(e) => {
+                        field.onChange(e)
+                        onFieldChange('deliveryZip', e.target.value)
+                      }}
+                      className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
+                      placeholder="Zip"
+                    />
+                    {errors.deliveryZip && (
+                      <p className="text-red-500 text-xs mt-1">{String(errors.deliveryZip.message)}</p>
+                    )}
+                  </>
+                )
+              })()}
             </div>
           </div>
         </div>
@@ -244,29 +392,55 @@ const LogisticsForm: React.FC<LogisticsFormProps> = ({
         {/* Shipment Type */}
         <div>
           <label className="block text-sm font-medium text-white mb-2">Shipment Type</label>
-          <select
-            value={data.shipmentType}
-            onChange={(e) => onFieldChange('shipmentType', e.target.value)}
-            className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-          >
-            <option value="LTL">LTL</option>
-            <option value="FTL">FTL</option>
-          </select>
+          {(() => {
+            const field = register('shipmentType')
+            return (
+              <>
+                <select
+                  value={data.shipmentType}
+                  onChange={(e) => {
+                    field.onChange(e)
+                    onFieldChange('shipmentType', e.target.value)
+                  }}
+                  className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
+                >
+                  <option value="LTL">LTL</option>
+                  <option value="FTL">FTL</option>
+                </select>
+                {errors.shipmentType && (
+                  <p className="text-red-500 text-xs mt-1">{String(errors.shipmentType.message)}</p>
+                )}
+              </>
+            )
+          })()}
         </div>
 
         {/* Truck Type Requested */}
         <div>
           <label className="block text-sm font-medium text-white mb-2">Truck Type Requested</label>
-          <select
-            value={data.truckType}
-            onChange={(e) => onFieldChange('truckType', e.target.value)}
-            className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-          >
-            <option value="">Select truck type</option>
-            <option value="Flatbed">Flatbed</option>
-            <option value="Flatbed with tarp">Flatbed with tarp</option>
-            <option value="Conestoga">Conestoga</option>
-          </select>
+          {(() => {
+            const field = register('truckType')
+            return (
+              <>
+                <select
+                  value={data.truckType}
+                  onChange={(e) => {
+                    field.onChange(e)
+                    onFieldChange('truckType', e.target.value)
+                  }}
+                  className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
+                >
+                  <option value="">Select truck type</option>
+                  <option value="Flatbed">Flatbed</option>
+                  <option value="Flatbed with tarp">Flatbed with tarp</option>
+                  <option value="Conestoga">Conestoga</option>
+                </select>
+                {errors.truckType && (
+                  <p className="text-red-500 text-xs mt-1">{String(errors.truckType.message)}</p>
+                )}
+              </>
+            )
+          })()}
         </div>
 
         {/* Storage Requirements */}

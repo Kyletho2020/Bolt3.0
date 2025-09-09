@@ -27,6 +27,9 @@ import useLogisticsForm from './hooks/useLogisticsForm'
 import useModals from './hooks/useModals'
 import { EquipmentRequirements } from './components/EquipmentRequired'
 import { EquipmentData, LogisticsData } from './types'
+import { useForm } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { equipmentSchema, logisticsSchema } from './lib/validation'
 
 const App: React.FC = () => {
   const {
@@ -51,6 +54,32 @@ const App: React.FC = () => {
     togglePieceSelection,
     deleteSelectedPieces
   } = useLogisticsForm()
+
+  const equipmentForm = useForm<EquipmentData>({
+    resolver: yupResolver(equipmentSchema),
+    defaultValues: equipmentData,
+    mode: 'onBlur'
+  })
+
+  const logisticsForm = useForm<LogisticsData>({
+    resolver: yupResolver(logisticsSchema),
+    defaultValues: logisticsData,
+    mode: 'onBlur'
+  })
+
+  useEffect(() => {
+    equipmentForm.reset(equipmentData)
+  }, [equipmentData])
+
+  useEffect(() => {
+    logisticsForm.reset(logisticsData)
+  }, [logisticsData])
+
+  const validateForms = async () => {
+    const eqValid = await equipmentForm.trigger()
+    const lgValid = await logisticsForm.trigger()
+    return eqValid && lgValid
+  }
 
   const {
     showAIExtractor,
@@ -201,6 +230,8 @@ const App: React.FC = () => {
             onFieldChange={handleEquipmentChange}
             onRequirementsChange={handleEquipmentRequirementsChange}
             onSelectContact={handleSelectHubSpotContact}
+            register={equipmentForm.register}
+            errors={equipmentForm.formState.errors}
           />
 
           {/* Logistics Quote Form */}
@@ -213,6 +244,8 @@ const App: React.FC = () => {
             removePiece={removePiece}
             togglePieceSelection={togglePieceSelection}
             deleteSelectedPieces={deleteSelectedPieces}
+            register={logisticsForm.register}
+            errors={logisticsForm.formState.errors}
           />
         </div>
 
@@ -323,6 +356,7 @@ const App: React.FC = () => {
           isOpen={showHistory}
           onClose={closeHistory}
           onLoadQuote={handleLoadQuote}
+          onValidate={validateForms}
         />
 
         {showApiKeySetup && (
