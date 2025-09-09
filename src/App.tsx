@@ -6,11 +6,7 @@ import {
   Bot,
   Archive,
   Plus,
-  Minus,
-  Package,
-  Truck,
   Key,
-  Trash2,
   Copy,
   CheckCircle,
   Mail
@@ -24,58 +20,50 @@ import {
 } from './components/PreviewTemplates'
 import QuoteSaveManager from './components/QuoteSaveManager'
 import ApiKeySetup from './components/ApiKeySetup'
-import ProjectDetails from './components/ProjectDetails'
-import { HubSpotContact } from './services/hubspotService'
-import EquipmentRequired, { EquipmentRequirements } from './components/EquipmentRequired'
 import ClarificationsSection from './components/ClarificationsSection'
+import { HubSpotContact } from './services/hubspotService'
+import EquipmentForm from './components/EquipmentForm'
+import LogisticsForm from './components/LogisticsForm'
+import useEquipmentForm from './hooks/useEquipmentForm'
+import useLogisticsForm from './hooks/useLogisticsForm'
+import useModals from './hooks/useModals'
+import { EquipmentRequirements } from './components/EquipmentRequired'
 
 const App: React.FC = () => {
-  // State for equipment form
-  const initialEquipmentRequirements: EquipmentRequirements = {
-    crewSize: '',
-    forklifts: [],
-    tractors: [],
-    trailers: []
-  }
+  const {
+    equipmentData,
+    setEquipmentData,
+    initialEquipmentData,
+    handleEquipmentChange,
+    handleEquipmentRequirementsChange,
+    handleSelectHubSpotContact
+  } = useEquipmentForm()
 
-  const initialEquipmentData = {
-    projectName: '',
-    companyName: '',
-    contactName: '',
-    siteAddress: '',
-    sitePhone: '',
-    shopLocation: 'Shop',
-    scopeOfWork: '',
-    email: '',
-    equipmentRequirements: initialEquipmentRequirements
-  }
-  const [equipmentData, setEquipmentData] = useState(initialEquipmentData)
+  const {
+    logisticsData,
+    setLogisticsData,
+    selectedPieces,
+    setSelectedPieces,
+    initialLogisticsData,
+    handleLogisticsChange,
+    handlePieceChange,
+    addPiece,
+    removePiece,
+    togglePieceSelection,
+    deleteSelectedPieces
+  } = useLogisticsForm()
 
-  // State for logistics form
-  const initialLogisticsData = {
-    pieces: [{ description: '', quantity: 1, length: '', width: '', height: '', weight: '' }],
-    pickupAddress: '',
-    pickupCity: '',
-    pickupState: '',
-    pickupZip: '',
-    deliveryAddress: '',
-    deliveryCity: '',
-    deliveryState: '',
-    deliveryZip: '',
-    shipmentType: '',
-    truckType: '',
-    storageType: '',
-    storageSqFt: ''
-  }
-  const [logisticsData, setLogisticsData] = useState(initialLogisticsData)
-
-  const [selectedPieces, setSelectedPieces] = useState<number[]>([])
-
-  // Modal states
-  const [showAIExtractor, setShowAIExtractor] = useState(false)
-  const [showHistory, setShowHistory] = useState(false)
-  const [showApiKeySetup, setShowApiKeySetup] = useState(false)
-
+  const {
+    showAIExtractor,
+    openAIExtractor,
+    closeAIExtractor,
+    showHistory,
+    openHistory,
+    closeHistory,
+    showApiKeySetup,
+    openApiKeySetup,
+    closeApiKeySetup
+  } = useModals()
 
   // Hooks
   const sessionId = useSessionId()
@@ -91,73 +79,6 @@ const App: React.FC = () => {
     }
   }, [equipmentData.siteAddress])
 
-  const handleSelectHubSpotContact = (contact: HubSpotContact) => {
-    setEquipmentData(prev => ({
-      ...prev,
-      contactName: `${contact.firstName} ${contact.lastName}`.trim(),
-      email: contact.email,
-      sitePhone: contact.phone || prev.sitePhone,
-      companyName: contact.companyName || prev.companyName,
-      siteAddress: contact.contactAddress || contact.companyAddress || prev.siteAddress
-    }))
-  }
-
-  const handleEquipmentChange = (field: string, value: string) => {
-    setEquipmentData(prev => ({ ...prev, [field]: value }))
-  }
-
-  const handleLogisticsChange = (field: string, value: string) => {
-    setLogisticsData(prev => ({ ...prev, [field]: value }))
-  }
-
-  const handlePieceChange = (index: number, field: string, value: string | number) => {
-    setLogisticsData(prev => ({
-      ...prev,
-      pieces: prev.pieces.map((piece, i) => 
-        i === index ? { ...piece, [field]: value } : piece
-      )
-    }))
-  }
-
-  const addPiece = () => {
-    setLogisticsData(prev => ({
-      ...prev,
-      pieces: [...prev.pieces, { description: '', quantity: 1, length: '', width: '', height: '', weight: '' }]
-    }))
-  }
-
-  const removePiece = (index: number) => {
-    if (logisticsData.pieces.length > 1) {
-      setLogisticsData(prev => ({
-        ...prev,
-        pieces: prev.pieces.filter((_, i) => i !== index)
-      }))
-      setSelectedPieces(prev =>
-        prev
-          .filter(i => i !== index)
-          .map(i => (i > index ? i - 1 : i))
-      )
-    }
-  }
-
-  const togglePieceSelection = (index: number) => {
-    setSelectedPieces(prev =>
-      prev.includes(index) ? prev.filter(i => i !== index) : [...prev, index]
-    )
-  }
-
-  const deleteSelectedPieces = () => {
-    if (selectedPieces.length === 0) return
-    setLogisticsData(prev => ({
-      ...prev,
-      pieces: prev.pieces.filter((_, i) => !selectedPieces.includes(i))
-    }))
-    setSelectedPieces([])
-  }
-
-  const handleEquipmentRequirementsChange = (data: EquipmentRequirements) => {
-    setEquipmentData(prev => ({ ...prev, equipmentRequirements: data }))
-  }
 
   const handleAIExtraction = (extractedEquipmentData: any, extractedLogisticsData: any) => {
     if (extractedEquipmentData) {
@@ -177,7 +98,8 @@ const App: React.FC = () => {
   ) => {
     setEquipmentData({
       ...loadedEquipmentData,
-      equipmentRequirements: loadedEquipmentRequirements || initialEquipmentRequirements
+      equipmentRequirements:
+        loadedEquipmentRequirements || initialEquipmentData.equipmentRequirements
     })
     setLogisticsData({
       truckType: '',
@@ -245,7 +167,7 @@ const App: React.FC = () => {
           </button>
 
           <button
-            onClick={() => setShowApiKeySetup(true)}
+            onClick={openApiKeySetup}
             className="flex items-center px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors border border-accent"
           >
             <Key className="w-4 h-4 mr-2" />
@@ -253,7 +175,7 @@ const App: React.FC = () => {
           </button>
 
           <button
-            onClick={() => setShowAIExtractor(true)}
+            onClick={openAIExtractor}
             disabled={!hasApiKey}
             className="flex items-center px-4 py-2 bg-accent text-black rounded-lg hover:bg-green-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
@@ -262,7 +184,7 @@ const App: React.FC = () => {
           </button>
 
           <button
-            onClick={() => setShowHistory(true)}
+            onClick={openHistory}
             className="flex items-center px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors border border-accent"
           >
             <Archive className="w-4 h-4 mr-2" />
@@ -272,268 +194,24 @@ const App: React.FC = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Equipment Quote Form */}
-          <div className="bg-gray-900 rounded-lg border-2 border-accent p-6">
-            <div className="flex items-center mb-6">
-              <FileText className="w-6 h-6 text-white mr-2" />
-              <h2 className="text-2xl font-bold text-white">Equipment Quote</h2>
-            </div>
-
-            <ProjectDetails
-              data={equipmentData}
-              onChange={handleEquipmentChange}
-              onSelectContact={handleSelectHubSpotContact}
-            />
-
-            <EquipmentRequired
-              data={equipmentData.equipmentRequirements}
-              onChange={handleEquipmentRequirementsChange}
-            />
-          </div>
+          <EquipmentForm
+            data={equipmentData}
+            onFieldChange={handleEquipmentChange}
+            onRequirementsChange={handleEquipmentRequirementsChange}
+            onSelectContact={handleSelectHubSpotContact}
+          />
 
           {/* Logistics Quote Form */}
-          <div className="bg-gray-900 rounded-lg border-2 border-accent p-6">
-            <div className="flex items-center mb-6">
-              <Truck className="w-6 h-6 text-white mr-2" />
-              <h2 className="text-2xl font-bold text-white">Logistics Quote</h2>
-            </div>
-
-            <div className="space-y-6">
-              {/* Items to Transport */}
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <label className="block text-sm font-medium text-white">
-                    <Package className="w-4 h-4 inline mr-1" />
-                    Items to Transport
-                  </label>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={deleteSelectedPieces}
-                      disabled={selectedPieces.length === 0}
-                      className="flex items-center px-3 py-1 bg-red-600 text-white rounded-lg hover:bg-red-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <Trash2 className="w-4 h-4 mr-1" />
-                      Delete Selected
-                    </button>
-                    <button
-                      onClick={addPiece}
-                      className="flex items-center px-3 py-1 bg-accent text-black rounded-lg hover:bg-green-400 transition-colors"
-                    >
-                      <Plus className="w-4 h-4 mr-1" />
-                      Add Item
-                    </button>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  {logisticsData.pieces.map((piece, index) => (
-                    <div key={index} className="grid grid-cols-12 gap-2 items-end">
-                      <div className="col-span-1 flex justify-center">
-                        <input
-                          type="checkbox"
-                          checked={selectedPieces.includes(index)}
-                          onChange={() => togglePieceSelection(index)}
-                          className="form-checkbox h-4 w-4 text-accent"
-                        />
-                      </div>
-                      <div className="col-span-4">
-                        <input
-                          type="text"
-                          value={piece.description}
-                          onChange={(e) => handlePieceChange(index, 'description', e.target.value)}
-                          className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white text-sm"
-                          placeholder="Description"
-                        />
-                      </div>
-                      <div className="col-span-1">
-                        <input
-                          type="number"
-                          value={piece.quantity}
-                          onChange={(e) => handlePieceChange(index, 'quantity', parseInt(e.target.value) || 1)}
-                         className="w-16 px-2 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white text-sm text-center"
-                          placeholder="Qty"
-                          min="1"
-                          max="99"
-                        />
-                      </div>
-                      <div className="col-span-1">
-                        <input
-                          type="text"
-                          value={piece.length}
-                          onChange={(e) => handlePieceChange(index, 'length', e.target.value)}
-                          className="w-full px-2 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white text-sm"
-                          placeholder="L"
-                        />
-                      </div>
-                      <div className="col-span-1">
-                        <input
-                          type="text"
-                          value={piece.width}
-                          onChange={(e) => handlePieceChange(index, 'width', e.target.value)}
-                          className="w-full px-2 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white text-sm"
-                          placeholder="W"
-                        />
-                      </div>
-                      <div className="col-span-1">
-                        <input
-                          type="text"
-                          value={piece.height}
-                          onChange={(e) => handlePieceChange(index, 'height', e.target.value)}
-                          className="w-full px-2 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white text-sm"
-                          placeholder="H"
-                        />
-                      </div>
-                      <div className="col-span-2">
-                        <input
-                          type="text"
-                          value={piece.weight}
-                          onChange={(e) => handlePieceChange(index, 'weight', e.target.value)}
-                          className="w-full px-2 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white text-sm"
-                          placeholder="Weight (lbs)"
-                        />
-                      </div>
-                      <div className="col-span-1">
-                        {logisticsData.pieces.length > 1 && (
-                          <button
-                            onClick={() => removePiece(index)}
-                            className="w-full p-2 bg-red-600 text-white rounded-lg hover:bg-red-500 transition-colors"
-                          >
-                            <Minus className="w-4 h-4" />
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Pickup Location */}
-              <div>
-                <label className="block text-sm font-medium text-white mb-2">Pickup Location</label>
-                <div className="space-y-3">
-                  <input
-                    type="text"
-                    value={logisticsData.pickupAddress}
-                    onChange={(e) => handleLogisticsChange('pickupAddress', e.target.value)}
-                    className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                    placeholder="Pickup address"
-                  />
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <input
-                      type="text"
-                      value={logisticsData.pickupCity}
-                      onChange={(e) => handleLogisticsChange('pickupCity', e.target.value)}
-                      className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                      placeholder="City"
-                    />
-                    <input
-                      type="text"
-                      value={logisticsData.pickupState}
-                      onChange={(e) => handleLogisticsChange('pickupState', e.target.value)}
-                      className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                      placeholder="State"
-                    />
-                    <input
-                      type="text"
-                      value={logisticsData.pickupZip}
-                      onChange={(e) => handleLogisticsChange('pickupZip', e.target.value)}
-                      className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                      placeholder="Zip"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Delivery Location */}
-              <div>
-                <label className="block text-sm font-medium text-white mb-2">Delivery Location</label>
-                <div className="space-y-3">
-                  <input
-                    type="text"
-                    value={logisticsData.deliveryAddress}
-                    onChange={(e) => handleLogisticsChange('deliveryAddress', e.target.value)}
-                    className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                    placeholder="Delivery address"
-                  />
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <input
-                      type="text"
-                      value={logisticsData.deliveryCity}
-                      onChange={(e) => handleLogisticsChange('deliveryCity', e.target.value)}
-                      className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                      placeholder="City"
-                    />
-                    <input
-                      type="text"
-                      value={logisticsData.deliveryState}
-                      onChange={(e) => handleLogisticsChange('deliveryState', e.target.value)}
-                      className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                      placeholder="State"
-                    />
-                    <input
-                      type="text"
-                      value={logisticsData.deliveryZip}
-                      onChange={(e) => handleLogisticsChange('deliveryZip', e.target.value)}
-                      className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                      placeholder="Zip"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Shipment Type */}
-              <div>
-                <label className="block text-sm font-medium text-white mb-2">Shipment Type</label>
-                <select
-                  value={logisticsData.shipmentType}
-                  onChange={(e) => handleLogisticsChange('shipmentType', e.target.value)}
-                  className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                >
-                  <option value="LTL">LTL</option>
-                  <option value="FTL">FTL</option>
-                </select>
-              </div>
-
-              {/* Truck Type Requested */}
-              <div>
-                <label className="block text-sm font-medium text-white mb-2">Truck Type Requested</label>
-                <select
-                  value={logisticsData.truckType}
-                  onChange={(e) => handleLogisticsChange('truckType', e.target.value)}
-                  className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                >
-                  <option value="">Select truck type</option>
-                  <option value="Flatbed">Flatbed</option>
-                  <option value="Flatbed with tarp">Flatbed with tarp</option>
-                  <option value="Conestoga">Conestoga</option>
-                </select>
-              </div>
-
-              {/* Storage Requirements */}
-              <div>
-                <label className="block text-sm font-medium text-white mb-2">Storage</label>
-                <select
-                  value={logisticsData.storageType}
-                  onChange={(e) => handleLogisticsChange('storageType', e.target.value)}
-                  className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                >
-                  <option value="">No Storage</option>
-                  <option value="inside">Inside Storage ($1.50/sq ft)</option>
-                  <option value="outside">Outside Storage ($0.75/sq ft)</option>
-                </select>
-                {logisticsData.storageType && (
-                  <input
-                    type="number"
-                    value={logisticsData.storageSqFt}
-                    onChange={(e) => handleLogisticsChange('storageSqFt', e.target.value)}
-                    className="mt-2 w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                    placeholder="Square footage"
-                    min="0"
-                  />
-                )}
-              </div>
-
-            </div>
-          </div>
+          <LogisticsForm
+            data={logisticsData}
+            selectedPieces={selectedPieces}
+            onFieldChange={handleLogisticsChange}
+            onPieceChange={handlePieceChange}
+            addPiece={addPiece}
+            removePiece={removePiece}
+            togglePieceSelection={togglePieceSelection}
+            deleteSelectedPieces={deleteSelectedPieces}
+          />
         </div>
 
         {/* Templates */}
@@ -631,7 +309,7 @@ const App: React.FC = () => {
         {/* Modals */}
         <AIExtractorModal
           isOpen={showAIExtractor}
-          onClose={() => setShowAIExtractor(false)}
+          onClose={closeAIExtractor}
           onExtract={handleAIExtraction}
           sessionId={sessionId}
         />
@@ -641,7 +319,7 @@ const App: React.FC = () => {
           equipmentRequirements={equipmentData.equipmentRequirements}
           logisticsData={logisticsData}
           isOpen={showHistory}
-          onClose={() => setShowHistory(false)}
+          onClose={closeHistory}
           onLoadQuote={handleLoadQuote}
         />
 
@@ -651,7 +329,7 @@ const App: React.FC = () => {
               <div className="flex items-center justify-between p-6 border-b-2 border-accent">
                 <h3 className="text-xl font-bold text-white">API Key Setup</h3>
                 <button
-                  onClick={() => setShowApiKeySetup(false)}
+                  onClick={closeApiKeySetup}
                   className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
                 >
                   <X className="w-5 h-5 text-white" />
