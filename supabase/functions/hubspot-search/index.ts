@@ -184,18 +184,28 @@ Deno.serve(async (req) => {
           const assocData = await assocRes.json() as { results?: Array<{ toObjectId?: string }> }
           const first = assocData.results?.[0]?.toObjectId
           if (first) {
-            const companyRes = await fetch(`https://api.hubapi.com/crm/v3/objects/companies/${first}?properties=name,address,address2,city,state,zip`, {
-              headers: { Authorization: `Bearer ${token}` },
-            })
+            const companyRes = await fetch(
+              `https://api.hubapi.com/crm/v3/objects/companies/${first}?properties=name,address,address2,city,state,zip`,
+              {
+                headers: { Authorization: `Bearer ${token}` },
+              }
+            )
             if (companyRes.ok) {
-              const companyData = await companyRes.json() as { properties?: Record<string, string> }
+              const companyData = (await companyRes.json()) as {
+                properties?: Record<string, string>
+              }
               const cp = companyData.properties || {}
               companyName = cp.name || ''
               companyAddress1 = cp.address || ''
               companyCity = cp.city || ''
               companyState = cp.state || ''
               companyZip = cp.zip || ''
-              companyAddress = composeFullAddress(companyAddress1, companyCity, companyState, companyZip)
+              companyAddress = composeFullAddress(
+                companyAddress1,
+                companyCity,
+                companyState,
+                companyZip
+              )
             }
           }
         }
