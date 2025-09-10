@@ -90,7 +90,8 @@ export const generateScopeTemplate = (
           .join('\n')}\n`
       : ''
 
-  return `Mobilize crew and Omega Morgan equipment to site: ${siteAddress}
+  return `Mobilize crew and Omega Morgan equipment to site:
+${siteAddress}
 
 ${contactName}
 ${phone}
