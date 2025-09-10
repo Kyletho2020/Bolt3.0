@@ -1,5 +1,16 @@
 import React, { useState } from 'react'
-import { FileText, Building, User, Phone, MapPin, ClipboardList, X, Save } from 'lucide-react'
+import {
+  FileText,
+  Building,
+  User,
+  Phone,
+  MapPin,
+  ClipboardList,
+  X,
+  Save,
+  Copy,
+  CheckCircle
+} from 'lucide-react'
 import HubSpotContactSearch from './HubSpotContactSearch'
 import { HubSpotContact, HubSpotService } from '../services/hubspotService'
 import { UseFormRegister, FieldErrors } from 'react-hook-form'
@@ -28,6 +39,7 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ data, onChange, onSelec
   const [pendingUpdates, setPendingUpdates] = useState<Record<string, unknown>>({})
   const [updateMessage, setUpdateMessage] = useState<string | null>(null)
   const [updateError, setUpdateError] = useState<string | null>(null)
+  const [projectNameCopied, setProjectNameCopied] = useState(false)
   const handleFieldChange = (field: keyof ProjectDetailsData, value: string) => {
     onChange(field, value)
     if (selectedContactId) {
@@ -67,6 +79,16 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ data, onChange, onSelec
     setSelectedContactId(contact.id)
     setPendingUpdates({})
     onSelectContact(contact)
+  }
+
+  const handleCopyProjectName = async () => {
+    try {
+      await navigator.clipboard.writeText(data.projectName)
+      setProjectNameCopied(true)
+      setTimeout(() => setProjectNameCopied(false), 2000)
+    } catch (err) {
+      console.error('Failed to copy project name', err)
+    }
   }
 
   const clearSection = () => {
@@ -117,16 +139,31 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ data, onChange, onSelec
             const field = register('projectName')
             return (
               <>
-                <input
-                  type="text"
-                  value={data.projectName}
-                  onChange={(e) => {
-                    field.onChange(e)
-                    handleFieldChange('projectName', e.target.value)
-                  }}
-                  className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                  placeholder="Enter project name"
-                />
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={data.projectName}
+                    onChange={(e) => {
+                      field.onChange(e)
+                      handleFieldChange('projectName', e.target.value)
+                    }}
+                    className="flex-1 px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
+                    placeholder="Enter project name"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleCopyProjectName}
+                    disabled={!data.projectName}
+                    aria-label="Copy project name"
+                    className="p-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors border border-accent disabled:opacity-50"
+                  >
+                    {projectNameCopied ? (
+                      <CheckCircle className="w-4 h-4" />
+                    ) : (
+                      <Copy className="w-4 h-4" />
+                    )}
+                  </button>
+                </div>
                 {errors.projectName && (
                   <p className="text-red-500 text-xs mt-1">{String(errors.projectName.message)}</p>
                 )}
