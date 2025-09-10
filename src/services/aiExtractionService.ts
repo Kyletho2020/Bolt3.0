@@ -63,10 +63,15 @@ export class AIExtractionService {
       }
 
       const result: ExtractionResult = await response.json()
+      console.log('AI extraction raw result:', result)
 
       if (!result.success) {
         throw new Error(result.error || 'Extraction failed')
       }
+
+      // Log the extracted data for debugging
+      console.log('Extracted equipment data:', result.equipmentData)
+      console.log('Extracted logistics data:', result.logisticsData)
 
       return {
         success: true,

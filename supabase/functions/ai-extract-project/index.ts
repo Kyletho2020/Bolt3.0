@@ -34,13 +34,11 @@ Return a JSON object with two main sections: "equipment" and "logistics". Struct
     "contactName": "string",
     "email": "string",
     "phone": "string",
-    "projectAddress": "string",
-    "city": "string",
-    "state": "string",
-    "zipCode": "string"
+    "projectAddress": "string (full address)",
+    "scopeOfWork": "string (description of work to be done)"
   },
   "logistics": {
-    "pieces": [{"description": "string", "quantity": "number", "length": "number", "width": "number", "height": "number", "weight": "number"}],
+    "pieces": [{"description": "string", "quantity": number, "length": number, "width": number, "height": number, "weight": number}],
     "pickupAddress": "string",
     "pickupCity": "string", 
     "pickupState": "string",
@@ -53,7 +51,6 @@ Return a JSON object with two main sections: "equipment" and "logistics". Struct
   }
 }
 
-Only include fields that you can extract from the text. If no relevant information is found for a section, omit that section entirely.`
 
 Deno.serve(async (req) => {
   // Handle CORS preflight

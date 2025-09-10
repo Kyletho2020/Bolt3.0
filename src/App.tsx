@@ -119,13 +119,52 @@ const App: React.FC = () => {
     extractedEquipmentData: Partial<EquipmentData>,
     extractedLogisticsData: Partial<LogisticsData>
   ) => {
+    console.log('handleAIExtraction called with:', { extractedEquipmentData, extractedLogisticsData })
+    
     if (extractedEquipmentData) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { projectDescription, ...rest } = extractedEquipmentData
-      setEquipmentData(prev => ({ ...prev, ...rest }))
+      const mappedEquipmentData = {
+        projectName: extractedEquipmentData.projectName || '',
+        companyName: extractedEquipmentData.companyName || '',
+        contactName: extractedEquipmentData.contactName || '',
+        siteAddress: extractedEquipmentData.projectAddress || extractedEquipmentData.siteAddress || '',
+        sitePhone: extractedEquipmentData.phone || extractedEquipmentData.sitePhone || '',
+        email: extractedEquipmentData.email || '',
+        scopeOfWork: extractedEquipmentData.scopeOfWork || ''
+      }
+      console.log('Updating equipment data with:', mappedEquipmentData)
+      setEquipmentData(prev => ({ ...prev, ...mappedEquipmentData }))
     }
+    
     if (extractedLogisticsData) {
-      setLogisticsData(prev => ({ ...prev, ...extractedLogisticsData }))
+      const mappedLogisticsData: Partial<LogisticsData> = {}
+      
+      // Map pieces data
+      if (extractedLogisticsData.pieces && Array.isArray(extractedLogisticsData.pieces)) {
+        mappedLogisticsData.pieces = extractedLogisticsData.pieces.map(piece => ({
+          description: piece.description || '',
+          quantity: piece.quantity || 1,
+          length: piece.length?.toString() || '',
+          width: piece.width?.toString() || '',
+          height: piece.height?.toString() || '',
+          weight: piece.weight?.toString() || ''
+        }))
+      }
+      
+      // Map address data
+      if (extractedLogisticsData.pickupAddress) mappedLogisticsData.pickupAddress = extractedLogisticsData.pickupAddress
+      if (extractedLogisticsData.pickupCity) mappedLogisticsData.pickupCity = extractedLogisticsData.pickupCity
+      if (extractedLogisticsData.pickupState) mappedLogisticsData.pickupState = extractedLogisticsData.pickupState
+      if (extractedLogisticsData.pickupZip) mappedLogisticsData.pickupZip = extractedLogisticsData.pickupZip
+      if (extractedLogisticsData.deliveryAddress) mappedLogisticsData.deliveryAddress = extractedLogisticsData.deliveryAddress
+      if (extractedLogisticsData.deliveryCity) mappedLogisticsData.deliveryCity = extractedLogisticsData.deliveryCity
+      if (extractedLogisticsData.deliveryState) mappedLogisticsData.deliveryState = extractedLogisticsData.deliveryState
+      if (extractedLogisticsData.deliveryZip) mappedLogisticsData.deliveryZip = extractedLogisticsData.deliveryZip
+      if (extractedLogisticsData.truckType) mappedLogisticsData.truckType = extractedLogisticsData.truckType
+      
+      console.log('Updating logistics data with:', mappedLogisticsData)
+      setLogisticsData(prev => ({ ...prev, ...mappedLogisticsData }))
     }
   }
 
