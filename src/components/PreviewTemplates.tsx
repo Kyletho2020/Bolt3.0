@@ -100,7 +100,7 @@ Omega Morgan to supply ${equipmentSummary || 'necessary crew and equipment'}.
 ${logisticsSection}${scopeOfWork ? `${scopeOfWork}\n\n` : ''}${itemsSection}When job is complete clean up debris and return to ${shopLocation}.`
 }
 
-export const generateLogisticsTemplate = (
+export const generateLogisticsEmail = (
   equipmentData: any,
   logisticsData: any
 ) => {
@@ -141,34 +141,19 @@ export const generateLogisticsTemplate = (
   const contactName = equipmentData.contactName || ''
   const companyName = equipmentData.companyName || ''
 
-  return `To: Logistics@omegamorgan.com; MachineryLogistics@omegamorgan.com
+  const subject = `Quote for Truck Request for ${shipmentType} - ${pickupZip} - ${deliveryZip}`
 
-Subject: Quote for Truck Request for ${shipmentType} - ${pickupZip} - ${deliveryZip}
+  const body = `Hello Team,\n\nI'm reaching out to request a logistics quote for an upcoming project. Please see the load and transport details below:\n\nNumber of Pieces: ${totalPieces}\n\n${itemsSection}\n\nTotal Load Weight: ${totalWeight}\n\nPick-Up Location: ${pickupLocation}\n\nDelivery/Set Location: ${deliveryLocation}\n\nTruck Type Requested: ${truckType}\n\nShipment Type: ${shipmentType}\n\nPlease let me know if you need any additional information or documents to complete the quote.\n\nLooking forward to your response.\n\nThanks,\n${contactName}${companyName ? `\n${companyName}` : ''}`
 
-Hello Team,
+  return { subject, body }
+}
 
-I'm reaching out to request a logistics quote for an upcoming project. Please see the load and transport details below:
-
-Number of Pieces: ${totalPieces}
-
-${itemsSection}
-
-Total Load Weight: ${totalWeight}
-
-Pick-Up Location: ${pickupLocation}
-
-Delivery/Set Location: ${deliveryLocation}
-
-Truck Type Requested: ${truckType}
-
-Shipment Type: ${shipmentType}
-
-Please let me know if you need any additional information or documents to complete the quote.
-
-Looking forward to your response.
-
-Thanks,
-${contactName}${companyName ? `\n${companyName}` : ''}`
+export const generateLogisticsTemplate = (
+  equipmentData: any,
+  logisticsData: any
+) => {
+  const { subject, body } = generateLogisticsEmail(equipmentData, logisticsData)
+  return `To: Logistics@omegamorgan.com; MachineryLogistics@omegamorgan.com\n\nSubject: ${subject}\n\n${body}`
 }
 
 interface PreviewTemplatesProps {
