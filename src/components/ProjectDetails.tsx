@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { FileText, Building, User, Phone, MapPin, ClipboardList, X } from 'lucide-react'
+import { FileText, Building, User, Phone, MapPin, ClipboardList, X, Save } from 'lucide-react'
 import HubSpotContactSearch from './HubSpotContactSearch'
 import { HubSpotContact, HubSpotService } from '../services/hubspotService'
 import { UseFormRegister, FieldErrors } from 'react-hook-form'
@@ -25,40 +25,47 @@ interface ProjectDetailsProps {
 
 const ProjectDetails: React.FC<ProjectDetailsProps> = ({ data, onChange, onSelectContact, register, errors }) => {
   const [selectedContactId, setSelectedContactId] = useState<string | null>(null)
+  const [pendingUpdates, setPendingUpdates] = useState<Record<string, unknown>>({})
   const [updateMessage, setUpdateMessage] = useState<string | null>(null)
   const [updateError, setUpdateError] = useState<string | null>(null)
-
-  const handleFieldChange = async (field: keyof ProjectDetailsData, value: string) => {
+  const handleFieldChange = (field: keyof ProjectDetailsData, value: string) => {
     onChange(field, value)
     if (selectedContactId) {
-      const payload: Partial<HubSpotContact> = {}
-      if (field === 'contactName') {
-        const [firstName, ...rest] = value.split(' ')
-        payload.firstName = firstName
-        payload.lastName = rest.join(' ')
-      } else if (field === 'sitePhone') {
-        payload.phone = value
-      } else if (field === 'email') {
-        payload.email = value
-      } else if (field === 'siteAddress') {
-        ;(payload as Record<string, unknown>).address = value
-      }
-
-      if (Object.keys(payload).length > 0) {
-        try {
-          await HubSpotService.updateContact(selectedContactId, payload)
-          setUpdateMessage('Contact updated')
-          setUpdateError(null)
-        } catch (err) {
-          setUpdateError(err instanceof Error ? err.message : 'Update failed')
-          setUpdateMessage(null)
+      setPendingUpdates(prev => {
+        const payload = { ...prev }
+        if (field === 'contactName') {
+          const [firstName, ...rest] = value.split(' ')
+          payload.firstName = firstName
+          payload.lastName = rest.join(' ')
+        } else if (field === 'sitePhone') {
+          payload.phone = value
+        } else if (field === 'email') {
+          payload.email = value
+        } else if (field === 'siteAddress') {
+          payload.address = value
         }
+        return payload
+      })
+    }
+  }
+
+  const handleSaveContact = async () => {
+    if (selectedContactId && Object.keys(pendingUpdates).length > 0) {
+      try {
+        await HubSpotService.updateContact(selectedContactId, pendingUpdates as Partial<HubSpotContact>)
+        setUpdateMessage('Contact updated')
+        setUpdateError(null)
+        setPendingUpdates({})
+      } catch (err) {
+        setUpdateError(err instanceof Error ? err.message : 'Update failed')
+        setUpdateMessage(null)
       }
     }
   }
 
   const handleSelectContact = (contact: HubSpotContact) => {
     setSelectedContactId(contact.id)
+    setPendingUpdates({})
     onSelectContact(contact)
   }
 
@@ -84,6 +91,18 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ data, onChange, onSelec
       </div>
 
       <HubSpotContactSearch onSelectContact={handleSelectContact} />
+
+      {selectedContactId && (
+        <button
+          type="button"
+          onClick={handleSaveContact}
+          disabled={Object.keys(pendingUpdates).length === 0}
+          className="flex items-center px-3 py-1 bg-accent text-black rounded-lg hover:bg-green-400 disabled:opacity-50 transition-colors mb-2"
+        >
+          <Save className="w-4 h-4 mr-1" />
+          Save to HubSpot
+        </button>
+      )}
 
       {updateMessage && <p className="text-sm text-green-400">{updateMessage}</p>}
       {updateError && <p className="text-sm text-red-400">{updateError}</p>}
