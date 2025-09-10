@@ -10,9 +10,9 @@ export const useApiKey = () => {
       setLoading(true)
       setError(null)
       
-      // Check if OPENAI_API_KEY is configured in environment
-      // Since this is client-side, we'll assume it's available if the env var exists
+      // Check if VITE_OPENAI_API_KEY is configured in environment
       const hasKey = !!import.meta.env.VITE_OPENAI_API_KEY
+      console.log('API Key check:', { hasKey, envVar: import.meta.env.VITE_OPENAI_API_KEY ? 'present' : 'missing' })
       setHasApiKey(hasKey)
     } catch (err) {
       console.error('Error checking API key:', err)

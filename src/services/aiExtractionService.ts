@@ -24,10 +24,12 @@ export class AIExtractionService {
         throw new Error('Session ID is required')
       }
 
-      // Check if API key is configured in environment
-      if (!import.meta.env.VITE_OPENAI_API_KEY) {
-        throw new Error('OpenAI API key not configured. Please set VITE_OPENAI_API_KEY environment variable.')
-      }
+      console.log('Calling AI extraction service...', { 
+        supabaseUrl: this.SUPABASE_URL,
+        hasAnonKey: !!this.SUPABASE_ANON_KEY,
+        sessionId,
+        textLength: text.length
+      })
 
       // Call the edge function
       const response = await fetch(`${this.SUPABASE_URL}/functions/v1/ai-extract-project`, {
@@ -42,8 +44,21 @@ export class AIExtractionService {
         }),
       })
 
+      console.log('Edge function response:', { 
+        ok: response.ok, 
+        status: response.status, 
+        statusText: response.statusText 
+      })
+
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: 'Network error' }))
+        const errorText = await response.text().catch(() => 'Network error')
+        console.error('Edge function error:', errorText)
+        let errorData
+        try {
+          errorData = JSON.parse(errorText)
+        } catch {
+          errorData = { error: errorText }
+        }
         throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`)
       }
 

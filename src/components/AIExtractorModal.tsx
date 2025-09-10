@@ -57,9 +57,12 @@ const AIExtractorModal: React.FC<AIExtractorModalProps> = ({ isOpen, onClose, on
     setInput('')
     setLoading(true)
     addMessage('user', userInput)
+    
+    console.log('Starting AI extraction...', { sessionId, inputLength: userInput.length })
 
     try {
       const result = await AIExtractionService.extractProjectInfo(userInput, sessionId)
+      console.log('AI extraction result:', result)
 
       if (result.success) {
         const { equipmentData, logisticsData } = result
