@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { supabase } from '../lib/supabase'
 
 export const useApiKey = () => {
   const [hasApiKey, setHasApiKey] = useState(false)
@@ -11,17 +10,10 @@ export const useApiKey = () => {
       setLoading(true)
       setError(null)
       
-      const { data, error: fetchError } = await supabase
-        .from('api_key_storage')
-        .select('encrypted_key')
-        .eq('id', 'c9f1ba25-04c8-4e36-b942-ff20dfa3d8b3')
-        .single()
-
-      if (fetchError && fetchError.code !== 'PGRST116') {
-        throw fetchError
-      }
-
-      setHasApiKey(!!data?.encrypted_key)
+      // Check if OPENAI_API_KEY is configured in environment
+      // Since this is client-side, we'll assume it's available if the env var exists
+      const hasKey = !!import.meta.env.VITE_OPENAI_API_KEY
+      setHasApiKey(hasKey)
     } catch (err) {
       console.error('Error checking API key:', err)
       setError(err instanceof Error ? err.message : 'Failed to check API key')

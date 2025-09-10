@@ -230,7 +230,7 @@ const App: React.FC = () => {
 
           <button
             onClick={openAIExtractor}
-            disabled={!hasApiKey}
+            disabled={!import.meta.env.VITE_OPENAI_API_KEY}
             className="flex items-center px-4 py-2 bg-accent text-black rounded-lg hover:bg-green-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <Bot className="w-4 h-4 mr-2" />

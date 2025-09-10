@@ -24,10 +24,9 @@ export class AIExtractionService {
         throw new Error('Session ID is required')
       }
 
-      // Check if API key exists
-      const hasKey = await ApiKeyService.hasApiKey()
-      if (!hasKey) {
-        throw new Error('OpenAI API key not configured. Please set up your API key first.')
+      // Check if API key is configured in environment
+      if (!import.meta.env.VITE_OPENAI_API_KEY) {
+        throw new Error('OpenAI API key not configured. Please set VITE_OPENAI_API_KEY environment variable.')
       }
 
       // Call the edge function
