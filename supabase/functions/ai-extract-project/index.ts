@@ -49,7 +49,7 @@ Return a JSON object with two main sections: "equipment" and "logistics". Struct
     "deliveryZip": "string",
     "truckType": "string (Flatbed, Flatbed with tarp, Conestoga)"
   }
-}
+}`
 
 
 Deno.serve(async (req) => {
@@ -108,7 +108,7 @@ Deno.serve(async (req) => {
     const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
+        'Authorization': \`Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(openaiRequest),
@@ -117,7 +117,7 @@ Deno.serve(async (req) => {
     if (!openaiResponse.ok) {
       const errorText = await openaiResponse.text()
       console.error('OpenAI API error:', openaiResponse.status, errorText)
-      throw new Error(\`OpenAI API error: ${openaiResponse.status} - ${errorText}`)
+      throw new Error(`OpenAI API error: ${openaiResponse.status} - ${errorText}`)
     }
 
     const openaiData = await openaiResponse.json()
@@ -166,7 +166,7 @@ Deno.serve(async (req) => {
 
       if (updateError) {
         console.error('Update error:', updateError)
-        throw new Error(\`Failed to update temp data: ${updateError.message}`)
+        throw new Error(`Failed to update temp data: ${updateError.message}`)
       }
       console.log('Updated existing temp data')
     } else {
@@ -181,7 +181,7 @@ Deno.serve(async (req) => {
 
       if (insertError) {
         console.error('Insert error:', insertError)
-        throw new Error(\`Failed to store temp data: ${insertError.message}`)
+        throw new Error(`Failed to store temp data: ${insertError.message}`)
       }
       console.log('Created new temp data record')
     }
