@@ -230,11 +230,15 @@ const App: React.FC = () => {
 
           <button
             onClick={openAIExtractor}
-            disabled={!import.meta.env.VITE_OPENAI_API_KEY}
-            className="flex items-center px-4 py-2 bg-accent text-black rounded-lg hover:bg-green-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            disabled={!hasApiKey}
+            className={`flex items-center px-4 py-2 rounded-lg transition-colors ${
+              hasApiKey
+                ? 'bg-accent text-black hover:bg-green-400'
+                : 'bg-gray-600 text-gray-300 cursor-not-allowed'
+            }`}
           >
             <Bot className="w-4 h-4 mr-2" />
-            AI Extractor
+            AI Extractor {hasApiKey ? '✓' : '✗'}
           </button>
         </div>
 
