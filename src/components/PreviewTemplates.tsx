@@ -97,7 +97,7 @@ ${contactName}
 ${phone}
 
 Omega Morgan to supply ${equipmentSummary || 'necessary crew and equipment'}.
-${logisticsSection}${scopeOfWork ? `${scopeOfWork}\n\n` : ''}${itemsSection}When job is complete clean up debris and return to ${shopLocation}.`
+${logisticsSection}${scopeOfWork ? `${scopeOfWork}\n\n` : ''}${itemsSection}\nWhen job is complete clean up debris and return to ${shopLocation}.`
 }
 
 export const generateLogisticsEmail = (
