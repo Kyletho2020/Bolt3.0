@@ -156,7 +156,7 @@ export const generateLogisticsTemplate = (
   logisticsData: any
 ) => {
   const { subject, body } = generateLogisticsEmail(equipmentData, logisticsData)
-  return `To: Logistics@omegamorgan.com; MachineryLogistics@omegamorgan.com\n\nSubject: ${subject}\n\n${body}`
+  return `To: Logistics@omegamorgan.com; MachineryLogistics@omegamorgan.com\n\n${subject}\n\n${body}`
 }
 
 interface PreviewTemplatesProps {
