@@ -217,7 +217,7 @@ const App: React.FC = () => {
 
   const { subject: logisticsSubject, body: logisticsBody } =
     generateLogisticsEmail(equipmentData, logisticsData)
-  const logisticsTemplate = `Subject: ${logisticsSubject}\n\n${logisticsBody}`
+  const logisticsTemplate = `${logisticsSubject}\n\n${logisticsBody}`
 
   const copyToClipboard = async (
     text: string,
