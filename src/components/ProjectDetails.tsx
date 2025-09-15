@@ -14,6 +14,7 @@ import {
 import HubSpotContactSearch from './HubSpotContactSearch'
 import { HubSpotContact, HubSpotService } from '../services/hubspotService'
 import { UseFormRegister, FieldErrors } from 'react-hook-form'
+import { toTitleCase } from '../lib/titleCase'
 
 export interface ProjectDetailsData {
   projectName: string
@@ -40,7 +41,8 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ data, onChange, onSelec
   const [updateMessage, setUpdateMessage] = useState<string | null>(null)
   const [updateError, setUpdateError] = useState<string | null>(null)
   const [projectNameCopied, setProjectNameCopied] = useState(false)
-  const handleFieldChange = (field: keyof ProjectDetailsData, value: string) => {
+  const handleFieldChange = (field: keyof ProjectDetailsData, rawValue: string) => {
+    const value = field === 'projectName' ? toTitleCase(rawValue) : rawValue
     onChange(field, value)
     if (selectedContactId) {
       setPendingUpdates(prev => {
@@ -144,8 +146,10 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ data, onChange, onSelec
                     type="text"
                     value={data.projectName}
                     onChange={(e) => {
+                      const formattedValue = toTitleCase(e.target.value)
+                      e.target.value = formattedValue
                       field.onChange(e)
-                      handleFieldChange('projectName', e.target.value)
+                      handleFieldChange('projectName', formattedValue)
                     }}
                     className="flex-1 px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
                     placeholder="Enter project name"
