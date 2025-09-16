@@ -33,6 +33,7 @@ import { EquipmentData, LogisticsData } from './types'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { equipmentSchema, logisticsSchema } from './lib/validation'
+import { parseAddressParts } from './lib/address'
 import { HubSpotContact } from './services/hubspotService'
 
 const App: React.FC = () => {
@@ -105,6 +106,25 @@ const App: React.FC = () => {
       }))
     }
   }, [equipmentData.siteAddress])
+
+  const copySiteAddressToPickup = () => {
+    const siteAddress = equipmentData.siteAddress?.trim()
+    if (!siteAddress) {
+      return false
+    }
+
+    const { street, city, state, zip } = parseAddressParts(siteAddress)
+
+    setLogisticsData(prev => ({
+      ...prev,
+      pickupAddress: street || siteAddress,
+      pickupCity: city,
+      pickupState: state,
+      pickupZip: zip
+    }))
+
+    return true
+  }
 
   const handleSelectHubSpotContact = (contact: HubSpotContact) => {
     baseHandleSelectHubSpotContact(contact)
@@ -296,6 +316,7 @@ const App: React.FC = () => {
             onFieldChange={handleEquipmentChange}
             onRequirementsChange={handleEquipmentRequirementsChange}
             onSelectContact={handleSelectHubSpotContact}
+            onCopySiteAddress={copySiteAddressToPickup}
             register={equipmentForm.register}
             errors={equipmentForm.formState.errors}
           />
