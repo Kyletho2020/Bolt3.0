@@ -2,6 +2,54 @@
 import React, { useState } from 'react'
 import { FileText, Mail, Copy, CheckCircle, Eye, X, Truck } from 'lucide-react'
 
+const shouldUseFallback = (value: any) =>
+  value === undefined || value === null || value === ''
+
+const sanitizeWeightInput = (value: any) =>
+  typeof value === 'string' ? value.replace(/,/g, '') : value
+
+const getNumericWeight = (value: any) => {
+  const sanitizedValue = sanitizeWeightInput(value)
+  const numericValue =
+    typeof sanitizedValue === 'number'
+      ? sanitizedValue
+      : Number(sanitizedValue)
+
+  if (Number.isNaN(numericValue)) {
+    return null
+  }
+
+  return numericValue
+}
+
+const formatWeight = (value: any, fallback: string) => {
+  if (shouldUseFallback(value)) {
+    return fallback
+  }
+
+  const numericValue = getNumericWeight(value)
+
+  if (numericValue === null) {
+    return typeof value === 'string' ? value : fallback
+  }
+
+  return numericValue.toLocaleString()
+}
+
+const parseWeight = (value: any) => {
+  if (shouldUseFallback(value)) {
+    return 0
+  }
+
+  const numericValue = getNumericWeight(value)
+
+  if (numericValue === null) {
+    return 0
+  }
+
+  return numericValue
+}
+
 export const generateEmailTemplate = (
   equipmentData: any,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -88,7 +136,7 @@ export const generateScopeTemplate = (
                 piece.description || '[Item Description]'
               } - ${piece.length || '[L]'}"L x ${piece.width || '[W]'}"W x ${
                 piece.height || '[H]'
-              }"H, ${piece.weight || '[Weight]'} lbs`
+              }"H, ${formatWeight(piece.weight, '[Weight]')} lbs`
           )
           .join('\n')}\n`
       : ''
@@ -126,15 +174,18 @@ export const generateLogisticsEmail = (
               piece.description || '[Description]'
             } - ${piece.length || '[L]'}"L x ${piece.width || '[W]'}"W x ${
               piece.height || '[H]'
-            }"H, ${piece.weight || '[Weight]'} lbs`
+            }"H, ${formatWeight(piece.weight, '[Weight]')} lbs`
         )
         .join('\n')
     : '[list all items with dimensions and weights]'
   const totalWeight = pieces.length
-    ? `${pieces.reduce(
-        (sum: number, piece: any) =>
-          sum + (piece.weight || 0) * (piece.quantity || 1),
-        0
+    ? `${formatWeight(
+        pieces.reduce(
+          (sum: number, piece: any) =>
+            sum + parseWeight(piece.weight) * (piece.quantity || 1),
+          0
+        ),
+        '[total weight]'
       )} lbs`
     : '[total weight]'
 
