@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
-import { Truck, Package, Plus, Minus, Trash2, Copy, CheckCircle } from 'lucide-react'
-import { UseFormRegister, FieldErrors, UseFormSetValue } from 'react-hook-form'
+import React from 'react'
+import { Truck, Package, Plus, Minus, Trash2 } from 'lucide-react'
+import { UseFormRegister, FieldErrors } from 'react-hook-form'
 
 interface Piece {
   description: string;
@@ -41,9 +41,7 @@ interface LogisticsFormProps {
   togglePieceSelection: (index: number) => void;
   deleteSelectedPieces: () => void;
   register: UseFormRegister<LogisticsData>;
-  setValue: UseFormSetValue<LogisticsData>;
   errors: FieldErrors<LogisticsData>;
-  siteAddress?: string;
 }
 
 const LogisticsForm: React.FC<LogisticsFormProps> = ({
@@ -56,20 +54,8 @@ const LogisticsForm: React.FC<LogisticsFormProps> = ({
   togglePieceSelection,
   deleteSelectedPieces,
   register,
-  setValue,
-  errors,
-  siteAddress = ''
+  errors
 }) => {
-  const [copiedSiteAddress, setCopiedSiteAddress] = useState(false)
-
-  const handleCopySiteAddress = () => {
-    if (!siteAddress) return
-    onFieldChange('pickupAddress', siteAddress)
-    setValue('pickupAddress', siteAddress, { shouldValidate: true, shouldDirty: true })
-    setCopiedSiteAddress(true)
-    setTimeout(() => setCopiedSiteAddress(false), 2000)
-  }
-
   return (
     <div className="bg-gray-900 rounded-lg border-2 border-accent p-6">
       <div className="flex items-center mb-6">
@@ -244,19 +230,6 @@ const LogisticsForm: React.FC<LogisticsFormProps> = ({
                       className="flex-1 px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
                       placeholder="Pickup address"
                     />
-                    <button
-                      type="button"
-                      onClick={handleCopySiteAddress}
-                      disabled={!siteAddress}
-                      aria-label="Copy site address to pickup location"
-                      className="p-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors border border-accent disabled:opacity-50"
-                    >
-                      {copiedSiteAddress ? (
-                        <CheckCircle className="w-4 h-4" />
-                      ) : (
-                        <Copy className="w-4 h-4" />
-                      )}
-                    </button>
                   </div>
                   {errors.pickupAddress && (
                     <p className="text-red-500 text-xs mt-1">{String(errors.pickupAddress.message)}</p>

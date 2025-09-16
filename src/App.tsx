@@ -311,9 +311,7 @@ const App: React.FC = () => {
             togglePieceSelection={togglePieceSelection}
             deleteSelectedPieces={deleteSelectedPieces}
             register={logisticsForm.register}
-            setValue={logisticsForm.setValue}
             errors={logisticsForm.formState.errors}
-            siteAddress={equipmentData.siteAddress || ''}
           />
         </div>
 
