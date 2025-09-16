@@ -30,10 +30,14 @@ const formatWeight = (value: any, fallback: string) => {
   const numericValue = getNumericWeight(value)
 
   if (numericValue === null) {
-    return typeof value === 'string' ? value : fallback
+    if (typeof value === 'string' && value.trim() !== '') {
+      return value
+    }
+
+    return fallback
   }
 
-  return numericValue.toLocaleString()
+  return `${numericValue.toLocaleString()} lbs`
 }
 
 const parseWeight = (value: any) => {
@@ -136,7 +140,7 @@ export const generateScopeTemplate = (
                 piece.description || '[Item Description]'
               } - ${piece.length || '[L]'}"L x ${piece.width || '[W]'}"W x ${
                 piece.height || '[H]'
-              }"H, ${formatWeight(piece.weight, '[Weight]')} lbs`
+              }"H, ${formatWeight(piece.weight, 'Not listed')}`
           )
           .join('\n')}\n`
       : ''
@@ -174,20 +178,20 @@ export const generateLogisticsEmail = (
               piece.description || '[Description]'
             } - ${piece.length || '[L]'}"L x ${piece.width || '[W]'}"W x ${
               piece.height || '[H]'
-            }"H, ${formatWeight(piece.weight, '[Weight]')} lbs`
+            }"H, ${formatWeight(piece.weight, 'Not listed')}`
         )
         .join('\n')
     : '[list all items with dimensions and weights]'
   const totalWeight = pieces.length
-    ? `${formatWeight(
+    ? formatWeight(
         pieces.reduce(
           (sum: number, piece: any) =>
             sum + parseWeight(piece.weight) * (piece.quantity || 1),
           0
         ),
-        '[total weight]'
-      )} lbs`
-    : '[total weight]'
+        'Not listed'
+      )
+    : 'Not listed'
 
   const pickupLocation = logisticsData.pickupAddress || '[pickup location]'
   const deliveryLocation = logisticsData.deliveryAddress || '[delivery location]'
