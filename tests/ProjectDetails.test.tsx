@@ -31,6 +31,7 @@ describe('ProjectDetails copy button', () => {
         data={data}
         onChange={() => {}}
         onSelectContact={() => {}}
+        onCopySiteAddress={() => true}
         register={() => ({ onChange: () => {} }) as any}
         errors={{}}
       />
@@ -41,5 +42,38 @@ describe('ProjectDetails copy button', () => {
     await waitFor(() => {
       expect(navigator.clipboard.writeText).toHaveBeenCalledWith('My Project')
     })
+  })
+
+  it('calls onCopySiteAddress when copy to pickup button is clicked', () => {
+    const copyHandler = vi.fn().mockReturnValue(true)
+
+    const data: ProjectDetailsData = {
+      projectName: '',
+      companyName: '',
+      contactName: '',
+      siteAddress: '123 Main St, Portland, OR 97205',
+      sitePhone: '',
+      shopLocation: '',
+      scopeOfWork: '',
+      email: ''
+    }
+
+    render(
+      <ProjectDetails
+        data={data}
+        onChange={() => {}}
+        onSelectContact={() => {}}
+        onCopySiteAddress={copyHandler}
+        register={() => ({ onChange: () => {} }) as any}
+        errors={{}}
+      />
+    )
+
+    const button = screen.getByRole('button', {
+      name: /copy site address to pickup location/i
+    })
+    fireEvent.click(button)
+
+    expect(copyHandler).toHaveBeenCalledTimes(1)
   })
 })

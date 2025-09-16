@@ -31,16 +31,25 @@ interface ProjectDetailsProps {
   data: ProjectDetailsData
   onChange: (field: keyof ProjectDetailsData, value: string) => void
   onSelectContact: (contact: HubSpotContact) => void
+  onCopySiteAddress: () => boolean
   register: UseFormRegister<ProjectDetailsData>
   errors: FieldErrors<ProjectDetailsData>
 }
 
-const ProjectDetails: React.FC<ProjectDetailsProps> = ({ data, onChange, onSelectContact, register, errors }) => {
+const ProjectDetails: React.FC<ProjectDetailsProps> = ({
+  data,
+  onChange,
+  onSelectContact,
+  onCopySiteAddress,
+  register,
+  errors
+}) => {
   const [selectedContactId, setSelectedContactId] = useState<string | null>(null)
   const [pendingUpdates, setPendingUpdates] = useState<Record<string, unknown>>({})
   const [updateMessage, setUpdateMessage] = useState<string | null>(null)
   const [updateError, setUpdateError] = useState<string | null>(null)
   const [projectNameCopied, setProjectNameCopied] = useState(false)
+  const [siteAddressCopied, setSiteAddressCopied] = useState(false)
   const handleFieldChange = (field: keyof ProjectDetailsData, rawValue: string) => {
     const value = field === 'projectName' ? toTitleCase(rawValue) : rawValue
     onChange(field, value)
@@ -90,6 +99,18 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ data, onChange, onSelec
       setTimeout(() => setProjectNameCopied(false), 2000)
     } catch (err) {
       console.error('Failed to copy project name', err)
+    }
+  }
+
+  const handleCopySiteAddress = () => {
+    try {
+      const copied = onCopySiteAddress()
+      if (copied) {
+        setSiteAddressCopied(true)
+        setTimeout(() => setSiteAddressCopied(false), 2000)
+      }
+    } catch (err) {
+      console.error('Failed to copy site address', err)
     }
   }
 
@@ -269,16 +290,37 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ data, onChange, onSelec
           const field = register('siteAddress')
           return (
             <>
-              <input
-                type="text"
-                value={data.siteAddress}
-                onChange={(e) => {
-                  field.onChange(e)
-                  handleFieldChange('siteAddress', e.target.value)
-                }}
-                className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                placeholder="Enter site address"
-              />
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={data.siteAddress}
+                  onChange={(e) => {
+                    field.onChange(e)
+                    handleFieldChange('siteAddress', e.target.value)
+                  }}
+                  className="flex-1 min-w-0 px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
+                  placeholder="Enter site address"
+                />
+                <button
+                  type="button"
+                  onClick={handleCopySiteAddress}
+                  disabled={!data.siteAddress}
+                  className="flex items-center px-3 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors border border-accent disabled:opacity-50 whitespace-nowrap"
+                  aria-label="Copy site address to pickup location"
+                >
+                  {siteAddressCopied ? (
+                    <>
+                      <CheckCircle className="w-4 h-4 mr-1" />
+                      Copied
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-4 h-4 mr-1" />
+                      Copy to Pickup
+                    </>
+                  )}
+                </button>
+              </div>
               {errors.siteAddress && (
                 <p className="text-red-500 text-xs mt-1">{String(errors.siteAddress.message)}</p>
               )}

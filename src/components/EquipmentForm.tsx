@@ -11,6 +11,7 @@ interface EquipmentFormProps {
   onFieldChange: (field: string, value: string) => void;
   onRequirementsChange: (data: EquipmentRequirements) => void;
   onSelectContact: (contact: HubSpotContact) => void;
+  onCopySiteAddress: () => boolean;
   register: UseFormRegister<EquipmentData>;
   errors: FieldErrors<EquipmentData>;
 }
@@ -20,6 +21,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({
   onFieldChange,
   onRequirementsChange,
   onSelectContact,
+  onCopySiteAddress,
   register,
   errors
 }) => {
@@ -33,6 +35,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({
         data={data}
         onChange={onFieldChange}
         onSelectContact={onSelectContact}
+        onCopySiteAddress={onCopySiteAddress}
         register={register}
         errors={errors}
       />
