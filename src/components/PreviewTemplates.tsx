@@ -140,7 +140,7 @@ export const generateScopeTemplate = (
                 piece.description || '[Item Description]'
               } - ${piece.length || '[L]'}"L x ${piece.width || '[W]'}"W x ${
                 piece.height || '[H]'
-              }"H, ${formatWeight(piece.weight, 'Not listed')}`
+              }"H, ${formatWeight(piece.weight, 'Weight Not listed')}`
           )
           .join('\n')}\n`
       : ''
@@ -178,7 +178,7 @@ export const generateLogisticsEmail = (
               piece.description || '[Description]'
             } - ${piece.length || '[L]'}"L x ${piece.width || '[W]'}"W x ${
               piece.height || '[H]'
-            }"H, ${formatWeight(piece.weight, 'Not listed')}`
+            }"H, ${formatWeight(piece.weight, 'Weight Not listed')}`
         )
         .join('\n')
     : '[list all items with dimensions and weights]'
@@ -189,9 +189,9 @@ export const generateLogisticsEmail = (
             sum + parseWeight(piece.weight) * (piece.quantity || 1),
           0
         ),
-        'Not listed'
+        'Weight Not listed'
       )
-    : 'Not listed'
+    : 'Weight Not listed'
 
   const pickupLocation = logisticsData.pickupAddress || '[pickup location]'
   const deliveryLocation = logisticsData.deliveryAddress || '[delivery location]'
