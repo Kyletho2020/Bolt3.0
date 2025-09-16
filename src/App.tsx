@@ -406,7 +406,7 @@ const App: React.FC = () => {
               </div>
               <div className="flex gap-2">
                 <a
-                  href={`mailto:Logistics@omegamorgan.com,MachineryLogistics@omegamorgan.com?subject=${encodeURIComponent(logisticsSubject)}&body=${encodeURIComponent(logisticsBody)}`}
+                  href={`mailto:Logistics@omegamorgan.com; MachineryLogistics@omegamorgan.com?subject=${encodeURIComponent(logisticsSubject)}&body=${encodeURIComponent(logisticsBody)}`}
                   className="flex items-center px-4 py-2 bg-accent text-black rounded-lg hover:bg-green-400 transition-colors"
                 >
                   <Mail className="w-4 h-4 mr-2" />
