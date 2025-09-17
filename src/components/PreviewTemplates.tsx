@@ -2,6 +2,35 @@
 import React, { useState } from 'react'
 import { FileText, Mail, Copy, CheckCircle, Eye, X, Truck } from 'lucide-react'
 
+const PROPER_EQUIPMENT_TERMS = new Set([
+  'versalift',
+  'trilifter'
+])
+
+const isProperEquipmentWord = (word: string) => {
+  const lettersOnly = word.replace(/[^A-Za-z]/g, '')
+
+  if (!lettersOnly) {
+    return false
+  }
+
+  const normalized = lettersOnly.toLowerCase()
+
+  if (PROPER_EQUIPMENT_TERMS.has(normalized)) {
+    return true
+  }
+
+  const hasLetter = /[A-Za-z]/.test(lettersOnly)
+  const isAllCaps = lettersOnly === lettersOnly.toUpperCase()
+
+  return hasLetter && isAllCaps
+}
+
+const normalizeEquipmentName = (name: string) =>
+  name.replace(/[A-Za-z][A-Za-z0-9'/-]*/g, match =>
+    isProperEquipmentWord(match) ? match : match.toLowerCase()
+  )
+
 const shouldUseFallback = (value: any) =>
   value === undefined || value === null || value === ''
 
@@ -92,10 +121,12 @@ export const generateScopeTemplate = (
   )
 
   const formatEquipmentItem = (quantity: number, name: string) => {
-    const needsPlural = quantity > 1 && !name.toLowerCase().endsWith('s')
+    const normalizedName = normalizeEquipmentName(name)
+    const needsPlural =
+      quantity > 1 && !normalizedName.toLowerCase().endsWith('s')
     return quantity > 1
-      ? `${quantity} ${needsPlural ? `${name}s` : name}`
-      : name
+      ? `${quantity} ${needsPlural ? `${normalizedName}s` : normalizedName}`
+      : normalizedName
   }
 
   const crewDescription = crewSize
