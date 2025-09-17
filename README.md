@@ -71,3 +71,11 @@ Encryption produces a value formatted as `iv:ciphertext`, where both parts are B
 - Lowboy
 - Step Deck
 
+### Material Handling & Rigging
+
+- Material Handler
+- 1-ton Gantry
+- 5-ton Gantry
+- 8'x20' Metal Plate
+- 8'x10' Metal Plate
+

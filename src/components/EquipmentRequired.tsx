@@ -11,6 +11,7 @@ export interface EquipmentRequirements {
   forklifts: EquipmentItem[]
   tractors: EquipmentItem[]
   trailers: EquipmentItem[]
+  additionalEquipment: EquipmentItem[]
 }
 
 interface EquipmentRequiredProps {
@@ -34,6 +35,20 @@ const tractorOptions = ['3-axle tractor', '4-axle tractor', 'Rollback']
 
 const trailerOptions = ['Dovetail', 'Flatbed', 'Lowboy', 'Step Deck']
 
+const additionalEquipmentOptions = [
+  'Material Handler',
+  '1-ton Gantry',
+  '5-ton Gantry',
+  "8'x20' Metal Plate",
+  "8'x10' Metal Plate"
+]
+
+type EquipmentField =
+  | 'forklifts'
+  | 'tractors'
+  | 'trailers'
+  | 'additionalEquipment'
+
 const EquipmentRequired: React.FC<EquipmentRequiredProps> = ({ data, onChange }) => {
   const handleFieldChange = <K extends keyof EquipmentRequirements>(
     field: K,
@@ -43,7 +58,7 @@ const EquipmentRequired: React.FC<EquipmentRequiredProps> = ({ data, onChange })
   }
 
   const adjustQuantity = (
-    field: 'forklifts' | 'tractors' | 'trailers',
+    field: EquipmentField,
     name: string,
     delta: number
   ) => {
@@ -67,17 +82,23 @@ const EquipmentRequired: React.FC<EquipmentRequiredProps> = ({ data, onChange })
   }
 
   const getQuantity = (
-    field: 'forklifts' | 'tractors' | 'trailers',
+    field: EquipmentField,
     name: string
   ) => data[field].find((i) => i.name === name)?.quantity || 0
 
   const clearSection = () => {
-    onChange({ crewSize: '', forklifts: [], tractors: [], trailers: [] })
+    onChange({
+      crewSize: '',
+      forklifts: [],
+      tractors: [],
+      trailers: [],
+      additionalEquipment: []
+    })
   }
 
   const renderOptionList = (
     label: string,
-    field: 'forklifts' | 'tractors' | 'trailers',
+    field: EquipmentField,
     options: string[]
   ) => (
     <div>
@@ -150,6 +171,7 @@ const EquipmentRequired: React.FC<EquipmentRequiredProps> = ({ data, onChange })
       {renderOptionList('Forklifts', 'forklifts', forkliftOptions)}
       {renderOptionList('Tractors', 'tractors', tractorOptions)}
       {renderOptionList('Trailers', 'trailers', trailerOptions)}
+      {renderOptionList('Material Handling & Rigging', 'additionalEquipment', additionalEquipmentOptions)}
     </div>
   )
 }

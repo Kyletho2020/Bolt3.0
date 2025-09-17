@@ -87,6 +87,9 @@ export const generateScopeTemplate = (
   const forklifts = (equipmentRequirements.forklifts || []).filter((f: any) => f.quantity > 0)
   const tractors = (equipmentRequirements.tractors || []).filter((t: any) => t.quantity > 0)
   const trailers = (equipmentRequirements.trailers || []).filter((t: any) => t.quantity > 0)
+  const additionalEquipment = (equipmentRequirements.additionalEquipment || []).filter(
+    (item: any) => item.quantity > 0
+  )
 
   const formatEquipmentItem = (quantity: number, name: string) => {
     const needsPlural = quantity > 1 && !name.toLowerCase().endsWith('s')
@@ -110,7 +113,8 @@ export const generateScopeTemplate = (
           ? t.name
           : `${t.name} trailer`
       )
-    )
+    ),
+    ...additionalEquipment.map((item: any) => formatEquipmentItem(item.quantity, item.name))
   ].filter(Boolean)
 
   const equipmentSummary = (() => {

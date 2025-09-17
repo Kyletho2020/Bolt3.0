@@ -151,13 +151,17 @@ const QuoteSaveManager: React.FC<QuoteSaveManagerProps> = ({
           email: '',
         }
 
-        const loadedRequirements =
-          quote.equipment_requirements || {
-            crewSize: '',
-            forklifts: [],
-            tractors: [],
-            trailers: []
-          }
+        const defaultRequirements = {
+          crewSize: '',
+          forklifts: [],
+          tractors: [],
+          trailers: [],
+          additionalEquipment: []
+        }
+
+        const loadedRequirements = quote.equipment_requirements
+          ? { ...defaultRequirements, ...quote.equipment_requirements }
+          : defaultRequirements
 
         const loadedLogisticsData = {
           ...(quote.logistics_data || {}),

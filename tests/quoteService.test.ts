@@ -20,7 +20,13 @@ const equipmentData: EquipmentData = {
   shopLocation: '',
   scopeOfWork: '',
   email: '',
-  equipmentRequirements: { crewSize: '', forklifts: [], tractors: [], trailers: [] } as EquipmentRequirements
+  equipmentRequirements: {
+    crewSize: '',
+    forklifts: [],
+    tractors: [],
+    trailers: [],
+    additionalEquipment: []
+  } as EquipmentRequirements
 }
 
 const logisticsData: LogisticsData = {
@@ -31,7 +37,13 @@ const logisticsData: LogisticsData = {
   storage: null
 }
 
-const equipmentRequirements: EquipmentRequirements = { crewSize: '', forklifts: [], tractors: [], trailers: [] }
+const equipmentRequirements: EquipmentRequirements = {
+  crewSize: '',
+  forklifts: [],
+  tractors: [],
+  trailers: [],
+  additionalEquipment: []
+}
 
 beforeEach(() => {
   vi.clearAllMocks()
