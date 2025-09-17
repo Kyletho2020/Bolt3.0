@@ -16,7 +16,13 @@ test('EquipmentForm renders Equipment Quote heading', () => {
     shopLocation: 'Shop',
     scopeOfWork: '',
     email: '',
-    equipmentRequirements: { crewSize: '', forklifts: [], tractors: [], trailers: [] } as EquipmentRequirements
+    equipmentRequirements: {
+      crewSize: '',
+      forklifts: [],
+      tractors: [],
+      trailers: [],
+      additionalEquipment: []
+    } as EquipmentRequirements
   };
 
   const html = renderToString(

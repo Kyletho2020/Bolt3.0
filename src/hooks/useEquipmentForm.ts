@@ -7,7 +7,8 @@ export const useEquipmentForm = () => {
     crewSize: '',
     forklifts: [],
     tractors: [],
-    trailers: []
+    trailers: [],
+    additionalEquipment: []
   };
 
   const initialEquipmentData = {
