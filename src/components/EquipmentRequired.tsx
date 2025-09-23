@@ -41,7 +41,8 @@ const additionalEquipmentOptions = [
   '1-ton Gantry',
   '5-ton Gantry',
   "8'x20' Metal Plate",
-  "8'x10' Metal Plate"
+  "8'x10' Metal Plate",
+  'Lift Platform'
 ]
 
 type EquipmentField =
