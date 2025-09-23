@@ -238,6 +238,7 @@ const App: React.FC = () => {
   const { subject: logisticsSubject, body: logisticsBody } =
     generateLogisticsEmail(equipmentData, logisticsData)
   const logisticsTemplate = `${logisticsSubject}\n\n${logisticsBody}`
+  const showLogisticsTemplate = Boolean(logisticsData.shipmentType)
 
   const copyToClipboard = async (
     text: string,
@@ -398,44 +399,46 @@ const App: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-gray-900 rounded-lg border-2 border-accent p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center">
-                <Truck className="w-6 h-6 text-white mr-2" />
-                <h2 className="text-2xl font-bold text-white">Logistics Email Template</h2>
+          {showLogisticsTemplate && (
+            <div className="bg-gray-900 rounded-lg border-2 border-accent p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center">
+                  <Truck className="w-6 h-6 text-white mr-2" />
+                  <h2 className="text-2xl font-bold text-white">Logistics Email Template</h2>
+                </div>
+                <div className="flex gap-2">
+                  <a
+                    href={`mailto:Logistics@omegamorgan.com; MachineryLogistics@omegamorgan.com?subject=${encodeURIComponent(logisticsSubject)}&body=${encodeURIComponent(logisticsBody)}`}
+                    className="flex items-center px-4 py-2 bg-accent text-black rounded-lg hover:bg-green-400 transition-colors"
+                  >
+                    <Mail className="w-4 h-4 mr-2" />
+                    Email
+                  </a>
+                  <button
+                    onClick={() => copyToClipboard(logisticsTemplate, 'logistics')}
+                    className="flex items-center px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors border border-accent"
+                  >
+                    {copiedTemplate === 'logistics' ? (
+                      <>
+                        <CheckCircle className="w-4 h-4 mr-2" />
+                        Copied!
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-4 h-4 mr-2" />
+                        Copy
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
-              <div className="flex gap-2">
-                <a
-                  href={`mailto:Logistics@omegamorgan.com; MachineryLogistics@omegamorgan.com?subject=${encodeURIComponent(logisticsSubject)}&body=${encodeURIComponent(logisticsBody)}`}
-                  className="flex items-center px-4 py-2 bg-accent text-black rounded-lg hover:bg-green-400 transition-colors"
-                >
-                  <Mail className="w-4 h-4 mr-2" />
-                  Email
-                </a>
-                <button
-                  onClick={() => copyToClipboard(logisticsTemplate, 'logistics')}
-                  className="flex items-center px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors border border-accent"
-                >
-                  {copiedTemplate === 'logistics' ? (
-                    <>
-                      <CheckCircle className="w-4 h-4 mr-2" />
-                      Copied!
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="w-4 h-4 mr-2" />
-                      Copy
-                    </>
-                  )}
-                </button>
+              <div className="bg-black rounded-lg p-4 border border-accent">
+                <pre className="whitespace-pre-wrap text-sm text-white font-mono leading-relaxed">
+                  {logisticsTemplate}
+                </pre>
               </div>
             </div>
-            <div className="bg-black rounded-lg p-4 border border-accent">
-              <pre className="whitespace-pre-wrap text-sm text-white font-mono leading-relaxed">
-                {logisticsTemplate}
-              </pre>
-            </div>
-          </div>
+          )}
         </div>
 
         {/* Clarifications */}

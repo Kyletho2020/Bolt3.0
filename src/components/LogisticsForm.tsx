@@ -401,11 +401,16 @@ const LogisticsForm: React.FC<LogisticsFormProps> = ({
                 <select
                   value={data.shipmentType}
                   onChange={(e) => {
+                    const value = e.target.value
                     field.onChange(e)
-                    onFieldChange('shipmentType', e.target.value)
+                    onFieldChange('shipmentType', value)
+                    if (!value) {
+                      onFieldChange('truckType', '')
+                    }
                   }}
                   className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
                 >
+                  <option value="">None</option>
                   <option value="LTL">LTL</option>
                   <option value="FTL">FTL</option>
                 </select>
@@ -418,32 +423,34 @@ const LogisticsForm: React.FC<LogisticsFormProps> = ({
         </div>
 
         {/* Truck Type Requested */}
-        <div>
-          <label className="block text-sm font-medium text-white mb-2">Truck Type Requested</label>
-          {(() => {
-            const field = register('truckType')
-            return (
-              <>
-                <select
-                  value={data.truckType}
-                  onChange={(e) => {
-                    field.onChange(e)
-                    onFieldChange('truckType', e.target.value)
-                  }}
-                  className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                >
-                  <option value="">Select truck type</option>
-                  <option value="Flatbed">Flatbed</option>
-                  <option value="Flatbed with tarp">Flatbed with tarp</option>
-                  <option value="Conestoga">Conestoga</option>
-                </select>
-                {errors.truckType && (
-                  <p className="text-red-500 text-xs mt-1">{String(errors.truckType.message)}</p>
-                )}
-              </>
-            )
-          })()}
-        </div>
+        {data.shipmentType && (
+          <div>
+            <label className="block text-sm font-medium text-white mb-2">Truck Type Requested</label>
+            {(() => {
+              const field = register('truckType')
+              return (
+                <>
+                  <select
+                    value={data.truckType}
+                    onChange={(e) => {
+                      field.onChange(e)
+                      onFieldChange('truckType', e.target.value)
+                    }}
+                    className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
+                  >
+                    <option value="">Select truck type</option>
+                    <option value="Flatbed">Flatbed</option>
+                    <option value="Flatbed with tarp">Flatbed with tarp</option>
+                    <option value="Conestoga">Conestoga</option>
+                  </select>
+                  {errors.truckType && (
+                    <p className="text-red-500 text-xs mt-1">{String(errors.truckType.message)}</p>
+                  )}
+                </>
+              )
+            })()}
+          </div>
+        )}
 
         {/* Storage Requirements */}
         <div>
