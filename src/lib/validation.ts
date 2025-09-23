@@ -33,8 +33,14 @@ export const logisticsSchema = yup.object({
   deliveryCity: yup.string().required('Delivery city is required'),
   deliveryState: yup.string().required('Delivery state is required'),
   deliveryZip: yup.string().required('Delivery zip is required'),
-  shipmentType: yup.string().required('Shipment type is required'),
-  truckType: yup.string().required('Truck type is required'),
+  shipmentType: yup
+    .string()
+    .oneOf(['', 'LTL', 'FTL'], 'Invalid shipment type'),
+  truckType: yup.string().when('shipmentType', {
+    is: (val: string) => val && val !== '',
+    then: schema => schema.required('Truck type is required'),
+    otherwise: schema => schema
+  }),
   storageType: yup.string(),
   storageSqFt: yup.string().when('storageType', {
     is: (val: string) => val && val !== '',
