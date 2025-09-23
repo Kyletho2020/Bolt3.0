@@ -29,6 +29,7 @@ const forkliftOptions = [
   'Versalift 40/60',
   'Versalift 60/80',
   'Trilifter',
+  'Forklift (12k Reach)',
 ]
 
 const tractorOptions = ['3-axle tractor', '4-axle tractor', 'Rollback']
