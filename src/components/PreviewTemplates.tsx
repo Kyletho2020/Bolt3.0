@@ -135,6 +135,7 @@ export const generateScopeTemplate = (
 
   const equipmentItems = [
     crewDescription,
+    'gear truck and trailer',
     ...forklifts.map((f: any) => formatEquipmentItem(f.quantity, f.name)),
     ...tractors.map((t: any) => formatEquipmentItem(t.quantity, t.name)),
     ...trailers.map((t: any) =>
