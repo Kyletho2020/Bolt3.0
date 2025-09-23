@@ -52,7 +52,10 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({
   const [siteAddressCopied, setSiteAddressCopied] = useState(false)
   const [companyNameCopied, setCompanyNameCopied] = useState(false)
   const handleFieldChange = (field: keyof ProjectDetailsData, rawValue: string) => {
-    const value = field === 'projectName' ? toTitleCase(rawValue) : rawValue
+    const value =
+      field === 'projectName' || field === 'contactName'
+        ? toTitleCase(rawValue)
+        : rawValue
     onChange(field, value)
     if (selectedContactId) {
       setPendingUpdates(prev => {
@@ -265,8 +268,10 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({
                   type="text"
                   value={data.contactName}
                   onChange={(e) => {
+                    const formattedValue = toTitleCase(e.target.value)
+                    e.target.value = formattedValue
                     field.onChange(e)
-                    handleFieldChange('contactName', e.target.value)
+                    handleFieldChange('contactName', formattedValue)
                   }}
                   className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
                   placeholder="Enter site contact"
