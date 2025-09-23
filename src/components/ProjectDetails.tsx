@@ -50,6 +50,7 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({
   const [updateError, setUpdateError] = useState<string | null>(null)
   const [projectNameCopied, setProjectNameCopied] = useState(false)
   const [siteAddressCopied, setSiteAddressCopied] = useState(false)
+  const [companyNameCopied, setCompanyNameCopied] = useState(false)
   const handleFieldChange = (field: keyof ProjectDetailsData, rawValue: string) => {
     const value = field === 'projectName' ? toTitleCase(rawValue) : rawValue
     onChange(field, value)
@@ -99,6 +100,16 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({
       setTimeout(() => setProjectNameCopied(false), 2000)
     } catch (err) {
       console.error('Failed to copy project name', err)
+    }
+  }
+
+  const handleCopyCompanyName = async () => {
+    try {
+      await navigator.clipboard.writeText(data.companyName)
+      setCompanyNameCopied(true)
+      setTimeout(() => setCompanyNameCopied(false), 2000)
+    } catch (err) {
+      console.error('Failed to copy company name', err)
     }
   }
 
@@ -206,16 +217,31 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({
             const field = register('companyName')
             return (
               <>
-                <input
-                  type="text"
-                  value={data.companyName}
-                  onChange={(e) => {
-                    field.onChange(e)
-                    handleFieldChange('companyName', e.target.value)
-                  }}
-                  className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
-                  placeholder="Enter company name"
-                />
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={data.companyName}
+                    onChange={(e) => {
+                      field.onChange(e)
+                      handleFieldChange('companyName', e.target.value)
+                    }}
+                    className="flex-1 px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
+                    placeholder="Enter company name"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleCopyCompanyName}
+                    disabled={!data.companyName}
+                    aria-label="Copy company name"
+                    className="p-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors border border-accent disabled:opacity-50"
+                  >
+                    {companyNameCopied ? (
+                      <CheckCircle className="w-4 h-4" />
+                    ) : (
+                      <Copy className="w-4 h-4" />
+                    )}
+                  </button>
+                </div>
                 {errors.companyName && (
                   <p className="text-red-500 text-xs mt-1">{String(errors.companyName.message)}</p>
                 )}
