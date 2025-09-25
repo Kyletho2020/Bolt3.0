@@ -182,7 +182,7 @@ const LogisticsForm: React.FC<LogisticsFormProps> = ({
                     {(() => {
                       const field = register(`pieces.${index}.weight` as const)
                       return (
-                        <div className="flex-1">
+                        <div className="w-full max-w-[50%] min-w-[8rem]">
                           <input
                             type="text"
                             value={piece.weight}
@@ -190,7 +190,7 @@ const LogisticsForm: React.FC<LogisticsFormProps> = ({
                               field.onChange(e)
                               onPieceChange(index, 'weight', e.target.value)
                             }}
-                            className="w-full px-2 py-1 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white text-sm"
+                            className="w-full px-2 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white text-sm"
                             placeholder="Weight (lbs)"
                           />
                           {errors.pieces?.[index]?.weight && (
