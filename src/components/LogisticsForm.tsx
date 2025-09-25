@@ -96,35 +96,35 @@ const LogisticsForm: React.FC<LogisticsFormProps> = ({
           <div className="space-y-3">
             {data.pieces.map((piece, index) => (
               <div key={piece.id} className="grid grid-cols-12 gap-2 items-end">
-                <div className="col-span-1 flex justify-center">
+                <div className="col-span-5 flex items-start gap-2">
                   <input
                     type="checkbox"
                     checked={selectedPieces.includes(piece.id)}
                     onChange={() => togglePieceSelection(piece.id)}
-                    className="form-checkbox h-4 w-4 text-accent"
+                    className="form-checkbox mt-2 h-4 w-4 text-accent"
                   />
-                </div>
-                <div className="col-span-3">
-                  {(() => {
-                    const field = register(`pieces.${index}.description` as const)
-                    return (
-                      <>
-                        <input
-                          type="text"
-                          value={piece.description}
-                          onChange={(e) => {
-                            field.onChange(e)
-                            onPieceChange(index, 'description', e.target.value)
-                          }}
-                          className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white text-sm"
-                          placeholder="Description"
-                        />
-                        {errors.pieces?.[index]?.description && (
-                          <p className="text-red-500 text-xs mt-1">{String(errors.pieces[index]?.description?.message)}</p>
-                        )}
-                      </>
-                    )
-                  })()}
+                  <div className="flex-1">
+                    {(() => {
+                      const field = register(`pieces.${index}.description` as const)
+                      return (
+                        <>
+                          <input
+                            type="text"
+                            value={piece.description}
+                            onChange={(e) => {
+                              field.onChange(e)
+                              onPieceChange(index, 'description', e.target.value)
+                            }}
+                            className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white text-sm"
+                            placeholder="Description"
+                          />
+                          {errors.pieces?.[index]?.description && (
+                            <p className="text-red-500 text-xs mt-1">{String(errors.pieces[index]?.description?.message)}</p>
+                          )}
+                        </>
+                      )
+                    })()}
+                  </div>
                 </div>
                 <div className="col-span-1">
                   {(() => {
