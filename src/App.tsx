@@ -263,7 +263,7 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <div className="max-w-[1450px] mx-auto px-4 py-8">
+      <div className="max-w-[1650px] mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white mb-2">OM Quote Generator</h1>
