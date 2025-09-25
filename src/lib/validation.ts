@@ -1,6 +1,7 @@
 import * as yup from 'yup'
 
 export const pieceSchema = yup.object({
+  id: yup.string().required('Piece id is required'),
   description: yup.string().required('Description is required'),
   quantity: yup
     .number()

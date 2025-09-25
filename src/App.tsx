@@ -33,6 +33,7 @@ import { EquipmentData, LogisticsData } from './types'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { equipmentSchema, logisticsSchema } from './lib/validation'
+import { createLogisticsPiece } from './lib/logisticsPieces'
 import { parseAddressParts } from './lib/address'
 import { HubSpotContact } from './services/hubspotService'
 
@@ -57,7 +58,8 @@ const App: React.FC = () => {
     addPiece,
     removePiece,
     togglePieceSelection,
-    deleteSelectedPieces
+    deleteSelectedPieces,
+    movePiece
   } = useLogisticsForm()
 
   const equipmentForm = useForm<EquipmentData>({
@@ -164,14 +166,17 @@ const App: React.FC = () => {
       
       // Map pieces data
       if (extractedLogisticsData.pieces && Array.isArray(extractedLogisticsData.pieces)) {
-        mappedLogisticsData.pieces = extractedLogisticsData.pieces.map(piece => ({
-          description: piece.description || '',
-          quantity: piece.quantity || 1,
-          length: piece.length?.toString() || '',
-          width: piece.width?.toString() || '',
-          height: piece.height?.toString() || '',
-          weight: piece.weight?.toString() || ''
-        }))
+        mappedLogisticsData.pieces = extractedLogisticsData.pieces.map(piece =>
+          createLogisticsPiece({
+            id: piece.id,
+            description: piece.description || '',
+            quantity: piece.quantity || 1,
+            length: piece.length?.toString() || '',
+            width: piece.width?.toString() || '',
+            height: piece.height?.toString() || '',
+            weight: piece.weight?.toString() || ''
+          })
+        )
       }
       
       // Map address data
@@ -205,7 +210,10 @@ const App: React.FC = () => {
       shipmentType: '',
       storageType: '',
       storageSqFt: '',
-      ...loadedLogisticsData
+      ...loadedLogisticsData,
+      pieces: loadedLogisticsData.pieces
+        ? loadedLogisticsData.pieces.map(piece => createLogisticsPiece(piece))
+        : loadedLogisticsData.pieces
     })
   }
 
@@ -332,6 +340,7 @@ const App: React.FC = () => {
             removePiece={removePiece}
             togglePieceSelection={togglePieceSelection}
             deleteSelectedPieces={deleteSelectedPieces}
+            movePiece={movePiece}
             register={logisticsForm.register}
             errors={logisticsForm.formState.errors}
           />

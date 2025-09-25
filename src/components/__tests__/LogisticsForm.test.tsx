@@ -6,7 +6,17 @@ import LogisticsForm from '../LogisticsForm';
 
 test('LogisticsForm renders Logistics Quote heading', () => {
   const data = {
-    pieces: [{ description: '', quantity: 1, length: '', width: '', height: '', weight: '' }],
+    pieces: [
+      {
+        id: 'piece-1',
+        description: '',
+        quantity: 1,
+        length: '',
+        width: '',
+        height: '',
+        weight: ''
+      }
+    ],
     pickupAddress: '',
     pickupCity: '',
     pickupState: '',
@@ -31,6 +41,7 @@ test('LogisticsForm renders Logistics Quote heading', () => {
       removePiece={() => {}}
       togglePieceSelection={() => {}}
       deleteSelectedPieces={() => {}}
+      movePiece={() => {}}
       register={() => ({ onChange: () => {}, onBlur: () => {}, ref: () => {} }) as any}
       errors={{}}
     />

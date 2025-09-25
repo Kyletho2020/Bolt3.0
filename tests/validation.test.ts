@@ -22,6 +22,7 @@ describe('validation schemas', () => {
   it('pieceSchema rejects quantity below 1', async () => {
     await expect(
       pieceSchema.validate({
+        id: 'piece-1',
         description: 'test',
         quantity: 0,
         length: '1',
@@ -35,7 +36,15 @@ describe('validation schemas', () => {
   it('logisticsSchema rejects when missing pickup address', async () => {
     await expect(
       logisticsSchema.validate({
-        pieces: [{ description: 'a', quantity: 1, length: '1', width: '1', height: '1', weight: '1' }],
+        pieces: [{
+          id: 'piece-1',
+          description: 'a',
+          quantity: 1,
+          length: '1',
+          width: '1',
+          height: '1',
+          weight: '1'
+        }],
         pickupAddress: '',
         pickupCity: 'c',
         pickupState: 's',
