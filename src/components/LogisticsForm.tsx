@@ -104,7 +104,7 @@ const LogisticsForm: React.FC<LogisticsFormProps> = ({
                     className="form-checkbox h-4 w-4 text-accent"
                   />
                 </div>
-                <div className="col-span-4">
+                <div className="col-span-3">
                   {(() => {
                     const field = register(`pieces.${index}.description` as const)
                     return (
@@ -199,33 +199,35 @@ const LogisticsForm: React.FC<LogisticsFormProps> = ({
                     )
                   })()}
                 </div>
-                <div className="col-span-1">
-                  <div className="flex flex-col gap-1">
-                    <button
-                      type="button"
-                      onClick={() => movePiece(index, index - 1)}
-                      disabled={index === 0}
-                      className="p-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <ArrowUp className="w-4 h-4" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => movePiece(index, index + 1)}
-                      disabled={index === data.pieces.length - 1}
-                      className="p-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <ArrowDown className="w-4 h-4" />
-                    </button>
+                <div className="col-span-2">
+                  <div className="flex items-stretch gap-2">
                     {data.pieces.length > 1 && (
                       <button
                         type="button"
                         onClick={() => removePiece(piece.id)}
-                        className="p-2 bg-red-600 text-white rounded-lg hover:bg-red-500 transition-colors"
+                        className="flex-1 h-10 bg-red-600 text-white rounded-lg hover:bg-red-500 transition-colors flex items-center justify-center"
                       >
                         <Minus className="w-4 h-4" />
                       </button>
                     )}
+                    <div className={`flex h-10 ${data.pieces.length > 1 ? 'flex-1' : 'w-full'} bg-gray-800 text-white rounded-lg overflow-hidden`}>
+                      <button
+                        type="button"
+                        onClick={() => movePiece(index, index - 1)}
+                        disabled={index === 0}
+                        className="flex-1 flex items-center justify-center hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <ArrowUp className="w-4 h-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => movePiece(index, index + 1)}
+                        disabled={index === data.pieces.length - 1}
+                        className="flex-1 flex items-center justify-center hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <ArrowDown className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
