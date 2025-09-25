@@ -25,6 +25,7 @@ const forkliftOptions = [
   'Forklift (15k)',
   'Forklift (30k)',
   'Forklift (12k Reach)',
+  'Forklift (20k Reach)',
   'Forklift – Hoist 18/26',
   'Versalift 25/35',
   'Versalift 40/60',
