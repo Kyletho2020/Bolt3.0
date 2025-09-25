@@ -1,24 +1,54 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import type { LogisticsData } from '../types';
+import { createLogisticsPiece, normalizePieces } from '../lib/logisticsPieces';
 
 export const useLogisticsForm = () => {
-  const initialLogisticsData = {
-    pieces: [{ description: '', quantity: 1, length: '', width: '', height: '', weight: '' }],
-    pickupAddress: '',
-    pickupCity: '',
-    pickupState: '',
-    pickupZip: '',
-    deliveryAddress: '',
-    deliveryCity: '',
-    deliveryState: '',
-    deliveryZip: '',
-    shipmentType: '',
-    truckType: '',
-    storageType: '',
-    storageSqFt: ''
-  };
+  const initialLogisticsData = useMemo<LogisticsData>(
+    () => ({
+      pieces: [createLogisticsPiece()],
+      pickupAddress: '',
+      pickupCity: '',
+      pickupState: '',
+      pickupZip: '',
+      deliveryAddress: '',
+      deliveryCity: '',
+      deliveryState: '',
+      deliveryZip: '',
+      shipmentType: '',
+      truckType: '',
+      storageType: '',
+      storageSqFt: ''
+    }),
+    []
+  );
 
-  const [logisticsData, setLogisticsData] = useState(initialLogisticsData);
-  const [selectedPieces, setSelectedPieces] = useState<number[]>([]);
+  const [logisticsDataState, setLogisticsDataState] = useState(initialLogisticsData);
+  const [selectedPieces, setSelectedPieces] = useState<string[]>([]);
+
+  const setLogisticsData = useCallback(
+    (updater: LogisticsData | ((prev: LogisticsData) => LogisticsData)) => {
+      setLogisticsDataState(prevState => {
+        const nextState =
+          typeof updater === 'function'
+            ? (updater as (prev: LogisticsData) => LogisticsData)(prevState)
+            : updater;
+
+        return {
+          ...nextState,
+          pieces: normalizePieces(nextState.pieces)
+        };
+      });
+    },
+    []
+  );
+
+  const logisticsData = logisticsDataState;
+
+  useEffect(() => {
+    setSelectedPieces(prev =>
+      prev.filter(id => logisticsData.pieces?.some(piece => piece.id === id))
+    );
+  }, [logisticsData.pieces]);
 
   const handleLogisticsChange = (field: string, value: string) => {
     setLogisticsData(prev => ({ ...prev, [field]: value }));
@@ -31,7 +61,7 @@ export const useLogisticsForm = () => {
   ) => {
     setLogisticsData(prev => ({
       ...prev,
-      pieces: prev.pieces.map((piece, i) =>
+      pieces: prev.pieces?.map((piece, i) =>
         i === index ? { ...piece, [field]: value } : piece
       )
     }));
@@ -40,42 +70,75 @@ export const useLogisticsForm = () => {
   const addPiece = () => {
     setLogisticsData(prev => ({
       ...prev,
-      pieces: [
-        ...prev.pieces,
-        { description: '', quantity: 1, length: '', width: '', height: '', weight: '' }
-      ]
+      pieces: [...(prev.pieces ?? []), createLogisticsPiece()]
     }));
   };
 
-  const removePiece = (index: number) => {
-    if (logisticsData.pieces.length > 1) {
-      setLogisticsData(prev => ({
+  const removePiece = (pieceId: string) => {
+    setLogisticsData(prev => {
+      if (!prev.pieces || prev.pieces.length <= 1) {
+        return prev;
+      }
+
+      const remainingPieces = prev.pieces.filter(piece => piece.id !== pieceId);
+
+      return {
         ...prev,
-        pieces: prev.pieces.filter((_, i) => i !== index)
-      }));
-      setSelectedPieces(prev =>
-        prev
-          .filter(i => i !== index)
-          .map(i => (i > index ? i - 1 : i))
-      );
-    }
+        pieces: remainingPieces.length > 0
+          ? remainingPieces
+          : [createLogisticsPiece()]
+      };
+    });
+    setSelectedPieces(prev => prev.filter(id => id !== pieceId));
   };
 
-  const togglePieceSelection = (index: number) => {
+  const togglePieceSelection = (pieceId: string) => {
     setSelectedPieces(prev =>
-      prev.includes(index)
-        ? prev.filter(i => i !== index)
-        : [...prev, index]
+      prev.includes(pieceId)
+        ? prev.filter(id => id !== pieceId)
+        : [...prev, pieceId]
     );
   };
 
   const deleteSelectedPieces = () => {
     if (selectedPieces.length === 0) return;
-    setLogisticsData(prev => ({
-      ...prev,
-      pieces: prev.pieces.filter((_, i) => !selectedPieces.includes(i))
-    }));
+    setLogisticsData(prev => {
+      const remainingPieces = prev.pieces?.filter(
+        piece => !selectedPieces.includes(piece.id)
+      );
+
+      return {
+        ...prev,
+        pieces: remainingPieces && remainingPieces.length > 0
+          ? remainingPieces
+          : [createLogisticsPiece()]
+      };
+    });
     setSelectedPieces([]);
+  };
+
+  const movePiece = (oldIndex: number, newIndex: number) => {
+    setLogisticsData(prev => {
+      const pieces = prev.pieces ? [...prev.pieces] : [];
+
+      if (
+        oldIndex === newIndex ||
+        oldIndex < 0 ||
+        newIndex < 0 ||
+        oldIndex >= pieces.length ||
+        newIndex >= pieces.length
+      ) {
+        return prev;
+      }
+
+      const [movedPiece] = pieces.splice(oldIndex, 1);
+      pieces.splice(newIndex, 0, movedPiece);
+
+      return {
+        ...prev,
+        pieces
+      };
+    });
   };
 
   return {
@@ -89,7 +152,8 @@ export const useLogisticsForm = () => {
     addPiece,
     removePiece,
     togglePieceSelection,
-    deleteSelectedPieces
+    deleteSelectedPieces,
+    movePiece
   };
 };
 

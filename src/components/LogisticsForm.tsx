@@ -1,8 +1,9 @@
 import React from 'react'
-import { Truck, Package, Plus, Minus, Trash2 } from 'lucide-react'
+import { Truck, Package, Plus, Minus, Trash2, ArrowUp, ArrowDown } from 'lucide-react'
 import { UseFormRegister, FieldErrors } from 'react-hook-form'
 
 interface Piece {
+  id: string;
   description: string;
   quantity: number;
   length: string;
@@ -29,7 +30,7 @@ interface LogisticsData {
 
 interface LogisticsFormProps {
   data: LogisticsData;
-  selectedPieces: number[];
+  selectedPieces: string[];
   onFieldChange: (field: string, value: string) => void;
   onPieceChange: (
     index: number,
@@ -37,9 +38,10 @@ interface LogisticsFormProps {
     value: string | number
   ) => void;
   addPiece: () => void;
-  removePiece: (index: number) => void;
-  togglePieceSelection: (index: number) => void;
+  removePiece: (pieceId: string) => void;
+  togglePieceSelection: (pieceId: string) => void;
   deleteSelectedPieces: () => void;
+  movePiece: (oldIndex: number, newIndex: number) => void;
   register: UseFormRegister<LogisticsData>;
   errors: FieldErrors<LogisticsData>;
 }
@@ -53,6 +55,7 @@ const LogisticsForm: React.FC<LogisticsFormProps> = ({
   removePiece,
   togglePieceSelection,
   deleteSelectedPieces,
+  movePiece,
   register,
   errors
 }) => {
@@ -92,12 +95,12 @@ const LogisticsForm: React.FC<LogisticsFormProps> = ({
 
           <div className="space-y-3">
             {data.pieces.map((piece, index) => (
-              <div key={index} className="grid grid-cols-12 gap-2 items-end">
+              <div key={piece.id} className="grid grid-cols-12 gap-2 items-end">
                 <div className="col-span-1 flex justify-center">
                   <input
                     type="checkbox"
-                    checked={selectedPieces.includes(index)}
-                    onChange={() => togglePieceSelection(index)}
+                    checked={selectedPieces.includes(piece.id)}
+                    onChange={() => togglePieceSelection(piece.id)}
                     className="form-checkbox h-4 w-4 text-accent"
                   />
                 </div>
@@ -197,14 +200,33 @@ const LogisticsForm: React.FC<LogisticsFormProps> = ({
                   })()}
                 </div>
                 <div className="col-span-1">
-                  {data.pieces.length > 1 && (
+                  <div className="flex flex-col gap-1">
                     <button
-                      onClick={() => removePiece(index)}
-                      className="w-full p-2 bg-red-600 text-white rounded-lg hover:bg-red-500 transition-colors"
+                      type="button"
+                      onClick={() => movePiece(index, index - 1)}
+                      disabled={index === 0}
+                      className="p-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      <Minus className="w-4 h-4" />
+                      <ArrowUp className="w-4 h-4" />
                     </button>
-                  )}
+                    <button
+                      type="button"
+                      onClick={() => movePiece(index, index + 1)}
+                      disabled={index === data.pieces.length - 1}
+                      className="p-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <ArrowDown className="w-4 h-4" />
+                    </button>
+                    {data.pieces.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removePiece(piece.id)}
+                        className="p-2 bg-red-600 text-white rounded-lg hover:bg-red-500 transition-colors"
+                      >
+                        <Minus className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}

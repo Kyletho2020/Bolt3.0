@@ -13,6 +13,7 @@ export interface EquipmentData {
 }
 
 export interface LogisticsPiece {
+  id: string
   description: string
   quantity: number
   length: string
