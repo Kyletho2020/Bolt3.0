@@ -78,9 +78,9 @@ const LogisticsForm: React.FC<LogisticsFormProps> = ({
               <button
                 onClick={deleteSelectedPieces}
                 disabled={selectedPieces.length === 0}
-                className="flex items-center px-3 py-1 bg-red-600 text-white rounded-lg hover:bg-red-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center px-2 py-0.5 text-xs bg-red-600 text-white rounded-lg hover:bg-red-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <Trash2 className="w-4 h-4 mr-1" />
+                <Trash2 className="w-3 h-3 mr-1" />
                 Delete Selected
               </button>
               <button
@@ -205,19 +205,19 @@ const LogisticsForm: React.FC<LogisticsFormProps> = ({
                       <button
                         type="button"
                         onClick={() => removePiece(piece.id)}
-                        className="flex-1 h-10 bg-red-600 text-white rounded-lg hover:bg-red-500 transition-colors flex items-center justify-center"
+                        className="flex-1 h-5 bg-red-600 text-white rounded-lg hover:bg-red-500 transition-colors flex items-center justify-center"
                       >
-                        <Minus className="w-4 h-4" />
+                        <Minus className="w-3 h-3" />
                       </button>
                     )}
-                    <div className={`flex h-10 ${data.pieces.length > 1 ? 'flex-1' : 'w-full'} bg-gray-800 text-white rounded-lg overflow-hidden`}>
+                    <div className={`flex h-5 ${data.pieces.length > 1 ? 'flex-1' : 'w-full'} bg-gray-800 text-white rounded-lg overflow-hidden`}>
                       <button
                         type="button"
                         onClick={() => movePiece(index, index - 1)}
                         disabled={index === 0}
                         className="flex-1 flex items-center justify-center hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        <ArrowUp className="w-4 h-4" />
+                        <ArrowUp className="w-3 h-3" />
                       </button>
                       <button
                         type="button"
@@ -225,7 +225,7 @@ const LogisticsForm: React.FC<LogisticsFormProps> = ({
                         disabled={index === data.pieces.length - 1}
                         className="flex-1 flex items-center justify-center hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        <ArrowDown className="w-4 h-4" />
+                        <ArrowDown className="w-3 h-3" />
                       </button>
                     </div>
                   </div>
