@@ -1,17 +1,13 @@
 import { useState } from 'react';
 import { HubSpotContact } from '../services/hubspotService';
-import { EquipmentRequirements } from '../components/EquipmentRequired';
+import {
+  EquipmentRequirements,
+  createEmptyEquipmentRequirements
+} from '../components/EquipmentRequired';
+import { EquipmentData } from '../types';
 
 export const useEquipmentForm = () => {
-  const initialEquipmentRequirements: EquipmentRequirements = {
-    crewSize: '',
-    forklifts: [],
-    tractors: [],
-    trailers: [],
-    additionalEquipment: []
-  };
-
-  const initialEquipmentData = {
+  const createInitialEquipmentData = (): EquipmentData => ({
     projectName: '',
     companyName: '',
     contactName: '',
@@ -20,10 +16,12 @@ export const useEquipmentForm = () => {
     shopLocation: 'Shop',
     scopeOfWork: '',
     email: '',
-    equipmentRequirements: initialEquipmentRequirements
-  };
+    equipmentRequirements: createEmptyEquipmentRequirements()
+  });
 
-  const [equipmentData, setEquipmentData] = useState(initialEquipmentData);
+  const [equipmentData, setEquipmentData] = useState<EquipmentData>(
+    createInitialEquipmentData
+  );
 
   const handleEquipmentChange = (field: string, value: string) => {
     setEquipmentData(prev => ({ ...prev, [field]: value }));
@@ -47,7 +45,7 @@ export const useEquipmentForm = () => {
   return {
     equipmentData,
     setEquipmentData,
-    initialEquipmentData,
+    initialEquipmentData: createInitialEquipmentData(),
     handleEquipmentChange,
     handleEquipmentRequirementsChange,
     handleSelectHubSpotContact
