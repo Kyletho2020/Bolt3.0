@@ -1,5 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { X, Plus, Minus } from 'lucide-react'
+import {
+  X,
+  Plus,
+  Minus,
+  ChevronDown,
+  ChevronRight,
+  ChevronUp
+} from 'lucide-react'
 
 export interface EquipmentItem {
   name: string
@@ -239,9 +246,16 @@ const EquipmentRequired: React.FC<EquipmentRequiredProps> = ({ data, onChange })
           <button
             type="button"
             onClick={() => setShowAllOptions((prev) => !prev)}
-            className="mt-4 inline-flex items-center px-3 py-1 bg-black border border-accent rounded-lg hover:bg-gray-800 transition-colors"
+            className="mt-4 inline-flex items-center gap-2 px-3 py-1 bg-black border border-accent rounded-lg hover:bg-gray-800 transition-colors"
           >
-            {showAllOptions ? 'Hide equipment list' : 'Add or adjust equipment'}
+            {showAllOptions ? (
+              <ChevronUp className="w-4 h-4" aria-hidden="true" />
+            ) : (
+              <ChevronDown className="w-4 h-4" aria-hidden="true" />
+            )}
+            <span>
+              {showAllOptions ? 'Hide equipment list' : 'Add or adjust equipment'}
+            </span>
           </button>
         </div>
 
@@ -273,7 +287,14 @@ const EquipmentRequired: React.FC<EquipmentRequiredProps> = ({ data, onChange })
                       }
                       className="w-full flex items-center justify-between px-4 py-2 bg-gray-900 text-white hover:bg-gray-800"
                     >
-                      <span>{section.label}</span>
+                      <span className="flex items-center gap-2">
+                        {isActive ? (
+                          <ChevronDown className="w-4 h-4" aria-hidden="true" />
+                        ) : (
+                          <ChevronRight className="w-4 h-4" aria-hidden="true" />
+                        )}
+                        <span>{section.label}</span>
+                      </span>
                       <span className="text-sm text-gray-300">
                         {data[section.field].reduce((total, item) => total + item.quantity, 0)} selected
                       </span>
