@@ -9,7 +9,8 @@ import {
   X,
   Save,
   Copy,
-  CheckCircle
+  CheckCircle,
+  Bot
 } from 'lucide-react'
 import HubSpotContactSearch from './HubSpotContactSearch'
 import { HubSpotContact, HubSpotService } from '../services/hubspotService'
@@ -32,6 +33,8 @@ interface ProjectDetailsProps {
   onChange: (field: keyof ProjectDetailsData, value: string) => void
   onSelectContact: (contact: HubSpotContact) => void
   onCopySiteAddress: () => boolean
+  onOpenScopeExtractor: () => void
+  canUseAI: boolean
   register: UseFormRegister<ProjectDetailsData>
   errors: FieldErrors<ProjectDetailsData>
 }
@@ -41,6 +44,8 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({
   onChange,
   onSelectContact,
   onCopySiteAddress,
+  onOpenScopeExtractor,
+  canUseAI,
   register,
   errors
 }) => {
@@ -390,10 +395,25 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-white mb-2">
-          <ClipboardList className="w-4 h-4 inline mr-1" />
-          Scope of Work
-        </label>
+        <div className="flex items-center justify-between mb-2">
+          <label className="block text-sm font-medium text-white">
+            <ClipboardList className="w-4 h-4 inline mr-1" />
+            Scope of Work
+          </label>
+          <button
+            type="button"
+            onClick={onOpenScopeExtractor}
+            disabled={!canUseAI}
+            className={`flex items-center px-2 py-1 rounded-lg text-xs transition-colors border ${
+              canUseAI
+                ? 'bg-accent text-black border-accent hover:bg-green-400'
+                : 'bg-gray-700 text-gray-300 border-gray-600 cursor-not-allowed'
+            }`}
+          >
+            <Bot className="w-3 h-3 mr-1" />
+            Extract Scope {canUseAI ? '✓' : '✗'}
+          </button>
+        </div>
         {(() => {
           const field = register('scopeOfWork')
           return (

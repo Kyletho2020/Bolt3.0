@@ -89,6 +89,13 @@ const App: React.FC = () => {
     closeHistory
   } = useModals()
 
+  const [extractorMode, setExtractorMode] = useState<'all' | 'logistics' | 'scope'>('all')
+
+  const handleOpenExtractor = (mode: 'all' | 'logistics' | 'scope') => {
+    setExtractorMode(mode)
+    openAIExtractor()
+  }
+
   // Hooks
   const sessionId = useSessionId()
   const { hasApiKey } = useApiKey()
@@ -138,23 +145,46 @@ const App: React.FC = () => {
     extractedLogisticsData: Partial<LogisticsData>
   ) => {
     console.log('handleAIExtraction called with:', { extractedEquipmentData, extractedLogisticsData })
-    
+
     if (extractedEquipmentData) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { projectDescription, ...rest } = extractedEquipmentData
-      const mappedEquipmentData = {
-        projectName: extractedEquipmentData.projectName || '',
-        companyName: extractedEquipmentData.companyName || '',
-        contactName: extractedEquipmentData.contactName || '',
-        siteAddress: extractedEquipmentData.projectAddress || extractedEquipmentData.siteAddress || '',
-        sitePhone: extractedEquipmentData.phone || extractedEquipmentData.sitePhone || '',
-        email: extractedEquipmentData.email || '',
-        scopeOfWork: extractedEquipmentData.scopeOfWork || ''
+      const mappedEquipmentData: Partial<EquipmentData> = {}
+
+      if (extractedEquipmentData.projectName) {
+        mappedEquipmentData.projectName = extractedEquipmentData.projectName
       }
-      console.log('Updating equipment data with:', mappedEquipmentData)
-      setEquipmentData(prev => ({ ...prev, ...mappedEquipmentData }))
+
+      if (extractedEquipmentData.companyName) {
+        mappedEquipmentData.companyName = extractedEquipmentData.companyName
+      }
+
+      if (extractedEquipmentData.contactName) {
+        mappedEquipmentData.contactName = extractedEquipmentData.contactName
+      }
+
+      const siteAddress = extractedEquipmentData.projectAddress || extractedEquipmentData.siteAddress
+      if (siteAddress) {
+        mappedEquipmentData.siteAddress = siteAddress
+      }
+
+      const sitePhone = extractedEquipmentData.phone || extractedEquipmentData.sitePhone
+      if (sitePhone) {
+        mappedEquipmentData.sitePhone = sitePhone
+      }
+
+      if (extractedEquipmentData.email) {
+        mappedEquipmentData.email = extractedEquipmentData.email
+      }
+
+      if (extractedEquipmentData.scopeOfWork) {
+        mappedEquipmentData.scopeOfWork = extractedEquipmentData.scopeOfWork
+      }
+
+      if (Object.keys(mappedEquipmentData).length > 0) {
+        console.log('Updating equipment data with:', mappedEquipmentData)
+        setEquipmentData(prev => ({ ...prev, ...mappedEquipmentData }))
+      }
     }
-    
+
     if (extractedLogisticsData) {
       const mappedLogisticsData: Partial<LogisticsData> = {}
       
@@ -287,7 +317,7 @@ const App: React.FC = () => {
           </button>
 
           <button
-            onClick={openAIExtractor}
+            onClick={() => handleOpenExtractor('all')}
             disabled={!hasApiKey}
             className={`flex items-center px-4 py-2 rounded-lg transition-colors ${
               hasApiKey
@@ -308,6 +338,8 @@ const App: React.FC = () => {
             onRequirementsChange={handleEquipmentRequirementsChange}
             onSelectContact={handleSelectHubSpotContact}
             onCopySiteAddress={copySiteAddressToPickup}
+            onOpenScopeExtractor={() => handleOpenExtractor('scope')}
+            canUseAI={hasApiKey}
             register={equipmentForm.register}
             errors={equipmentForm.formState.errors}
           />
@@ -323,6 +355,8 @@ const App: React.FC = () => {
             togglePieceSelection={togglePieceSelection}
             deleteSelectedPieces={deleteSelectedPieces}
             movePiece={movePiece}
+            onOpenLogisticsExtractor={() => handleOpenExtractor('logistics')}
+            canUseAI={hasApiKey}
             register={logisticsForm.register}
             errors={logisticsForm.formState.errors}
           />
@@ -463,6 +497,7 @@ const App: React.FC = () => {
           onClose={closeAIExtractor}
           onExtract={handleAIExtraction}
           sessionId={sessionId}
+          mode={extractorMode}
         />
 
         <QuoteSaveManager

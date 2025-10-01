@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Bot, Send, Loader, X, AlertCircle, CheckCircle } from 'lucide-react'
 import { useApiKey } from '../hooks/useApiKey'
 import { AIExtractionService } from '../services/aiExtractionService'
@@ -19,25 +19,67 @@ interface AIExtractorModalProps {
     logisticsData: Partial<LogisticsData>
   ) => void
   sessionId: string
+  mode?: 'all' | 'logistics' | 'scope'
 }
 
-const AIExtractorModal: React.FC<AIExtractorModalProps> = ({ isOpen, onClose, onExtract, sessionId }) => {
+const MODE_CONFIG = {
+  all: {
+    title: 'AI Project Extractor',
+    intro:
+      "Hi! I can help extract project information from emails, work orders, or any text. I'll automatically fill out both the equipment and logistics quote forms with the extracted data.",
+    placeholder: 'Paste your email, work order, or project description here...',
+    noDataMessage:
+      "I couldn't find any project information in that text. Try including details like project name, company, address, contact info, or work description."
+  },
+  logistics: {
+    title: 'AI Logistics Extractor',
+    intro:
+      'Hi! Share shipment details and I will pull out the items to transport plus pickup and delivery addresses. Only the logistics section will be updated.',
+    placeholder: 'Paste text with logistics details (items, pickup and delivery addresses)...',
+    noDataMessage:
+      "I couldn't find logistics items or pickup/delivery addresses in that text. Try including item descriptions and pickup/delivery details."
+  },
+  scope: {
+    title: 'AI Scope Extractor',
+    intro: 'Hi! Provide the project description and I will capture just the scope of work for you.',
+    placeholder: 'Paste text that describes the scope of work for this project...',
+    noDataMessage:
+      "I couldn't find a scope of work in that text. Try including sentences that describe the work to be performed."
+  }
+} as const
+
+const AIExtractorModal: React.FC<AIExtractorModalProps> = ({
+  isOpen,
+  onClose,
+  onExtract,
+  sessionId,
+  mode = 'all'
+}) => {
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      type: 'system',
-      content: "Hi! I can help extract project information from emails, work orders, or any text. I'll automatically fill out both the equipment and logistics quote forms with the extracted data.",
-      timestamp: new Date()
-    }
-  ])
+  const [messages, setMessages] = useState<Message[]>([])
 
   const { hasApiKey, loading: apiKeyLoading, error: apiKeyError } = useApiKey()
 
   const addMessage = (type: Message['type'], content: string) => {
     setMessages(prev => [...prev, { id: Date.now().toString(), type, content, timestamp: new Date() }])
   }
+
+  const modeConfig = useMemo(() => MODE_CONFIG[mode], [mode])
+
+  useEffect(() => {
+    if (isOpen) {
+      setMessages([
+        {
+          id: Date.now().toString(),
+          type: 'system',
+          content: modeConfig.intro,
+          timestamp: new Date()
+        }
+      ])
+      setInput('')
+    }
+  }, [isOpen, modeConfig])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -65,19 +107,81 @@ const AIExtractorModal: React.FC<AIExtractorModalProps> = ({ isOpen, onClose, on
       console.log('AI extraction result:', result)
 
       if (result.success) {
-        const { equipmentData, logisticsData } = result
-        if ((equipmentData && Object.keys(equipmentData).length) || (logisticsData && Object.keys(logisticsData).length)) {
+        let { equipmentData = {}, logisticsData = {} } = result
+
+        if (mode === 'logistics') {
+          const allowedFields: (keyof LogisticsData)[] = [
+            'pieces',
+            'pickupAddress',
+            'pickupCity',
+            'pickupState',
+            'pickupZip',
+            'deliveryAddress',
+            'deliveryCity',
+            'deliveryState',
+            'deliveryZip'
+          ]
+          const filteredLogisticsData: Partial<LogisticsData> = {}
+          allowedFields.forEach(field => {
+            const value = logisticsData?.[field]
+            if (value && (!(Array.isArray(value)) || value.length > 0)) {
+              filteredLogisticsData[field] = value
+            }
+            if (Array.isArray(value) && value.length === 0) {
+              // Ensure empty arrays don't get passed through
+              delete filteredLogisticsData[field]
+            }
+          })
+          logisticsData = filteredLogisticsData
+          equipmentData = {}
+        } else if (mode === 'scope') {
+          const scopeOnly: Partial<EquipmentData> = {}
+          if (equipmentData?.scopeOfWork) {
+            scopeOnly.scopeOfWork = equipmentData.scopeOfWork
+          }
+          equipmentData = scopeOnly
+          logisticsData = {}
+        }
+
+        const hasEquipmentData = equipmentData && Object.keys(equipmentData).length > 0
+        const hasLogisticsData = logisticsData && Object.keys(logisticsData).length > 0
+
+        if (hasEquipmentData || hasLogisticsData) {
           onExtract(equipmentData, logisticsData)
-          const fields: string[] = []
-          if (equipmentData && Object.keys(equipmentData).length) {
-            fields.push(`Equipment: ${Object.keys(equipmentData).join(', ')}`)
+
+          let successMessage = ''
+          if (mode === 'scope') {
+            successMessage = 'Great! I captured the scope of work and updated the form.'
+          } else if (mode === 'logistics') {
+            const logisticsFieldLabels: Record<string, string> = {
+              pieces: 'Items to Transport',
+              pickupAddress: 'Pickup Address',
+              pickupCity: 'Pickup City',
+              pickupState: 'Pickup State',
+              pickupZip: 'Pickup ZIP',
+              deliveryAddress: 'Delivery Address',
+              deliveryCity: 'Delivery City',
+              deliveryState: 'Delivery State',
+              deliveryZip: 'Delivery ZIP'
+            }
+            const logisticsFields = Object.keys(logisticsData || {}).map(
+              field => logisticsFieldLabels[field] || field
+            )
+            successMessage = `Great! I updated logistics details: ${logisticsFields.join(', ')}.`
+          } else {
+            const fields: string[] = []
+            if (hasEquipmentData) {
+              fields.push(`Equipment: ${Object.keys(equipmentData).join(', ')}`)
+            }
+            if (hasLogisticsData) {
+              fields.push(`Logistics: ${Object.keys(logisticsData).join(', ')}`)
+            }
+            successMessage = `Great! I extracted information for: ${fields.join(' | ')}. Both forms have been updated with the extracted data.`
           }
-          if (logisticsData && Object.keys(logisticsData).length) {
-            fields.push(`Logistics: ${Object.keys(logisticsData).join(', ')}`)
-          }
-          addMessage('ai', `Great! I extracted information for: ${fields.join(' | ')}. Both forms have been updated with the extracted data.`)
+
+          addMessage('ai', successMessage)
         } else {
-          addMessage('ai', "I couldn't find any project information in that text. Try including details like project name, company, address, contact info, or work description.")
+          addMessage('ai', modeConfig.noDataMessage)
         }
       } else {
         addMessage('error', result.error || 'Extraction failed')
@@ -100,7 +204,7 @@ const AIExtractorModal: React.FC<AIExtractorModalProps> = ({ isOpen, onClose, on
         <div className="flex items-center justify-between p-6 border-b-2 border-accent">
           <div className="flex items-center">
             <Bot className="w-6 h-6 text-white mr-2" />
-            <h3 className="text-xl font-bold text-white">AI Project Extractor</h3>
+            <h3 className="text-xl font-bold text-white">{modeConfig.title}</h3>
           </div>
           <button onClick={onClose} className="p-2 hover:bg-black rounded-lg transition-colors">
             <X className="w-5 h-5 text-white" />
@@ -170,7 +274,7 @@ const AIExtractorModal: React.FC<AIExtractorModalProps> = ({ isOpen, onClose, on
             <textarea
               value={input}
               onChange={e => setInput(e.target.value)}
-              placeholder={isReady ? 'Paste your email, work order, or project description here...' : 'Please wait for system to be ready...'}
+              placeholder={isReady ? modeConfig.placeholder : 'Please wait for system to be ready...'}
               className="w-full px-4 py-3 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent resize-none disabled:bg-black disabled:text-white text-white placeholder-white"
               rows={3}
               disabled={loading || !isReady}
