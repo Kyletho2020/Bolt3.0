@@ -1,128 +1,68 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { X, Plus, Minus, ChevronDown, ChevronRight } from 'lucide-react'
 
-export interface EquipmentItem {
-  name: string
-  quantity: number
-}
-
-export interface EquipmentRequirements {
-  crewSize: string
-  forklifts: EquipmentItem[]
-  tractors: EquipmentItem[]
-  trailers: EquipmentItem[]
-  additionalEquipment: EquipmentItem[]
-}
+import {
+  EquipmentField,
+  EquipmentRequirements,
+  createEmptyEquipmentRequirements,
+  equipmentSections
+} from '../lib/equipmentCatalog'
 
 interface EquipmentRequiredProps {
   data: EquipmentRequirements
   onChange: (data: EquipmentRequirements) => void
 }
 
-const forkliftOptions = [
-  'Forklift (5k)',
-  'Forklift (8k)',
-  'Forklift (15k)',
-  'Forklift (30k)',
-  'Forklift (12k Reach)',
-  'Forklift (20k Reach)',
-  'Forklift – Hoist 18/26',
-  'Versalift 25/35',
-  'Versalift 40/60',
-  'Versalift 60/80',
-  'Trilifter',
-]
-
-const tractorOptions = ['3-axle tractor', '4-axle tractor', 'Rollback']
-
-const trailerOptions = ['Dovetail', 'Flatbed', 'Lowboy', 'Step Deck']
-
-const additionalEquipmentOptions = [
-  'Material Handler',
-  '1-ton Gantry',
-  '5-ton Gantry',
-  "8'x20' Metal Plate",
-  "8'x10' Metal Plate",
-  'Lift Platform'
-]
-
-type EquipmentField =
-  | 'forklifts'
-  | 'tractors'
-  | 'trailers'
-  | 'additionalEquipment'
-
-interface EquipmentSection {
-  label: string
-  field: EquipmentField
-  options: string[]
-}
-
-export const equipmentSections: EquipmentSection[] = [
-  { label: 'Forklifts', field: 'forklifts', options: forkliftOptions },
-  { label: 'Tractors', field: 'tractors', options: tractorOptions },
-  { label: 'Trailers', field: 'trailers', options: trailerOptions },
-  {
-    label: 'Material Handling & Rigging',
-    field: 'additionalEquipment',
-    options: additionalEquipmentOptions
-  }
-]
-
-export const createEmptyEquipmentRequirements = (): EquipmentRequirements => ({
-  crewSize: '',
-  forklifts: [],
-  tractors: [],
-  trailers: [],
-  additionalEquipment: []
-})
-
 const EquipmentRequired: React.FC<EquipmentRequiredProps> = ({ data, onChange }) => {
   const [searchQuery, setSearchQuery] = useState('')
   const [showAllOptions, setShowAllOptions] = useState(false)
   const [activeCategory, setActiveCategory] = useState<EquipmentField | null>(() => {
-    const firstSelected = equipmentSections.find(
-      (section) => data[section.field].length > 0
-    )
+    const firstSelected = equipmentSections.find((section) => data[section.field].length > 0)
 
     return firstSelected ? firstSelected.field : null
   })
 
-  const handleFieldChange = <K extends keyof EquipmentRequirements>(
-    field: K,
-    value: EquipmentRequirements[K]
-  ) => {
-    onChange({ ...data, [field]: value })
-  }
+  const handleFieldChange = useCallback(
+    <K extends keyof EquipmentRequirements>(field: K, value: EquipmentRequirements[K]) => {
+      onChange({ ...data, [field]: value })
+    },
+    [data, onChange]
+  )
 
-  const adjustQuantity = (
-    field: EquipmentField,
-    name: string,
-    delta: number
-  ) => {
-    const items = data[field]
-    const index = items.findIndex((i) => i.name === name)
-    if (index >= 0) {
-      const newQty = items[index].quantity + delta
-      if (newQty <= 0) {
-        handleFieldChange(
-          field,
-          items.filter((_, i) => i !== index)
-        )
-      } else {
-        const newItems = [...items]
-        newItems[index] = { name, quantity: newQty }
-        handleFieldChange(field, newItems)
+  const adjustQuantity = useCallback(
+    (field: EquipmentField, name: string, delta: number) => {
+      const items = data[field]
+      const index = items.findIndex((item) => item.name === name)
+
+      if (index >= 0) {
+        const newQty = items[index].quantity + delta
+
+        if (newQty <= 0) {
+          handleFieldChange(
+            field,
+            items.filter((_, itemIndex) => itemIndex !== index)
+          )
+        } else {
+          const newItems = [...items]
+          newItems[index] = { name, quantity: newQty }
+          handleFieldChange(field, newItems)
+        }
+
+        return
       }
-    } else if (delta > 0) {
-      handleFieldChange(field, [...items, { name, quantity: 1 }])
-    }
-  }
 
-  const getQuantity = (
-    field: EquipmentField,
-    name: string
-  ) => data[field].find((i) => i.name === name)?.quantity || 0
+      if (delta > 0) {
+        handleFieldChange(field, [...items, { name, quantity: 1 }])
+      }
+    },
+    [data, handleFieldChange]
+  )
+
+  const getQuantity = useCallback(
+    (field: EquipmentField, name: string) =>
+      data[field].find((item) => item.name === name)?.quantity || 0,
+    [data]
+  )
 
   const normalizedQuery = searchQuery.trim().toLowerCase()
 
@@ -130,9 +70,7 @@ const EquipmentRequired: React.FC<EquipmentRequiredProps> = ({ data, onChange })
     () =>
       equipmentSections.map((section) => ({
         ...section,
-        options: section.options.filter((option) =>
-          option.toLowerCase().includes(normalizedQuery)
-        )
+        options: section.options.filter((option) => option.toLowerCase().includes(normalizedQuery))
       })),
     [normalizedQuery]
   )
@@ -140,10 +78,7 @@ const EquipmentRequired: React.FC<EquipmentRequiredProps> = ({ data, onChange })
   const totalsByField = useMemo(
     () =>
       equipmentSections.reduce<Record<EquipmentField, number>>((acc, section) => {
-        acc[section.field] = data[section.field].reduce(
-          (total, item) => total + item.quantity,
-          0
-        )
+        acc[section.field] = data[section.field].reduce((total, item) => total + item.quantity, 0)
         return acc
       }, {} as Record<EquipmentField, number>),
     [data]
@@ -162,7 +97,7 @@ const EquipmentRequired: React.FC<EquipmentRequiredProps> = ({ data, onChange })
   )
 
   const handleToggleCategory = useCallback((field: EquipmentField) => {
-    setActiveCategory((prev) => (prev === field ? null : field))
+    setActiveCategory((previous) => (previous === field ? null : field))
   }, [])
 
   const handleClearCategory = useCallback(
@@ -177,7 +112,7 @@ const EquipmentRequired: React.FC<EquipmentRequiredProps> = ({ data, onChange })
   )
 
   const handleShowAllOptions = useCallback(() => {
-    setShowAllOptions((prev) => !prev)
+    setShowAllOptions((previous) => !previous)
   }, [])
 
   useEffect(() => {
@@ -185,19 +120,15 @@ const EquipmentRequired: React.FC<EquipmentRequiredProps> = ({ data, onChange })
       return
     }
 
-    const sectionWithMatches = filteredSections.find(
-      (section) => section.options.length > 0
-    )
+    const sectionWithMatches = filteredSections.find((section) => section.options.length > 0)
 
     if (sectionWithMatches) {
-      setActiveCategory((prev) => {
+      setActiveCategory((previous) => {
         if (
-          prev &&
-          filteredSections.some(
-            (section) => section.field === prev && section.options.length > 0
-          )
+          previous &&
+          filteredSections.some((section) => section.field === previous && section.options.length > 0)
         ) {
-          return prev
+          return previous
         }
 
         return sectionWithMatches.field
@@ -206,21 +137,19 @@ const EquipmentRequired: React.FC<EquipmentRequiredProps> = ({ data, onChange })
       return
     }
 
-    const sectionWithSelections = equipmentSections.find(
-      (section) => data[section.field].length > 0
-    )
+    const sectionWithSelections = equipmentSections.find((section) => data[section.field].length > 0)
 
     setActiveCategory(sectionWithSelections ? sectionWithSelections.field : null)
   }, [showAllOptions, filteredSections, data])
 
-  const clearSection = () => {
+  const clearSection = useCallback(() => {
     onChange(createEmptyEquipmentRequirements())
-  }
+  }, [onChange])
 
   return (
     <div className="mt-6 space-y-6">
       <div className="flex items-center justify-between">
-      <h3 className="text-xl font-bold text-white">Equipment Requirements</h3>
+        <h3 className="text-xl font-bold text-white">Equipment Requirements</h3>
         <button
           type="button"
           onClick={clearSection}
@@ -235,13 +164,13 @@ const EquipmentRequired: React.FC<EquipmentRequiredProps> = ({ data, onChange })
         <label className="block text-sm font-medium text-white mb-2">Crew Size</label>
         <select
           value={data.crewSize}
-          onChange={(e) => handleFieldChange('crewSize', e.target.value)}
+          onChange={(event) => handleFieldChange('crewSize', event.target.value)}
           className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
         >
           <option value="" disabled>
             Select crew size
           </option>
-          {Array.from({ length: 9 }, (_, i) => i + 2).map((size) => (
+          {Array.from({ length: 9 }, (_, index) => index + 2).map((size) => (
             <option key={size} value={size}>
               {size}
             </option>
@@ -302,7 +231,7 @@ const EquipmentRequired: React.FC<EquipmentRequiredProps> = ({ data, onChange })
               <input
                 type="text"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(event) => setSearchQuery(event.target.value)}
                 placeholder="Type to filter equipment"
                 className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
               />
@@ -313,6 +242,7 @@ const EquipmentRequired: React.FC<EquipmentRequiredProps> = ({ data, onChange })
                 const isActive = activeCategory === section.field
                 const hasOptions = section.options.length > 0
                 const selectedCount = totalsByField[section.field]
+
                 return (
                   <div key={section.field} className="border border-accent rounded-lg overflow-hidden">
                     <button
@@ -328,9 +258,7 @@ const EquipmentRequired: React.FC<EquipmentRequiredProps> = ({ data, onChange })
                         )}
                         {section.label}
                       </span>
-                      <span className="text-sm text-gray-300">
-                        {selectedCount} selected
-                      </span>
+                      <span className="text-sm text-gray-300">{selectedCount} selected</span>
                     </button>
                     {isActive && (
                       <div className="bg-black/50 px-4 py-3 space-y-2">
@@ -353,7 +281,7 @@ const EquipmentRequired: React.FC<EquipmentRequiredProps> = ({ data, onChange })
                         </div>
                         {hasOptions &&
                           section.options.map((option) => {
-                            const qty = getQuantity(section.field, option)
+                            const quantity = getQuantity(section.field, option)
                             return (
                               <div
                                 key={option}
@@ -369,7 +297,7 @@ const EquipmentRequired: React.FC<EquipmentRequiredProps> = ({ data, onChange })
                                   >
                                     <Minus className="w-4 h-4" />
                                   </button>
-                                  <span aria-live="polite">{qty}</span>
+                                  <span aria-live="polite">{quantity}</span>
                                   <button
                                     type="button"
                                     onClick={() => adjustQuantity(section.field, option, 1)}
@@ -388,9 +316,7 @@ const EquipmentRequired: React.FC<EquipmentRequiredProps> = ({ data, onChange })
                 )
               })}
               {filteredSections.every((section) => section.options.length === 0) && (
-                <p className="text-sm text-gray-300 text-center py-4">
-                  No equipment matches your search.
-                </p>
+                <p className="text-sm text-gray-300 text-center py-4">No equipment matches your search.</p>
               )}
             </div>
           </div>

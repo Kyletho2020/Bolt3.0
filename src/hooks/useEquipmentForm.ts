@@ -1,10 +1,10 @@
-import { useState } from 'react';
-import { HubSpotContact } from '../services/hubspotService';
+import { useState } from 'react'
+import { HubSpotContact } from '../services/hubspotService'
 import {
   EquipmentRequirements,
   createEmptyEquipmentRequirements
-} from '../components/EquipmentRequired';
-import { EquipmentData } from '../types';
+} from '../lib/equipmentCatalog'
+import { EquipmentData } from '../types'
 
 export const useEquipmentForm = () => {
   const createInitialEquipmentData = (): EquipmentData => ({
@@ -17,30 +17,28 @@ export const useEquipmentForm = () => {
     scopeOfWork: '',
     email: '',
     equipmentRequirements: createEmptyEquipmentRequirements()
-  });
+  })
 
-  const [equipmentData, setEquipmentData] = useState<EquipmentData>(
-    createInitialEquipmentData
-  );
+  const [equipmentData, setEquipmentData] = useState<EquipmentData>(createInitialEquipmentData)
 
   const handleEquipmentChange = (field: string, value: string) => {
-    setEquipmentData(prev => ({ ...prev, [field]: value }));
-  };
+    setEquipmentData((prev) => ({ ...prev, [field]: value }))
+  }
 
-  const handleEquipmentRequirementsChange = (data: EquipmentRequirements) => {
-    setEquipmentData(prev => ({ ...prev, equipmentRequirements: data }));
-  };
+  const handleEquipmentRequirementsChange = (equipment: EquipmentRequirements) => {
+    setEquipmentData((prev) => ({ ...prev, equipmentRequirements: equipment }))
+  }
 
   const handleSelectHubSpotContact = (contact: HubSpotContact) => {
-    setEquipmentData(prev => ({
+    setEquipmentData((prev) => ({
       ...prev,
       contactName: `${contact.firstName} ${contact.lastName}`.trim(),
       email: contact.email,
       sitePhone: contact.phone || prev.sitePhone,
       companyName: contact.companyName || prev.companyName,
       siteAddress: contact.contactAddress || contact.companyAddress || prev.siteAddress
-    }));
-  };
+    }))
+  }
 
   return {
     equipmentData,
@@ -49,7 +47,7 @@ export const useEquipmentForm = () => {
     handleEquipmentChange,
     handleEquipmentRequirementsChange,
     handleSelectHubSpotContact
-  };
-};
+  }
+}
 
-export default useEquipmentForm;
+export default useEquipmentForm

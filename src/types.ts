@@ -1,4 +1,4 @@
-import { EquipmentRequirements } from './components/EquipmentRequired'
+import { EquipmentRequirements } from './lib/equipmentCatalog'
 
 export interface EquipmentData {
   projectName?: string
