@@ -1,5 +1,5 @@
-import React from 'react'
-import { X, Plus, Minus } from 'lucide-react'
+import React, { useEffect, useMemo, useState } from 'react'
+import { X, Plus, Minus, ChevronDown, ChevronRight } from 'lucide-react'
 
 export interface EquipmentItem {
   name: string
@@ -52,7 +52,28 @@ type EquipmentField =
   | 'trailers'
   | 'additionalEquipment'
 
+interface EquipmentSection {
+  label: string
+  field: EquipmentField
+  options: string[]
+}
+
+const equipmentSections: EquipmentSection[] = [
+  { label: 'Forklifts', field: 'forklifts', options: forkliftOptions },
+  { label: 'Tractors', field: 'tractors', options: tractorOptions },
+  { label: 'Trailers', field: 'trailers', options: trailerOptions },
+  {
+    label: 'Material Handling & Rigging',
+    field: 'additionalEquipment',
+    options: additionalEquipmentOptions
+  }
+]
+
 const EquipmentRequired: React.FC<EquipmentRequiredProps> = ({ data, onChange }) => {
+  const [searchQuery, setSearchQuery] = useState('')
+  const [showAllOptions, setShowAllOptions] = useState(false)
+  const [activeCategory, setActiveCategory] = useState<EquipmentField | null>(null)
+
   const handleFieldChange = <K extends keyof EquipmentRequirements>(
     field: K,
     value: EquipmentRequirements[K]
@@ -89,6 +110,53 @@ const EquipmentRequired: React.FC<EquipmentRequiredProps> = ({ data, onChange })
     name: string
   ) => data[field].find((i) => i.name === name)?.quantity || 0
 
+  const filteredSections = useMemo(
+    () =>
+      equipmentSections.map((section) => ({
+        ...section,
+        options: section.options.filter((option) =>
+          option.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      })),
+    [searchQuery]
+  )
+
+  const selectedItems = useMemo(
+    () =>
+      equipmentSections.flatMap((section) =>
+        data[section.field].map((item) => ({
+          ...item,
+          field: section.field,
+          label: section.label
+        }))
+      ),
+    [data]
+  )
+
+  useEffect(() => {
+    if (!showAllOptions) {
+      setActiveCategory(null)
+      return
+    }
+
+    const availableSection = filteredSections.find((section) => section.options.length > 0)
+    if (availableSection) {
+      setActiveCategory((prev) => {
+        if (
+          prev &&
+          filteredSections.some(
+            (section) => section.field === prev && section.options.length > 0
+          )
+        ) {
+          return prev
+        }
+        return availableSection.field
+      })
+    } else {
+      setActiveCategory(null)
+    }
+  }, [showAllOptions, filteredSections])
+
   const clearSection = () => {
     onChange({
       crewSize: '',
@@ -98,46 +166,6 @@ const EquipmentRequired: React.FC<EquipmentRequiredProps> = ({ data, onChange })
       additionalEquipment: []
     })
   }
-
-  const renderOptionList = (
-    label: string,
-    field: EquipmentField,
-    options: string[]
-  ) => (
-    <div>
-      <label className="block text-sm font-medium text-white mb-2">{label}</label>
-      <div className="space-y-2">
-        {options.map((option) => {
-          const qty = getQuantity(field, option)
-          return (
-            <div
-              key={option}
-              className="flex items-center justify-between bg-gray-900 border border-accent rounded-lg px-3 py-1 text-white"
-            >
-              <span>{option}</span>
-              <div className="flex items-center space-x-2">
-                <button
-                  type="button"
-                  onClick={() => adjustQuantity(field, option, -1)}
-                  className="p-1 bg-gray-800 rounded hover:bg-gray-700"
-                >
-                  <Minus className="w-4 h-4" />
-                </button>
-                <span>{qty}</span>
-                <button
-                  type="button"
-                  onClick={() => adjustQuantity(field, option, 1)}
-                  className="p-1 bg-gray-800 rounded hover:bg-gray-700"
-                >
-                  <Plus className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          )
-        })}
-      </div>
-    </div>
-  )
 
   return (
     <div className="mt-6 space-y-6">
@@ -171,10 +199,142 @@ const EquipmentRequired: React.FC<EquipmentRequiredProps> = ({ data, onChange })
         </select>
       </div>
 
-      {renderOptionList('Forklifts', 'forklifts', forkliftOptions)}
-      {renderOptionList('Tractors', 'tractors', tractorOptions)}
-      {renderOptionList('Trailers', 'trailers', trailerOptions)}
-      {renderOptionList('Material Handling & Rigging', 'additionalEquipment', additionalEquipmentOptions)}
+      <div className="space-y-4">
+        <div className="bg-gray-900 border border-accent rounded-lg p-4 text-white">
+          <h4 className="text-lg font-semibold mb-3">Selected Equipment</h4>
+          {selectedItems.length > 0 ? (
+            <div className="space-y-2">
+              {selectedItems.map((item) => (
+                <div
+                  key={`${item.field}-${item.name}`}
+                  className="flex items-center justify-between bg-black/40 border border-accent/60 rounded-lg px-3 py-2"
+                >
+                  <div>
+                    <p className="font-medium">{item.name}</p>
+                    <p className="text-xs text-gray-300">{item.label}</p>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      type="button"
+                      onClick={() => adjustQuantity(item.field, item.name, -1)}
+                      className="p-1 bg-gray-800 rounded hover:bg-gray-700"
+                    >
+                      <Minus className="w-4 h-4" />
+                    </button>
+                    <span>{item.quantity}</span>
+                    <button
+                      type="button"
+                      onClick={() => adjustQuantity(item.field, item.name, 1)}
+                      className="p-1 bg-gray-800 rounded hover:bg-gray-700"
+                    >
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-gray-300">No equipment selected yet.</p>
+          )}
+          <button
+            type="button"
+            onClick={() => setShowAllOptions((prev) => !prev)}
+            className="mt-4 inline-flex items-center px-3 py-1 bg-black border border-accent rounded-lg hover:bg-gray-800 transition-colors"
+          >
+            {showAllOptions ? 'Hide equipment list' : 'Add or adjust equipment'}
+          </button>
+        </div>
+
+        {showAllOptions && (
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-white mb-2">Search Equipment</label>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Type to filter equipment"
+                className="w-full px-3 py-2 bg-black border border-accent rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-white"
+              />
+            </div>
+
+            <div className="space-y-2">
+              {filteredSections.map((section) => {
+                const isActive = activeCategory === section.field
+                const hasOptions = section.options.length > 0
+                return (
+                  <div key={section.field} className="border border-accent rounded-lg overflow-hidden">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setActiveCategory((prev) =>
+                          prev === section.field ? null : section.field
+                        )
+                      }
+                      className="w-full flex items-center justify-between gap-3 px-4 py-2 bg-gray-900 text-white hover:bg-gray-800"
+                    >
+                      <span className="flex items-center gap-2">
+                        {isActive ? (
+                          <ChevronDown className="w-4 h-4" aria-hidden="true" />
+                        ) : (
+                          <ChevronRight className="w-4 h-4" aria-hidden="true" />
+                        )}
+                        {section.label}
+                      </span>
+                      <span className="text-sm text-gray-300">
+                        {data[section.field].reduce((total, item) => total + item.quantity, 0)} selected
+                      </span>
+                    </button>
+                    {isActive && (
+                      <div className="bg-black/50 px-4 py-3 space-y-2">
+                        {hasOptions ? (
+                          section.options.map((option) => {
+                            const qty = getQuantity(section.field, option)
+                            return (
+                              <div
+                                key={option}
+                                className="flex items-center justify-between bg-gray-900 border border-accent rounded-lg px-3 py-2 text-white"
+                              >
+                                <span>{option}</span>
+                                <div className="flex items-center space-x-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => adjustQuantity(section.field, option, -1)}
+                                    className="p-1 bg-gray-800 rounded hover:bg-gray-700"
+                                  >
+                                    <Minus className="w-4 h-4" />
+                                  </button>
+                                  <span>{qty}</span>
+                                  <button
+                                    type="button"
+                                    onClick={() => adjustQuantity(section.field, option, 1)}
+                                    className="p-1 bg-gray-800 rounded hover:bg-gray-700"
+                                  >
+                                    <Plus className="w-4 h-4" />
+                                  </button>
+                                </div>
+                              </div>
+                            )
+                          })
+                        ) : (
+                          <p className="text-sm text-gray-300">
+                            No equipment matches your search.
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+              {filteredSections.every((section) => section.options.length === 0) && (
+                <p className="text-sm text-gray-300 text-center py-4">
+                  No equipment matches your search.
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
