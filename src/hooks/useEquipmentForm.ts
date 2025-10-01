@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { HubSpotContact } from '../services/hubspotService';
+import { formatAddressFromParts } from '../lib/address';
 import { EquipmentRequirements } from '../components/EquipmentRequired';
 
 export const useEquipmentForm = () => {
@@ -34,13 +35,50 @@ export const useEquipmentForm = () => {
   };
 
   const handleSelectHubSpotContact = (contact: HubSpotContact) => {
+    const contactPrimaryStreet = contact.contactAddress1 || '';
+    const contactSecondaryStreet = contact.contactAddress || '';
+    const companyPrimaryStreet = contact.companyAddress1 || '';
+    const companySecondaryStreet = contact.companyAddress || '';
+
+    const preferredContactAddress =
+      formatAddressFromParts({
+        street: contactPrimaryStreet,
+        city: contact.contactCity,
+        state: contact.contactState,
+        zip: contact.contactZip
+      }) ||
+      formatAddressFromParts({
+        street: contactSecondaryStreet,
+        city: contact.contactCity,
+        state: contact.contactState,
+        zip: contact.contactZip
+      }) ||
+      contactPrimaryStreet.trim() ||
+      contactSecondaryStreet.trim();
+
+    const preferredCompanyAddress =
+      formatAddressFromParts({
+        street: companyPrimaryStreet,
+        city: contact.companyCity,
+        state: contact.companyState,
+        zip: contact.companyZip
+      }) ||
+      formatAddressFromParts({
+        street: companySecondaryStreet,
+        city: contact.companyCity,
+        state: contact.companyState,
+        zip: contact.companyZip
+      }) ||
+      companyPrimaryStreet.trim() ||
+      companySecondaryStreet.trim();
+
     setEquipmentData(prev => ({
       ...prev,
       contactName: `${contact.firstName} ${contact.lastName}`.trim(),
       email: contact.email,
       sitePhone: contact.phone || prev.sitePhone,
       companyName: contact.companyName || prev.companyName,
-      siteAddress: contact.contactAddress || contact.companyAddress || prev.siteAddress
+      siteAddress: preferredContactAddress || preferredCompanyAddress || prev.siteAddress
     }));
   };
 

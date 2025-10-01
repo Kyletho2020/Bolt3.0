@@ -5,6 +5,13 @@ export interface ParsedAddressParts {
   zip: string
 }
 
+interface AddressPartsInput {
+  street?: string | null
+  city?: string | null
+  state?: string | null
+  zip?: string | null
+}
+
 const toUpperState = (value: string | undefined) =>
   value ? value.toUpperCase() : ''
 
@@ -140,4 +147,39 @@ export const parseAddressParts = (address: string): ParsedAddressParts => {
     state,
     zip
   }
+}
+
+export const formatAddressFromParts = ({
+  street,
+  city,
+  state,
+  zip
+}: AddressPartsInput): string => {
+  const normalizedStreet = street?.trim() ?? ''
+  const normalizedCity = city?.trim() ?? ''
+  const normalizedState = state?.trim()?.toUpperCase() ?? ''
+  const normalizedZip = zip?.trim() ?? ''
+
+  const lines: string[] = []
+
+  if (normalizedStreet) {
+    lines.push(normalizedStreet)
+  }
+
+  const cityStateZipSegments: string[] = []
+
+  if (normalizedCity) {
+    cityStateZipSegments.push(normalizedCity)
+  }
+
+  const stateZip = [normalizedState, normalizedZip].filter(Boolean).join(' ').trim()
+  if (stateZip) {
+    cityStateZipSegments.push(stateZip)
+  }
+
+  if (cityStateZipSegments.length > 0) {
+    lines.push(cityStateZipSegments.join(', '))
+  }
+
+  return lines.join('\n').trim()
 }
