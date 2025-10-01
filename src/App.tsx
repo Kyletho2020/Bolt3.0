@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import {
   FileText,
-  X,
   Bot,
   Archive,
   Plus,
-  Key,
   Copy,
   CheckCircle,
   Mail,
@@ -21,7 +19,6 @@ import {
   generateLogisticsEmail
 } from './components/PreviewTemplates'
 import QuoteSaveManager from './components/QuoteSaveManager'
-import ApiKeySetup from './components/ApiKeySetup'
 import ClarificationsSection from './components/ClarificationsSection'
 import EquipmentForm from './components/EquipmentForm'
 import LogisticsForm from './components/LogisticsForm'
@@ -89,15 +86,12 @@ const App: React.FC = () => {
     closeAIExtractor,
     showHistory,
     openHistory,
-    closeHistory,
-    showApiKeySetup,
-    openApiKeySetup,
-    closeApiKeySetup
+    closeHistory
   } = useModals()
 
   // Hooks
   const sessionId = useSessionId()
-  const { hasApiKey, refetch: refetchApiKey } = useApiKey()
+  const { hasApiKey } = useApiKey()
 
   // Auto-populate pickup address from project address
   useEffect(() => {
@@ -217,10 +211,6 @@ const App: React.FC = () => {
     })
   }
 
-  const handleApiKeyChange = () => {
-    refetchApiKey()
-  }
-
   const handleNewQuote = () => {
     setEquipmentData(initialEquipmentData)
     setLogisticsData(initialLogisticsData)
@@ -294,14 +284,6 @@ const App: React.FC = () => {
           >
             <Save className="w-4 h-4 mr-2" />
             Save Quote
-          </button>
-
-          <button
-            onClick={openApiKeySetup}
-            className="flex items-center px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors border border-accent"
-          >
-            <Key className="w-4 h-4 mr-2" />
-            API Key Setup
           </button>
 
           <button
@@ -491,25 +473,6 @@ const App: React.FC = () => {
           onClose={closeHistory}
           onLoadQuote={handleLoadQuote}
         />
-
-        {showApiKeySetup && (
-          <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
-            <div className="bg-gray-900 border-2 border-accent rounded-2xl shadow-2xl w-full max-w-md">
-              <div className="flex items-center justify-between p-6 border-b-2 border-accent">
-                <h3 className="text-xl font-bold text-white">API Key Setup</h3>
-                <button
-                  onClick={closeApiKeySetup}
-                  className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
-                >
-                  <X className="w-5 h-5 text-white" />
-                </button>
-              </div>
-              <div className="p-6">
-                <ApiKeySetup onApiKeyChange={handleApiKeyChange} />
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   )
