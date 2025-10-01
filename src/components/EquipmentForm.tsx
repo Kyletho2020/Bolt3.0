@@ -12,6 +12,8 @@ interface EquipmentFormProps {
   onRequirementsChange: (data: EquipmentRequirements) => void;
   onSelectContact: (contact: HubSpotContact) => void;
   onCopySiteAddress: () => boolean;
+  onOpenScopeExtractor: () => void;
+  canUseAI: boolean;
   register: UseFormRegister<EquipmentData>;
   errors: FieldErrors<EquipmentData>;
 }
@@ -22,6 +24,8 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({
   onRequirementsChange,
   onSelectContact,
   onCopySiteAddress,
+  onOpenScopeExtractor,
+  canUseAI,
   register,
   errors
 }) => {
@@ -36,6 +40,8 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({
         onChange={onFieldChange}
         onSelectContact={onSelectContact}
         onCopySiteAddress={onCopySiteAddress}
+        onOpenScopeExtractor={onOpenScopeExtractor}
+        canUseAI={canUseAI}
         register={register}
         errors={errors}
       />

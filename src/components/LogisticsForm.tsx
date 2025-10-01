@@ -1,5 +1,5 @@
 import React from 'react'
-import { Truck, Package, Plus, Minus, Trash2, ArrowUp, ArrowDown } from 'lucide-react'
+import { Truck, Package, Plus, Minus, Trash2, ArrowUp, ArrowDown, Bot } from 'lucide-react'
 import { UseFormRegister, FieldErrors } from 'react-hook-form'
 
 interface Piece {
@@ -42,6 +42,8 @@ interface LogisticsFormProps {
   togglePieceSelection: (pieceId: string) => void;
   deleteSelectedPieces: () => void;
   movePiece: (oldIndex: number, newIndex: number) => void;
+  onOpenLogisticsExtractor: () => void;
+  canUseAI: boolean;
   register: UseFormRegister<LogisticsData>;
   errors: FieldErrors<LogisticsData>;
 }
@@ -56,14 +58,31 @@ const LogisticsForm: React.FC<LogisticsFormProps> = ({
   togglePieceSelection,
   deleteSelectedPieces,
   movePiece,
+  onOpenLogisticsExtractor,
+  canUseAI,
   register,
   errors
 }) => {
   return (
     <div className="bg-gray-900 rounded-lg border-2 border-accent p-6">
-      <div className="flex items-center mb-6">
-        <Truck className="w-6 h-6 text-white mr-2" />
-        <h2 className="text-2xl font-bold text-white">Logistics Quote</h2>
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+        <div className="flex items-center">
+          <Truck className="w-6 h-6 text-white mr-2" />
+          <h2 className="text-2xl font-bold text-white">Logistics Quote</h2>
+        </div>
+        <button
+          type="button"
+          onClick={onOpenLogisticsExtractor}
+          disabled={!canUseAI}
+          className={`flex items-center justify-center px-3 py-2 rounded-lg text-sm transition-colors ${
+            canUseAI
+              ? 'bg-accent text-black hover:bg-green-400'
+              : 'bg-gray-700 text-gray-300 cursor-not-allowed'
+          }`}
+        >
+          <Bot className="w-4 h-4 mr-2" />
+          AI Logistics Extractor {canUseAI ? '✓' : '✗'}
+        </button>
       </div>
 
       <div className="space-y-6">
