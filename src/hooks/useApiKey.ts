@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { ApiKeyService } from '../services/apiKeyService'
 
 export const useApiKey = () => {
   const [hasApiKey, setHasApiKey] = useState(false)
@@ -9,10 +10,9 @@ export const useApiKey = () => {
     try {
       setLoading(true)
       setError(null)
-      
-      // Check if VITE_OPENAI_API_KEY is configured in environment
-      const hasKey = !!import.meta.env.VITE_OPENAI_API_KEY
-      console.log('API Key check:', { hasKey, envVar: import.meta.env.VITE_OPENAI_API_KEY ? 'present' : 'missing' })
+
+      const hasKey = await ApiKeyService.hasApiKey()
+      console.log('API Key check:', { hasKey })
       setHasApiKey(hasKey)
     } catch (err) {
       console.error('Error checking API key:', err)
