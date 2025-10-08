@@ -124,12 +124,13 @@ export const generateScopeTemplate = (
     quantity: number
     description: string
     showQuantity?: boolean
+    article?: 'a' | 'an' | ''
   }
 
   const toSummaryEntry = (
     quantity: number,
     name: string,
-    options: { showQuantity?: boolean } = {}
+    options: { showQuantity?: boolean; article?: 'a' | 'an' | '' } = {}
   ): EquipmentSummaryEntry => ({
     quantity,
     description: normalizeEquipmentName(name),
@@ -138,7 +139,10 @@ export const generateScopeTemplate = (
 
   const equipmentEntries: EquipmentSummaryEntry[] = [
     crewSize
-      ? toSummaryEntry(1, `${crewSize}-man crew`, { showQuantity: false })
+      ? toSummaryEntry(1, `${crewSize}-man crew`, {
+          showQuantity: false,
+          article: 'a'
+        })
       : null,
     toSummaryEntry(1, 'gear truck and trailer', { showQuantity: false }),
     ...forklifts.map((f: any) => toSummaryEntry(f.quantity, f.name)),
@@ -152,15 +156,53 @@ export const generateScopeTemplate = (
     ...additionalEquipment.map((item: any) => toSummaryEntry(item.quantity, item.name))
   ].filter((entry): entry is EquipmentSummaryEntry => Boolean(entry && entry.description))
 
-  const equipmentSummaryLine = equipmentEntries.length
-    ? `Omega Morgan to supply: ${equipmentEntries
-        .map((item, index) => {
-          const quantityText =
-            item.showQuantity === false ? '' : `(Qty: ${item.quantity}) `
-          const descriptionText = `${quantityText}${item.description}`.trim()
-          return `(${index + 1}) ${descriptionText}`
-        })
-        .join(', ')}.`
+  const getIndefiniteArticle = (description: string) => {
+    const trimmed = description.trim().toLowerCase()
+
+    if (!trimmed) {
+      return 'a'
+    }
+
+    const firstChar = trimmed[0]
+
+    if ('aeiou'.includes(firstChar)) {
+      return 'an'
+    }
+
+    return 'a'
+  }
+
+  const formatEquipmentDescription = (item: EquipmentSummaryEntry) => {
+    if (item.showQuantity !== false && item.quantity > 1) {
+      return `(Qty: ${item.quantity}) ${item.description}`
+    }
+
+    const article =
+      item.article !== undefined
+        ? item.article
+        : item.showQuantity === false
+          ? ''
+          : getIndefiniteArticle(item.description)
+
+    return article ? `${article} ${item.description}` : item.description
+  }
+
+  const formattedEquipment = equipmentEntries.map(formatEquipmentDescription)
+
+  const equipmentSummaryLine = formattedEquipment.length
+    ? `Omega Morgan to supply ${(() => {
+        if (formattedEquipment.length === 1) {
+          return `${formattedEquipment[0]}.`
+        }
+
+        if (formattedEquipment.length === 2) {
+          return `${formattedEquipment[0]} and ${formattedEquipment[1]}.`
+        }
+
+        return `${formattedEquipment.slice(0, -1).join(', ')}, and ${
+          formattedEquipment[formattedEquipment.length - 1]
+        }.`
+      })()}`
     : 'Omega Morgan to supply necessary crew and equipment.'
 
   const storageLine = logisticsData.storageType
