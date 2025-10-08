@@ -120,44 +120,38 @@ export const generateScopeTemplate = (
     (item: any) => item.quantity > 0
   )
 
-  const formatEquipmentItem = (quantity: number, name: string) => {
-    const normalizedName = normalizeEquipmentName(name)
-    const needsPlural =
-      quantity > 1 && !normalizedName.toLowerCase().endsWith('s')
-    return quantity > 1
-      ? `${quantity} ${needsPlural ? `${normalizedName}s` : normalizedName}`
-      : normalizedName
+  type EquipmentSummaryEntry = {
+    quantity: number
+    description: string
   }
 
-  const crewDescription = crewSize
-    ? `${crewSize === '8' ? 'an' : 'a'} ${crewSize}-man crew`
-    : ''
+  const toSummaryEntry = (quantity: number, name: string): EquipmentSummaryEntry => ({
+    quantity,
+    description: normalizeEquipmentName(name)
+  })
 
-  const equipmentItems = [
-    crewDescription,
-    'gear truck and trailer',
-    ...forklifts.map((f: any) => formatEquipmentItem(f.quantity, f.name)),
-    ...tractors.map((t: any) => formatEquipmentItem(t.quantity, t.name)),
+  const equipmentEntries: EquipmentSummaryEntry[] = [
+    crewSize ? { quantity: 1, description: `${crewSize}-man crew` } : null,
+    { quantity: 1, description: 'gear truck and trailer' },
+    ...forklifts.map((f: any) => toSummaryEntry(f.quantity, f.name)),
+    ...tractors.map((t: any) => toSummaryEntry(t.quantity, t.name)),
     ...trailers.map((t: any) =>
-      formatEquipmentItem(
+      toSummaryEntry(
         t.quantity,
-        t.name.toLowerCase().includes('trailer')
-          ? t.name
-          : `${t.name} trailer`
+        t.name.toLowerCase().includes('trailer') ? t.name : `${t.name} trailer`
       )
     ),
-    ...additionalEquipment.map((item: any) => formatEquipmentItem(item.quantity, item.name))
-  ].filter(Boolean)
+    ...additionalEquipment.map((item: any) => toSummaryEntry(item.quantity, item.name))
+  ].filter((entry): entry is EquipmentSummaryEntry => Boolean(entry && entry.description))
 
-  const equipmentSummary = (() => {
-    if (equipmentItems.length === 0) return ''
-    if (equipmentItems.length === 1) return equipmentItems[0]
-    if (equipmentItems.length === 2)
-      return `${equipmentItems[0]} and ${equipmentItems[1]}`
-    return `${equipmentItems.slice(0, -1).join(', ')} and ${
-      equipmentItems[equipmentItems.length - 1]
-    }`
-  })()
+  const equipmentSummaryLine = equipmentEntries.length
+    ? `Omega Morgan to supply: ${equipmentEntries
+        .map(
+          (item, index) =>
+            `(${index + 1}) (Qty: ${item.quantity}) ${item.description}`
+        )
+        .join(', ')}.`
+    : 'Omega Morgan to supply necessary crew and equipment.'
 
   const storageLine = logisticsData.storageType
     ? `Storage: ${
@@ -187,7 +181,7 @@ ${siteAddress}
 ${contactName}
 ${phone}
 
-Omega Morgan to supply ${equipmentSummary || 'necessary crew and equipment'}.
+${equipmentSummaryLine}
 ${logisticsSection}${scopeOfWork ? `${scopeOfWork}\n\n` : ''}${itemsSection}\nWhen job is complete clean up debris and return to ${shopLocation}.`
 }
 
