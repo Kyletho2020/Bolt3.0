@@ -50,7 +50,7 @@ const additionalEquipmentOptions = [
   '5-ton Gantry',
   "8'x20' Metal Plate",
   "8'x10' Metal Plate",
-  'Lift Platform'
+  'Lift Platform',
   '15-ton Carry Deck'
 ]
 
