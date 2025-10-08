@@ -166,13 +166,40 @@ export const formatAddressFromParts = ({
     lines.push(normalizedStreet)
   }
 
+  const streetParts = normalizedStreet ? parseAddressParts(normalizedStreet) : createEmpty()
+
+  const streetCity = streetParts.city.trim().toLowerCase()
+  const streetState = streetParts.state.trim().toUpperCase()
+  const streetZip = streetParts.zip.trim()
+
+  const normalizedCityLower = normalizedCity.toLowerCase()
+
+  const streetAlreadyHasCity =
+    Boolean(normalizedCity) && streetCity === normalizedCityLower
+
+  const streetAlreadyHasState =
+    Boolean(normalizedState) && streetState === normalizedState
+
+  const streetAlreadyHasZip = Boolean(normalizedZip) && streetZip === normalizedZip
+
   const cityStateZipSegments: string[] = []
 
-  if (normalizedCity) {
+  if (normalizedCity && !streetAlreadyHasCity) {
     cityStateZipSegments.push(normalizedCity)
   }
 
-  const stateZip = [normalizedState, normalizedZip].filter(Boolean).join(' ').trim()
+  const stateZipParts: string[] = []
+
+  if (normalizedState && !streetAlreadyHasState) {
+    stateZipParts.push(normalizedState)
+  }
+
+  if (normalizedZip && !streetAlreadyHasZip) {
+    stateZipParts.push(normalizedZip)
+  }
+
+  const stateZip = stateZipParts.join(' ').trim()
+
   if (stateZip) {
     cityStateZipSegments.push(stateZip)
   }
