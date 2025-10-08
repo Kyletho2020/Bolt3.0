@@ -123,16 +123,24 @@ export const generateScopeTemplate = (
   type EquipmentSummaryEntry = {
     quantity: number
     description: string
+    showQuantity?: boolean
   }
 
-  const toSummaryEntry = (quantity: number, name: string): EquipmentSummaryEntry => ({
+  const toSummaryEntry = (
+    quantity: number,
+    name: string,
+    options: { showQuantity?: boolean } = {}
+  ): EquipmentSummaryEntry => ({
     quantity,
-    description: normalizeEquipmentName(name)
+    description: normalizeEquipmentName(name),
+    ...options
   })
 
   const equipmentEntries: EquipmentSummaryEntry[] = [
-    crewSize ? { quantity: 1, description: `${crewSize}-man crew` } : null,
-    { quantity: 1, description: 'gear truck and trailer' },
+    crewSize
+      ? toSummaryEntry(1, `${crewSize}-man crew`, { showQuantity: false })
+      : null,
+    toSummaryEntry(1, 'gear truck and trailer', { showQuantity: false }),
     ...forklifts.map((f: any) => toSummaryEntry(f.quantity, f.name)),
     ...tractors.map((t: any) => toSummaryEntry(t.quantity, t.name)),
     ...trailers.map((t: any) =>
@@ -146,10 +154,12 @@ export const generateScopeTemplate = (
 
   const equipmentSummaryLine = equipmentEntries.length
     ? `Omega Morgan to supply: ${equipmentEntries
-        .map(
-          (item, index) =>
-            `(${index + 1}) (Qty: ${item.quantity}) ${item.description}`
-        )
+        .map((item, index) => {
+          const quantityText =
+            item.showQuantity === false ? '' : `(Qty: ${item.quantity}) `
+          const descriptionText = `${quantityText}${item.description}`.trim()
+          return `(${index + 1}) ${descriptionText}`
+        })
         .join(', ')}.`
     : 'Omega Morgan to supply necessary crew and equipment.'
 
